@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "NODE_OPTIONS=--no-experimental-strip-types next dev",
+    "build": "NODE_OPTIONS=--no-experimental-strip-types next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "sync-tracker": "sh ./scripts_sync_tracker.sh"

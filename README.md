@@ -1,94 +1,66 @@
-# The Bag Index
+# The Appreciation Index
 
-Value-retention briefs for luxury handbags. Enter a bag and a client horizon; the app researches
-resale and auction data, house financials, ownership / M&A / supply chain, the creative director,
-and social momentum (TikTok, Instagram, Pinterest, search), then scores the bag on five weighted
-layers and renders a sourced, client-ready brief.
+**Will this bag hold its value?** Ask in plain words. Get one clear answer, then the parts that matter: the money, the designer, the culture, the business, the big picture.
 
-Built with Next.js and the Claude API. The rubric that makes the calls lives in `src/lib/rubric.ts`
-and is the product's core IP. Everything else is plumbing.
+A value-retention intelligence tool for luxury handbags, built for shoppers, stylists and sourcers who want to know which pieces will still matter in five or ten years, and which to buy simply to wear.
 
-## How it works
+![Blazy's first year at Chanel: retail vs resale](docs/chanel_blazy_first_year.png)
 
-1. **Research** (`src/lib/research.ts`): one Claude call with server-side web search builds an
-   evidence dossier under eight required headings (retail price, resale, house results, ownership
-   and M&A, supply chain, creative director, social momentum, macro).
-2. **Score** (`src/lib/score.ts`): a second Claude call reads only that dossier and returns a
-   structured JSON brief (structured outputs guarantee the shape; the composite is recomputed
-   from the weights in code).
-3. **Save + render**: the brief is stored in Supabase (or in memory in local dev) and rendered
-   at `/brief/<id>`, which is the page you share with a client.
+## What it does
 
-## Run it locally
+1. **You ask a question.** "Is the Chanel Souplissimo worth buying?" A small model call turns that into a structured request (house, bag, size, horizon, client type, generation).
+2. **It reads its own evidence first.** A tracker database of resale listings, realised sales, sourced retail prices, runway looks, creative-director history, supply-chain facts and cultural signals is turned into a dossier before any web search happens.
+3. **It researches the gaps.** Claude's server-side web search fills in what the tracker lacks, with every claim tied to a retrieved source.
+4. **It scores five layers** on a transparent rubric and returns a structured brief (JSON, schema-enforced):
 
-You need Node.js 20 or newer. Install it from https://nodejs.org (the LTS download), then:
+| Layer | Weight | What it weighs |
+|---|---|---|
+| Resale and auction record | 30 | Retention vs retail now and retail at purchase, sold prices, liquidity, markdowns |
+| House health, ownership, supply chain | 20 | Financials, M&A, tanneries and workshops, pricing power, material scarcity |
+| Creative-director lineage and history | 15 | Who designed it, era premiums, archive codes, the scandal ledger |
+| Social and cultural momentum | 25 | TikTok, Instagram, search, saves, and whether the moment is durable |
+| Macro | 10 | Tariffs, FX, luxury sentiment, regulation |
+
+5. **It answers like a person.** A verdict in plain words ("Buy carefully. The version matters."), then six cards, each one idea with a "Why?" that opens the evidence. Every answer ends with the same line: *value-retention analysis based on public market data, not investment advice.*
+
+Calls: **Core Hold** · **Selective** · **Watch** · **Wear, Don't Bank**.
+
+## Why it exists
+
+Creative directors are moving house at a pace the market has never seen: Blazy to Chanel, Anderson to Dior, Chiuri to Fendi, Mulier out of Alaïa. Resale platforms publish asking prices with an incentive attached. Retail prices climb every January. Nobody puts retail-then, retail-now and resale-now side by side for a specific bag and says what it means. This does.
+
+![Chanel by designer era](docs/chanel_eras_editorial.png)
+
+## Architecture
+
+![Architecture](docs/architecture.png)
+
+- **App:** Next.js 15, TypeScript, Anthropic SDK (structured outputs via Zod, web search tool, adaptive thinking, prompt caching). Streams progress over NDJSON so a two-to-four-minute research turn survives HTTP timeouts.
+- **Evidence:** a SQLite tracker (`node:sqlite`, read-only) fed by a separate data lab: Shopify storefront collectors for five resale sites, auction parsers, runway capture, and human-pace reads of sources behind the author's own logins. Collectors run on a daily and bi-weekly schedule.
+- **Analysis:** SQL views for size-matched retention (median ask ÷ current retail, bags only), sell-through proxies, item trajectories, and a runway-to-resale catalogue.
+- **Routes:** `/` ask box · `/api/ask` question → brief · `/classic` the full analyst form · `/api/brief` · `/briefs` library · `/brief/[id]`.
+
+The tracker database itself is not committed. It is synced in locally with `scripts_sync_tracker.sh` and contains derived data only: no images, no article text, no usernames, no listing dumps. Every row carries a source URL and retrieval time.
+
+## Running it
 
 ```bash
-cd ~/Desktop/bag-index
 npm install
-cp .env.example .env.local
-# open .env.local and paste your ANTHROPIC_API_KEY
-npm run dev
+cp .env.example .env.local   # add ANTHROPIC_API_KEY
+npm run build && npm run start
 ```
 
-Open http://localhost:3000.
+Then open http://localhost:3000. (`npm run dev` works too, but on Node 24 the production build is the reliable path; the scripts already set the flag Node 24 needs.)
 
-## Deploy it (Vercel, free tier)
+Without a tracker database the app still works and says so in each brief; it simply researches from the web.
 
-1. Push this folder to a GitHub repository.
-   ```bash
-   cd ~/Desktop/bag-index
-   git init && git add -A && git commit -m "The Bag Index v0.1"
-   gh repo create bag-index --private --source=. --push
-   ```
-2. Go to https://vercel.com, "Add New Project", import the repo. Framework is auto-detected.
-3. In the project's Environment Variables add `ANTHROPIC_API_KEY`, and optionally `ACCESS_CODE`,
-   `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
-4. Deploy. Research turns can run two to four minutes; `maxDuration = 300` is set on the API route,
-   which needs Vercel's Fluid Compute (on by default for new projects). If a brief times out at 60s,
-   check that setting in Project Settings → Functions.
+## Data ethics
 
-## The tracker (Katie's Fashion Data Lab)
+- Sanctioned feeds and storefront JSON first; robots.txt and terms respected; request caps and 4–6 second spacing.
+- Never past a login, paywall or CAPTCHA. Sources behind the author's subscriptions are read at human pace in her own browser and stored as derived rows only.
+- Resale platforms profit from resale; their reports are cited as such. Asking prices are never presented as sales.
+- Every brief is value-retention analysis based on public market data, not investment advice. Past resale performance does not guarantee future results.
 
-The analyst reads a sourced evidence dossier from `data/tracker.db` (a read-only copy of the
-Fashion Data Lab SQLite database) before it searches the web. Locally it prefers the live Desktop
-copy. Before each deploy run `npm run sync-tracker` and commit the refreshed `data/tracker.db`.
-Set `TRACKER_DB_PATH` to override.
+## Status
 
-## Persistent storage (Supabase, free tier)
-
-1. Create a project at https://supabase.com.
-2. Open the SQL editor, paste `supabase/schema.sql`, run it.
-3. Copy the project URL and the **service role** key (Settings → API) into your env vars.
-   The service-role key is server-only; never expose it in client code.
-
-## Pilot access
-
-Set `ACCESS_CODE` to any string and share it with pilot users. Every page and API route is gated
-until the code is entered once (30-day cookie). Leave it blank to open the app.
-
-## Cost
-
-Each brief makes two Claude calls. At Claude Opus 5 list pricing ($5 / $25 per million input /
-output tokens) a brief that reads ~60k tokens of search results and writes ~8k tokens costs
-roughly $0.50. The `usage` column in the database records the real number per brief.
-
-## What's deliberately not here yet
-
-- **Payments.** Stripe Checkout + a `customers` table is the next step once a pilot user says
-  they would pay. Don't build billing before that.
-- **Accounts.** The passcode gate is enough for a pilot. Replace with Supabase Auth or Clerk when
-  there are more than a handful of users.
-- **Your own data layer.** The Fashion Data Lab database on the Desktop (Google Trends time-series,
-  scored briefs) can be exposed to the research step as a custom tool so the model reads your
-  proprietary history alongside web search. That is where the moat compounds.
-- **Refusal fallbacks.** For hardening, the research call can pass Anthropic's server-side
-  `fallbacks: "default"` (beta header `server-side-fallback-2026-07-01`) so a rare policy decline
-  is re-run on a fallback model automatically. Refusals on this content are very unlikely.
-
-## Legal
-
-Every brief ends with: *"This is value-retention analysis based on public market data, not
-investment advice. Past resale performance does not guarantee future results."* Keep that line in
-the interface. Before charging, get a lawyer's read on terms of service and on how resale-platform
-report data may be reused in a paid product.
+v0.2, October 2026. Working end to end on a laptop; a stylist pilot is next. Built by Katie Graves (Cornell Tech MBA) with Claude.

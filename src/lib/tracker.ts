@@ -109,7 +109,7 @@ export function buildTrackerDossier(house: string, bag: string): TrackerDossier 
   const listingStats = q<Row>(
     `select source, model_guess, count(*) as n, round(avg(price)) as mean_ask,
             round(min(price)) as min_ask, round(max(price)) as max_ask, max(last_seen) as as_of
-     from resale_listings where price is not null and ${likeAny("brand", hTerms)} and lower(model_guess) like ?
+     from v_bag_listings where price is not null and ${likeAny("brand", hTerms)} and lower(model_guess) like ?
      group by source, model_guess having n >= 3 order by n desc limit 12`,
     [...likeParams(hTerms), `%${bagTerm}%`],
   );
@@ -122,6 +122,46 @@ export function buildTrackerDossier(house: string, bag: string): TrackerDossier 
       ...listingStats.map(
         (l) =>
           `${l.source} · ${l.model_guess} (as of ${l.as_of}): n=${l.n}, mean ask $${l.mean_ask}, range $${l.min_ask}–$${l.max_ask}`,
+      ),
+    ]),
+  );
+
+  // 2b. RETAIL vs RESALE — Katie: "comparing retail prices originally to what they sell for second hand is INTEGRAL"
+  const retailNow = q<Row>(
+    `select house, model, size_or_spec, retail_now, effective_date, source_url from v_retail_current
+     where ${likeAny("house", hTerms)} and lower(model) like ? limit 3`,
+    [...likeParams(hTerms), `%${bagTerm}%`],
+  );
+  const retailHist = q<Row>(
+    `select year, retail_that_year, price_type, source_url from v_retail_history
+     where ${likeAny("house", hTerms)} and lower(model) like ? order by year limit 10`,
+    [...likeParams(hTerms), `%${bagTerm}%`],
+  );
+  const retention = q<Row>(
+    `select source, snapshot_date, n_listings, median_ask, retail_now, retention_vs_current_retail_pct, reference_size
+     from v_retail_vs_resale_asks where ${likeAny("house", hTerms)} and lower(model) like ?
+     order by snapshot_date desc, n_listings desc limit 10`,
+    [...likeParams(hTerms), `%${bagTerm}%`],
+  );
+  const sold = q<Row>(
+    `select read_date, era_guess, condition, sold_or_ask, sold, trr_est_retail, pct_of_trr_est_retail, retail_now, pct_of_current_retail
+     from v_retail_vs_resale_sold where ${likeAny("house", hTerms)} and lower(model) like ? order by read_date desc limit 12`,
+    [...likeParams(hTerms), `%${bagTerm}%`],
+  );
+  const histLine = retailHist.length
+    ? `Retail price path (US, reference size): ${retailHist.map((h) => `${h.year} $${h.retail_that_year}${h.price_type === "launch" ? " (launch)" : ""}`).join(" → ")}`
+    : "";
+  out.push(
+    section("RETAIL vs RESALE (tracker; lead the brief with this)", [
+      ...retailNow.map((r) => `Current US retail, ${r.size_or_spec}: $${r.retail_now} as of ${r.effective_date} (${r.source_url})`),
+      ...(histLine ? [histLine] : []),
+      ...retention.map(
+        (r) =>
+          `${r.source} · ${r.snapshot_date}: n=${r.n_listings}, median ask $${r.median_ask}${r.retail_now ? ` = ${r.retention_vs_current_retail_pct}% of current retail ($${r.retail_now}, ${r.reference_size})` : " (no retail reference yet)"}`,
+      ),
+      ...sold.map(
+        (r) =>
+          `RealReal read ${r.read_date}: ${r.era_guess ?? ""} ${r.condition ?? ""} ${r.sold ? "SOLD" : "asking"} $${r.sold_or_ask}${r.trr_est_retail ? ` = ${r.pct_of_trr_est_retail}% of TRR est. retail $${r.trr_est_retail}` : ""}${r.retail_now ? `; ${r.pct_of_current_retail}% of current retail` : ""}`,
       ),
     ]),
   );

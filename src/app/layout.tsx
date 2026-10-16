@@ -8,8 +8,8 @@ const body = IBM_Plex_Sans({ subsets: ["latin"], variable: "--font-body", weight
 const mono = IBM_Plex_Mono({ subsets: ["latin"], variable: "--font-mono", weight: ["400", "500"] });
 
 export const metadata: Metadata = {
-  title: "The Bag Index",
-  description: "Value-retention briefs for luxury handbags, sourced and scored.",
+  title: "The Appreciation Index",
+  description: "Which luxury pieces hold their value, and which to buy to wear.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -17,10 +17,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
         <nav className="nav">
-          <Link href="/" className="brand">The Bag Index</Link>
+          <Link href="/" className="brand">The Appreciation Index</Link>
           <div className="links">
-            <Link href="/">New brief</Link>
-            <Link href="/briefs">Past briefs</Link>
+            <Link href="/">Ask</Link>
+            <Link href="/briefs">Past answers</Link>
+            <Link href="/classic">Analyst form</Link>
           </div>
         </nav>
         {children}
