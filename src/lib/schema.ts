@@ -16,7 +16,17 @@ export const LayerScore = z.object({
   evidence: z.array(EvidenceItem).describe("One to six items."),
 });
 
+export const SIGNAL_INTENTS = ["flip_1y", "hold_5y", "hold_10y", "wear"] as const;
+export const Signal = z.object({
+  intent: z.enum(SIGNAL_INTENTS).describe("flip_1y = buy now, sell within a year. hold_5y = buy now, sell in about five years. hold_10y = buy now, keep ten years. wear = buy to use, value is secondary."),
+  verdict: z.enum(["yes", "no", "wait"]).describe("yes = do it. no = don't, for this intent. wait = not yet; say what to wait for in why."),
+  why: z.string().describe("One plain sentence, under 25 words, no jargon, that a non-expert understands. Name the one fact that decides it."),
+});
+
 export const BriefResult = z.object({
+  plain_answer: z.string().describe("The whole answer in one short sentence, under 16 words, written for someone who will read nothing else. No numbers unless one number IS the answer."),
+  signals: z.array(Signal).describe("Exactly four entries, one per intent, in the order flip_1y, hold_5y, hold_10y, wear."),
+  timing: z.string().describe("One sentence on WHEN to buy or sell: a price increase ahead, a season to wait for, a market that is cooling. Under 25 words."),
   call: z.enum(CALLS),
   confidence: z.enum(["High", "Medium", "Low"]),
   one_line: z.string().describe("The call in plain English for a client, one sentence."),
@@ -39,6 +49,7 @@ export const BriefResult = z.object({
 });
 
 export type BriefResult = z.infer<typeof BriefResult>;
+export type Signal = z.infer<typeof Signal>;
 export type EvidenceItem = z.infer<typeof EvidenceItem>;
 
 export const BriefInput = z.object({

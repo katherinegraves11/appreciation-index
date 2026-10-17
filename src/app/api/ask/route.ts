@@ -3,6 +3,7 @@ import { runResearch } from "@/lib/research";
 import { runScoring } from "@/lib/score";
 import { saveBrief } from "@/lib/db";
 import { MODEL } from "@/lib/anthropic";
+import { quickNumbers } from "@/lib/tracker";
 
 export const maxDuration = 300;
 export const runtime = "nodejs";
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
         const parsed = await parseQuestion(question);
         if (!parsed.ok) { send({ clarification: parsed.clarification }); return; }
         const input = parsed.input;
-        send({ parsed: { house: input.house, bag: input.bag, spec: input.spec || "" }, status: `Looking up the ${input.house} ${input.bag}…` });
+        send({ parsed: { house: input.house, bag: input.bag, spec: input.spec || "" }, interpretation: parsed.interpretation, status: parsed.interpretation ? `${parsed.interpretation} Looking it up…` : `Looking up the ${input.house} ${input.bag}…` });
         const research = await runResearch(input, (line) => send({ status: line }));
         send({ status: "Weighing it up…" });
         const scored = await runScoring(input, research.dossier);
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
           input, dossier: research.dossier, sources: research.sources, result: scored.result, model: MODEL,
           usage: { input_tokens: research.usage.input_tokens + scored.usage.input_tokens, output_tokens: research.usage.output_tokens + scored.usage.output_tokens },
         });
-        send({ done: true, id, result: scored.result, input: { house: input.house, bag: input.bag, spec: input.spec || "" } });
+        send({ done: true, id, result: scored.result, input: { house: input.house, bag: input.bag, spec: input.spec || "" }, numbers: quickNumbers(input.house, input.bag) });
       } catch (err) {
         send({ error: err instanceof Error ? err.message : "Something went wrong." });
       } finally {

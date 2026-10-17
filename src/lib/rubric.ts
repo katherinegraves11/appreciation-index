@@ -132,4 +132,11 @@ Write the dossier as organized notes under those nine headings. For every fact, 
 
 export const SCORING_INSTRUCTIONS = `${COHORT_LENS}
 
+SIGNALS (the part the client actually reads). Produce four signals, one per intent, each yes / no / wait with a one-sentence why in plain words:
+- flip_1y (buy now, sell within a year): "yes" only if there is evidence of realised sales above retail AND liquidity (fast sell-through or many listings clearing). Asking prices alone are never enough. Launch-scarcity premiums get "wait" or "no".
+- hold_5y (buy now, sell in about five years): "yes" if size-matched retention against current retail is roughly 85%+ with durable demand and stable house; "wait" when the thesis is forming; "no" when retention is below ~60% or the demand is a press cycle.
+- hold_10y (buy now, keep ten years): "yes" only for archive codes or Hermès-tier structural scarcity with a documented multi-year retail and resale path; otherwise "wait" or "no". Be stricter than hold_5y.
+- wear (buy to use, value is secondary): usually "yes"; "no" only if quality, durability or authenticity problems are documented; "wait" if a price increase or a better version is imminent.
+Each why names the single deciding fact (e.g. "Two sold at $17,995 against $8,400 retail, but only two"). plain_answer is the one sentence a busy person reads; timing says when to act. Never contradict the layer scores or the call.
+
 Using only the dossier provided (and nothing from memory that is not in it), score the bag on the five layers and produce the client brief as structured data. Scores must be justified by evidence lines in the dossier. Every evidence item must carry the source it came from. If the dossier is thin on a layer, score conservatively and lower the confidence. Composite must equal the weighted average of the layer scores, rounded to the nearest integer. End with the disclaimer verbatim: "${DISCLAIMER}"`;

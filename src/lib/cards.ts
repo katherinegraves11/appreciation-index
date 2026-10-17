@@ -33,3 +33,25 @@ export const CALL_WORDS: Record<string, string> = {
   "Watch": "Wait. The signal isn't clear yet.",
   "Wear, Don't Bank": "Buy it to wear, not to hold value.",
 };
+
+
+export const INTENT_LABEL: Record<string, { title: string; sub: string }> = {
+  flip_1y: { title: "Sell within a year", sub: "Buy now, sell soon" },
+  hold_5y: { title: "Hold five years", sub: "Buy now, sell around 2031" },
+  hold_10y: { title: "Keep ten years", sub: "Buy now, keep" },
+  wear: { title: "Just to wear", sub: "Value is secondary" },
+};
+export const VERDICT_WORD: Record<string, string> = { yes: "Buy", no: "Don't", wait: "Wait" };
+
+/** Signals for the four intents. Older briefs have none; derive a cautious set from the call so the page never shows a gap. */
+export function toSignals(r: BriefResult) {
+  if (Array.isArray(r.signals) && r.signals.length) return r.signals;
+  const c = r.call;
+  const v5 = c === "Core Hold" ? "yes" : c === "Selective" ? "wait" : c === "Watch" ? "wait" : "no";
+  return [
+    { intent: "flip_1y", verdict: "no", why: "No realised sales above retail in this brief; asking prices are not sales." },
+    { intent: "hold_5y", verdict: v5, why: r.one_line },
+    { intent: "hold_10y", verdict: c === "Core Hold" ? "wait" : "no", why: "Ten years needs a documented multi-year price path; this brief does not have one." },
+    { intent: "wear", verdict: "yes", why: "Nothing in the evidence argues against buying it to use." },
+  ] as const;
+}

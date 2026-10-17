@@ -60,7 +60,7 @@ function section(title: string, lines: string[]): string {
 
 export type TrackerDossier = { text: string; rowCount: number; available: boolean };
 
-export function buildTrackerDossier(house: string, bag: string): TrackerDossier {
+export function buildTrackerDossier(house: string, bag: string, spec?: string): TrackerDossier {
   const db = open();
   if (!db) return { text: "", rowCount: 0, available: false };
 
@@ -166,6 +166,35 @@ export function buildTrackerDossier(house: string, bag: string): TrackerDossier 
     ]),
   );
 
+  // 2c. FAMILY MATCHES — when the question is about an era, material, finish or collection (pony hair, cheetah,
+  // Métiers d'Art, Blazy-era, Philo-era), match listing titles word by word so the dossier is not empty.
+  const famWords = norm(`${bag} ${spec ?? ""}`).split(" ").filter((w) => w.length > 3 && !["bags", "bag", "pieces", "piece", "with", "from", "that", "this", "2026", "2025"].includes(w));
+  if (famWords.length) {
+    const where = famWords.map(() => "lower(title) like ?").join(" or ");
+    const fp = famWords.map((w) => `%${w}%`);
+    const trrFam = q<Row>(
+      `select model_guess, count(*) n, sum(sold) sold, round(avg(price)) avg_ask, min(price) lo, max(price) hi, max(read_date) last_read
+       from trr_item_reads where ${likeAny("house", hTerms)} and (${where}) group by model_guess having n >= 2 order by n desc limit 12`,
+      [...likeParams(hTerms), ...fp],
+    );
+    const soldFam = q<Row>(
+      `select title, price, read_date from trr_item_reads where ${likeAny("house", hTerms)} and sold=1 and (${where}) order by price desc limit 15`,
+      [...likeParams(hTerms), ...fp],
+    );
+    const listFam = q<Row>(
+      `select source, model_guess, count(*) n, round(avg(price)) avg_ask, min(price) lo, max(price) hi from v_bag_listings
+       where ${likeAny("brand", hTerms)} and (${where}) group by source, model_guess having n >= 2 order by n desc limit 12`,
+      [...likeParams(hTerms), ...fp],
+    );
+    out.push(
+      section(`Family matches (tracker; titles containing: ${famWords.join(", ")})`, [
+        ...trrFam.map((r) => `RealReal · ${r.model_guess}: ${r.n} tiles, ${r.sold} SOLD, avg ask $${r.avg_ask} (range $${r.lo}–$${r.hi}), last read ${r.last_read}`),
+        ...soldFam.map((r) => `SOLD on RealReal ${r.read_date}: ${String(r.title).slice(0, 90)} — $${r.price}`),
+        ...listFam.map((r) => `${r.source} · ${r.model_guess}: ${r.n} asks, avg $${r.avg_ask} (range $${r.lo}–$${r.hi})`),
+      ]),
+    );
+  }
+
   // 3. Momentum (search, saved searches, supply, rankings)
   const mom = q<Row>(
     `select term, source, metric, value, period_start, period_end from momentum
@@ -227,4 +256,70 @@ export function buildTrackerDossier(house: string, bag: string): TrackerDossier 
   db.close();
   const text = `## TRACKER EVIDENCE (Katie's Fashion Data Lab — verified, sourced rows; treat as primary evidence)\n\n${out.join("\n")}`;
   return { text, rowCount: n, available: true };
+}
+
+
+/** What is moving on resale right now: a compact cheat sheet the question parser uses to resolve vague phrasing. */
+export function hotList(): string {
+  const db = open();
+  if (!db) return "(tracker unavailable)";
+  try {
+    const rows = db.prepare(`
+      select house, model_guess, era_guess, count(*) n, sum(sold) sold,
+             round(avg(cast(nullif(substr(title, instr(title,'saves=')+6, 3),'') as real))) saves,
+             round(avg(price)) avg_ask,
+             group_concat(distinct case when lower(title) like '%pony%' or lower(title) like '%cheetah%' then 'pony hair / cheetah' end) finish
+      from trr_item_reads where read_date >= date('now','-45 days') and model_guess is not null and model_guess <> ''
+      group by house, model_guess, era_guess having n >= 3 order by sold desc, saves desc limit 40`).all() as Row[];
+    db.close();
+    return rows.map((r) => `- ${r.house} ${r.model_guess}${r.era_guess ? ` (${r.era_guess})` : ""}${r.finish ? `, ${r.finish}` : ""}: ${r.n} listed, ${r.sold} sold, ~${r.saves ?? 0} saves, avg ask $${r.avg_ask}`).join("\n");
+  } catch {
+    db.close();
+    return "(tracker unavailable)";
+  }
+}
+
+
+/** Quick numbers for the answer strip: retail, sold, asks, saves for one house+model (size-matched where possible). */
+export type QuickNumbers = {
+  retail_now: number | null; retail_launch: number | null; retail_size: string | null;
+  ask_median: number | null; ask_n: number; sold_median: number | null; sold_n: number; sold_pct_of_retail: number | null;
+  saves_avg: number | null; trend_pct: number | null; trr_sold_90d: number; icon: boolean;
+};
+export function quickNumbers(house: string, bag: string): QuickNumbers | null {
+  const db = open(); if (!db) return null;
+  const hTerms = houseTerms(house); const bagTerm = norm(bag).split(" ").filter((w) => w.length > 2)[0] ?? norm(bag);
+  const g = <T extends Row>(sql: string, params: (string | number)[] = []): T | undefined => { try { return db.prepare(sql).get(...params) as T | undefined; } catch { return undefined; } };
+  const rc = g<Row>(`select retail_now, size_or_spec from v_retail_current where ${likeAny("house", hTerms)} and lower(model) like ? limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
+  const launch = g<Row>(`select price from retail_reference where ${likeAny("house", hTerms)} and lower(model) like ? and price_type='launch' order by effective_date limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
+  const sold = g<Row>(`select n_sold_same_size n, median_sold m, sold_pct_of_retail p from v_sold_vs_retail where ${likeAny("house", hTerms)} and lower(model) like ? limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
+  const ask = g<Row>(`select n_listings_same_size n, median_ask_same_size m from v_retention_scoreboard_sized where ${likeAny("house", hTerms)} and lower(model) like ? limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
+  const trr = g<Row>(`select round(avg(cast(nullif(substr(title, instr(title,'saves=')+6,3),'') as real))) saves, sum(sold) sold90 from trr_item_reads where ${likeAny("house", hTerms)} and lower(model_guess) like ? and read_date >= date('now','-90 days')`, [...likeParams(hTerms), `%${bagTerm}%`]);
+  const trend = g<Row>(`select a.median_ask a0, b.median_ask a1 from resale_aggregates a join resale_aggregates b on a.source=b.source and a.house=b.house and a.model=b.model where ${likeAny("a.house", hTerms)} and lower(a.model) like ? and a.snapshot_date < b.snapshot_date order by b.snapshot_date desc, a.snapshot_date desc limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
+  const icon = g<Row>(`select launch_year from bags where ${likeAny("house", hTerms)} and lower(model) like ? and launch_year <= 2010 limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
+  db.close();
+  return {
+    retail_now: (rc?.retail_now as number) ?? null, retail_launch: (launch?.price as number) ?? null, retail_size: (rc?.size_or_spec as string) ?? null,
+    ask_median: (ask?.m as number) ?? null, ask_n: (ask?.n as number) ?? 0,
+    sold_median: (sold?.m as number) ?? null, sold_n: (sold?.n as number) ?? 0, sold_pct_of_retail: (sold?.p as number) ?? null,
+    saves_avg: (trr?.saves as number) ?? null, trend_pct: trend?.a0 && trend?.a1 ? Math.round((((trend.a1 as number) - (trend.a0 as number)) / (trend.a0 as number)) * 1000) / 10 : null,
+    trr_sold_90d: (trr?.sold90 as number) ?? 0, icon: !!icon,
+  };
+}
+
+/** The race board: one row per house, from sold prices (holds value) and sell-through/saves (heat). */
+export type RaceRow = { house: string; models: number; sold_pct: number | null; heat: number | null; delist_pct: number | null; saves: number | null; sold_90d: number };
+export function raceBoard(): RaceRow[] {
+  const db = open(); if (!db) return [];
+  try {
+    const rows = db.prepare(`
+      with hold as (select house, count(*) models, round(avg(sold_pct_of_retail)) sold_pct from v_sold_vs_retail group by house),
+      heat as (select house, round(avg(cast(nullif(substr(title, instr(title,'saves=')+6,3),'') as real))) saves, sum(sold) sold90 from trr_item_reads where read_date >= date('now','-90 days') group by house),
+      dl as (select brand house, round(100.0*sum(gone)/sum(listed_before),1) delist from v_disappearance group by brand)
+      select h.house, h.models, h.sold_pct, t.saves, t.sold90, d.delist
+      from hold h left join heat t on t.house=h.house left join dl d on d.house=h.house order by h.sold_pct desc`).all() as Row[];
+    db.close();
+    return rows.map((r) => ({ house: String(r.house), models: Number(r.models), sold_pct: (r.sold_pct as number) ?? null, saves: (r.saves as number) ?? null, sold_90d: Number(r.sold90 ?? 0), delist_pct: (r.delist as number) ?? null,
+      heat: r.saves != null || r.delist != null ? Math.round(Math.min(100, ((r.saves as number) ?? 20) * 1.2 + ((r.delist as number) ?? 30))) : null }));
+  } catch { db.close(); return []; }
 }

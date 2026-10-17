@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { BriefResult } from "@/lib/schema";
-import { toCards, CALL_WORDS, type Card } from "@/lib/cards";
+import { toCards, toSignals, INTENT_LABEL, VERDICT_WORD, CALL_WORDS, type Card } from "@/lib/cards";
 
 const MOOD_WORD = { strong: "Good sign", mixed: "Mixed", weak: "Weak spot" } as const;
 
@@ -47,19 +47,35 @@ function CardBox({ c }: { c: Card }) {
 
 export default function Cards({ result, bagName, briefId }: { result: BriefResult; bagName: string; briefId?: string }) {
   const cards = toCards(result);
+  const signals = toSignals(result);
   const [sides, setSides] = useState(false);
+  const [detail, setDetail] = useState(false);
   return (
     <div className="answer">
       <div className="verdict">
         <p className="k">{bagName}</p>
-        <h2 className="verdict-call">{CALL_WORDS[result.call] ?? result.call}</h2>
-        <p className="verdict-line">{result.one_line}</p>
+        <h2 className="verdict-call">{result.plain_answer || CALL_WORDS[result.call] || result.call}</h2>
+        {result.timing && <p className="verdict-line">{result.timing}</p>}
         <p className="verdict-meta">
           <span className="pill">{result.call}</span>
-          <span className="pill">{result.composite} / 100</span>
           <span className="pill">Confidence: {result.confidence.toLowerCase()}</span>
         </p>
       </div>
+
+      <div className="signals" aria-label="What to do">
+        {signals.map((s) => (
+          <section key={s.intent} className={`signal ${s.verdict}`}>
+            <p className="k">{INTENT_LABEL[s.intent]?.title ?? s.intent}</p>
+            <p className="sig-word">{VERDICT_WORD[s.verdict]}</p>
+            <p className="sig-why">{s.why}</p>
+          </section>
+        ))}
+      </div>
+
+      <button type="button" className="more detail-toggle" onClick={() => setDetail(!detail)} aria-expanded={detail}>
+        {detail ? "Hide the why" : "Show me why"}
+      </button>
+      {detail && (<>
 
       <div className="cards">{cards.map((c) => <CardBox key={c.key} c={c} />)}</div>
 
@@ -75,6 +91,8 @@ export default function Cards({ result, bagName, briefId }: { result: BriefResul
           </div>
         )}
       </div>
+
+      </>)}
 
       <p className="disclaimer">{result.disclaimer}{briefId && <> · <a href={`/brief/${briefId}`}>Full brief with every source</a></>}</p>
     </div>

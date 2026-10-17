@@ -21,7 +21,7 @@ export async function runResearch(
   input: BriefInput,
   onProgress?: (line: string) => void,
 ): Promise<ResearchOutput> {
-  const tracker = buildTrackerDossier(input.house, input.bag);
+  const tracker = buildTrackerDossier(input.house, input.bag, input.spec || undefined);
   onProgress?.(tracker.available ? `Read ${tracker.rowCount} rows from the tracker…` : "Tracker not available; researching from the web…");
   const messages: Anthropic.MessageParam[] = [
     {
