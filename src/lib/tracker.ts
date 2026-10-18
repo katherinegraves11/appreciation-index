@@ -428,3 +428,27 @@ export function pestelDossier(house: string): string {
   const ev = recent.map((e) => `${e.date} · ${e.category}: ${e.description} (${e.houses_affected ?? "n/a"}) ${e.source_url}`);
   return [section("PESTEL WATCH (tracker: standing list of world factors that move bag values; use for the macro layer and for timing)", lines), ev.length ? section("Recent macro events (last 45 days)", ev) : ""].filter(Boolean).join("\n\n");
 }
+
+
+/** Who controls the house and what they just decided (tracker: ownership_map + stakeholder_decisions). */
+export function ownershipDossier(house: string): string {
+  const db = open(); if (!db) return "";
+  const hTerms = houseTerms(house);
+  const q = <T extends Row>(sql: string, params: (string | number)[] = []): T[] => { try { return db.prepare(sql).all(...params) as T[]; } catch { return []; } };
+  const o = q<Row>(`select * from ownership_map where ${likeAny("house", hTerms)} limit 1`, likeParams(hTerms))[0];
+  const parent = o?.parent as string | undefined;
+  const siblings = parent ? q<Row>(`select house, creative_director, last_major_decision, decision_date from ownership_map where parent = ? and house <> ?`, [parent, o!.house as string]) : [];
+  const dec = q<Row>(`select decision_date, house, actor, decision, implication_for_bags, source_name, source_url from stakeholder_decisions where ${likeAny("house", hTerms)} ${parent ? "or house in (select house from ownership_map where parent = ?)" : ""} order by decision_date desc limit 8`, [...likeParams(hTerms), ...(parent ? [parent] : [])]);
+  db.close();
+  if (!o) return "";
+  const lines = [
+    `${o.house}: parent ${o.parent ?? "independent"}${o.listed ? ` (listed, ${o.ticker})` : " (private)"}. Controlling holder: ${o.controlling_holder} via ${o.holder_vehicle}${o.stake_capital_pct != null ? `, ${o.stake_capital_pct}% of capital / ${o.stake_votes_pct}% of votes as of ${o.stake_as_of}` : ""}. [${o.source_name}; ${o.source_url}; confidence ${o.confidence}]`,
+    `Decision-makers: chair ${o.chair}; CEO ${o.ceo}${o.fashion_president && o.fashion_president !== "—" ? `; fashion president ${o.fashion_president}` : ""}; creative director ${o.creative_director} (since ${o.cd_since}).`,
+    `Succession: ${o.succession_notes}`,
+    `Cross-holdings: ${o.cross_holdings}`,
+    `Last major decision (${o.decision_date}): ${o.last_major_decision}. Implication for bags: ${o.implication_for_bags}`,
+    ...(siblings.length ? [`Sister houses under the same owner: ${siblings.map((s) => `${s.house} (${s.creative_director}; ${s.last_major_decision}, ${s.decision_date})`).join(" · ")}`] : []),
+    ...dec.map((d) => `Decision log ${d.decision_date} · ${d.house} · ${d.actor}: ${d.decision}. → ${d.implication_for_bags} [${d.source_name}; ${d.source_url}]`),
+  ];
+  return section("OWNERSHIP & STAKEHOLDERS (tracker: who controls the house, who decides, what they decided)", lines);
+}
