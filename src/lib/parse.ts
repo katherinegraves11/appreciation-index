@@ -17,6 +17,8 @@ const Parsed = z.object({
   budget: z.string().describe("Budget if stated, else empty."),
   clarification: z.string().describe("If not understood: one friendly sentence asking which bag they mean. Else empty."),
   interpretation: z.string().describe("One short sentence telling the client how you read their question, e.g. 'Reading that as the Chanel Métiers d\'Art 2026 cheetah pony-hair Mini 25.' Empty if not understood."),
+  questionType: z.enum(["bag", "family", "collection"]).describe("bag = one named model. family = a group defined by designer era, material, finish or collection. collection = a whole runway show / season, or a timing question about pre-ordering vs waiting for bags that have not reached stores yet."),
+  season: z.string().describe("For collection questions: the season and show, e.g. 'Spring 2027 ready-to-wear, Paris, 5 Oct 2026'. Else empty."),
 });
 
 /** Turn a plain-English question into the structured input the research pipeline needs. */
@@ -24,12 +26,12 @@ export async function parseQuestion(question: string) {
   const hot = hotList();
   const response = await anthropic.messages.parse({
     model: FAST_MODEL,
-    max_tokens: 600,
+    max_tokens: 1400,
     output_config: { format: zodOutputFormat(Parsed) },
     messages: [
       {
         role: "user",
-        content: `A luxury-handbag client asked: "${question.slice(0, 600)}"\nExtract what they are asking about. Designer hints: Matthieu Blazy = Chanel from Dec 2024 (debut Spring 2026, Oct 2025; Métiers d\'Art Paris–New York Dec 2025 with cheetah pony-hair pieces), and Bottega Veneta 2021–2025 before that. Jonathan Anderson = Dior from 2025, Loewe 2013–2025. Pieter Mulier = Alaïa 2021–2026. Phoebe Philo = Celine 2008–2017. Virginie Viard = Chanel 2019–2024. A question about a designer\'s bags, a material, a finish or a collection is a valid family question: fill house, put the family in bag, list the known pieces in spec. Clients often describe a bag loosely ("the pony hair bag that came out that\'s selling for crazy", "the new Chanel everyone has", "the Alaïa with the long strap"). Resolve such phrases using this list of what is moving on resale right now (from our tracker, most-saved and most-sold first):\n${hot}\nPick the best match, say so in interpretation, and only set understood=false when no house or designer can be inferred.`,
+        content: `A luxury-handbag client asked: "${question.slice(0, 600)}"\nExtract what they are asking about. Designer hints: Matthieu Blazy = Chanel from Dec 2024 (debut Spring 2026, Oct 2025; Métiers d\'Art Paris–New York Dec 2025 with cheetah pony-hair pieces), and Bottega Veneta 2021–2025 before that. Jonathan Anderson = Dior from 2025, Loewe 2013–2025. Pieter Mulier = Alaïa 2021–2026. Phoebe Philo = Celine 2008–2017. Virginie Viard = Chanel 2019–2024. A question about a designer\'s bags, a material, a finish or a collection is a valid family question: fill house, put the family in bag, list the known pieces in spec. Clients often describe a bag loosely ("the pony hair bag that came out that\'s selling for crazy", "the new Chanel everyone has", "the Alaïa with the long strap"). Resolve such phrases using this list of what is moving on resale right now (from our tracker, most-saved and most-sold first):\n${hot}\nPick the best match, say so in interpretation, and only set understood=false when no house or designer can be inferred.\n\nCOLLECTION questions: "the bags that just walked", "the new collection from Paris Fashion Week", "pre-order or wait until it hits stores", "Blazy\'s latest show" are questionType=collection. Fill house, season, and set bag to "<Season> runway bags" (e.g. "Spring 2027 runway bags"); put the known families in spec. Known shows: Chanel Spring 2027 ready-to-wear, Paris, 5 Oct 2026 (Blazy\'s third RTW): oversized CC flap (7 looks), double-pocket flap (6), pocketed hobo (4), flat cut-out-handle tote (4), trapezoid flap, CC Box Bag, strass mini flap, 2.55-inspired curved bag, elongated baguette clutch; in store Jan–Mar 2027. Dior Spring 2027, 29 Sep 2026 (Anderson). Louis Vuitton Spring 2027, 6 Oct 2026. Hermès, Loewe, Celine, Bottega Veneta, Miu Miu, Prada, Balenciaga, Alaïa, The Row also showed Spring 2027 in Sep–Oct 2026.`,
       },
     ],
   });
@@ -39,6 +41,7 @@ export async function parseQuestion(question: string) {
   const input = BriefInput.parse({
     house: p.house, bag: p.bag, spec: p.spec, horizonYears: p.horizonYears, clientType: p.clientType,
     cohort: p.cohort, budget: p.budget, notes: `Client's own words: ${question.slice(0, 500)}`,
+    questionType: p.questionType || "bag", season: p.season || "",
   });
   return { ok: true as const, input, interpretation: p.interpretation || "" };
 }

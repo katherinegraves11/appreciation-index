@@ -37,6 +37,22 @@ export default function Answer({ result, bagName, briefId, numbers }: { result: 
         <div className="stamps"><span className="stamp">{result.call}</span><span className="stamp">confidence {result.confidence.toLowerCase()}</span></div>
       </section>
 
+      {result.options && result.options.length > 0 && (
+        <>
+          <p className="lab stripcap">when to buy</p>
+          <div className="tiles options" aria-label="When to buy">
+            {result.options.slice(0, 3).map((o, i) => (
+              <section key={i} className={`tile on ${CLS[o.verdict]}`}>
+                <svg className="frame" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" stroke="currentColor"><rect x="1.5" y="1.5" width="97" height="97" rx="3" strokeWidth=".6" /><rect x="4" y="4" width="92" height="92" rx="2" strokeWidth=".3" /></svg>
+                <p className="lab intent">{o.label.toLowerCase()}</p>
+                <p className="word">{WORD[o.verdict]}</p>
+                <p className="why">{o.why}</p>
+              </section>
+            ))}
+          </div>
+        </>
+      )}
+
       <div className="tiles" aria-label="What to do">
         {signals.map((s) => (
           <section key={s.intent} className={`tile ${CLS[s.verdict]}`} data-intent={s.intent}>
@@ -70,25 +86,48 @@ export default function Answer({ result, bagName, briefId, numbers }: { result: 
         </>
       )}
 
+      {n?.buzz && (
+        <p className="buzzline">
+          <span className="lab">buzz</span> <b>{n.buzz.score ?? "—"}</b>/100 · {n.buzz.direction ?? "no direction yet"} · {n.buzz.platforms} platform{n.buzz.platforms === 1 ? "" : "s"}{n.buzz.level === "house" ? " · house-level read" : ""}
+          {n.buzz.movers.slice(0, 2).map((m, i) => <span key={i} className="mv"> · {m.platform} “{m.term}” {m.metric === "growth_pct_7d" ? `${m.value > 0 ? "+" : ""}${Math.round(m.value)}% this week` : `${m.metric.replace(/_/g, " ")} ${m.value}`}</span>)}
+        </p>
+      )}
+
       <button type="button" className="why-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "hide the why" : "show me why"}</button>
       {open && (
-        <div className="detail">
-          {cards.map((c) => (
-            <section key={c.key}>
-              <h4>{c.title}</h4>
-              <p className="mood">{c.mood === "strong" ? "good sign" : c.mood === "weak" ? "weak spot" : "mixed"}</p>
-              <p>{c.headline}</p>
-              {c.more && <p>{c.more}</p>}
-              {c.bullets && c.bullets.length > 0 && <ul>{c.bullets.map((b, i) => <li key={i}>{b}</li>)}</ul>}
-              {c.evidence.length > 0 && <ul>{c.evidence.slice(0, 4).map((e, i) => <li key={i}>{e.text} <span className="src">{e.url ? <a href={e.url} target="_blank" rel="noreferrer">{e.source}</a> : e.source}</span></li>)}</ul>}
-            </section>
-          ))}
-          <section>
-            <h4>The two sides</h4>
-            <p className="mood">why yes</p><ul>{result.bull_case.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}</ul>
-            <p className="mood">why not</p><ul>{result.bear_case.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}</ul>
-            <p className="mood">what would change this</p><ul>{result.what_would_change_this.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}</ul>
+        <div className="edit">
+          <section className="glance">
+            <p className="lab">at a glance</p>
+            <ol>{(result.takeaways && result.takeaways.length ? result.takeaways : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}>{t}</li>)}</ol>
           </section>
+
+          <div className="ecards">
+            {cards.filter((c) => c.key !== "buy").map((c) => {
+              const [proof, ...more] = c.evidence;
+              return (
+                <article key={c.key} className={`ecard ${c.mood}`}>
+                  <header><h4>{c.title}</h4><span className="stamp">{c.mood === "strong" ? "good sign" : c.mood === "weak" ? "weak spot" : "mixed"}</span></header>
+                  <p className="h">{c.headline}</p>
+                  {c.soWhat && <p className="so">{c.soWhat}</p>}
+                  {proof && <p className="proof">{proof.text} <span className="src">{proof.url ? <a href={proof.url} target="_blank" rel="noreferrer">{proof.source}</a> : proof.source}</span></p>}
+                  {(more.length > 0 || c.more) && (
+                    <details>
+                      <summary>more</summary>
+                      {c.more && <p>{c.more}</p>}
+                      <ul>{more.slice(0, 5).map((e, i) => <li key={i}>{e.text} <span className="src">{e.url ? <a href={e.url} target="_blank" rel="noreferrer">{e.source}</a> : e.source}</span></li>)}</ul>
+                    </details>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="watch">
+            {result.spec_guidance?.length > 0 && <section><p className="lab">if you buy</p><ul>{result.spec_guidance.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}</ul></section>}
+            <section><p className="lab">for</p><ul>{result.bull_case.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}</ul></section>
+            <section><p className="lab">against</p><ul>{result.bear_case.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}</ul></section>
+            <section><p className="lab">what would change this</p><ul>{result.what_would_change_this.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}</ul></section>
+          </div>
         </div>
       )}
 

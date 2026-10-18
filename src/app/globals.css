@@ -210,3 +210,40 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 .pill{font-size:12px;letter-spacing:.06em;padding:5px 10px;border:1px solid var(--line)}
 @media (max-width:640px){form.brief{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* timing options + buzz line */
+.tiles.options{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:10px}
+.tiles.options .tile{min-height:170px;opacity:1;transform:none}
+.tiles.options .tile::before{content:none}
+.buzzline{text-align:center;margin:18px auto 0;max-width:70ch;font-size:16px;color:var(--ink-2);line-height:1.5}
+.buzzline b{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--ink)}
+.buzzline .mv{white-space:nowrap}
+
+/* the why, cut like an editor's page: takeaways, five fixed cards, then what to watch */
+.edit{margin-top:22px}
+.glance{max-width:62ch;margin:0 auto 26px;text-align:center}
+.glance ol{margin:8px 0 0;padding:0;list-style:none;counter-reset:tk}
+.glance li{font-family:var(--serif);font-size:24px;line-height:1.25;margin:10px 0;color:var(--ink);counter-increment:tk;text-wrap:balance}
+.glance li::before{content:counter(tk,decimal-leading-zero);display:block;font-family:var(--text);font-size:12px;letter-spacing:.14em;color:var(--ink-3);margin-bottom:2px}
+.ecards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.ecard{position:relative;border:1px solid var(--line);padding:18px 18px 14px;background:transparent}
+.ecard::after{content:"";position:absolute;inset:4px;border:1px solid var(--line);opacity:.5;pointer-events:none}
+.ecard header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}
+.ecard h4{font-family:var(--serif);font-weight:400;font-size:24px;margin:0;color:var(--ink)}
+.ecard .stamp{font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--line);color:var(--ink-2);white-space:nowrap}
+.ecard.strong .stamp{border-color:var(--buy);color:var(--buy)}.ecard.weak .stamp{border-color:var(--dont);color:var(--dont)}.ecard.mixed .stamp{border-color:var(--wait);color:var(--wait)}
+.ecard .h{margin:0;font-size:18px;line-height:1.4;color:var(--ink)}
+.ecard .so{margin:8px 0 0;font-style:italic;color:var(--indigo);font-size:17px}
+.ecard .proof{margin:12px 0 0;padding-left:12px;border-left:2px solid var(--line);font-size:15.5px;line-height:1.45;color:var(--ink-2)}
+.ecard .src,.watch .src{color:var(--ink-3);font-size:14px;font-style:italic}
+.ecard .src a{color:var(--ink-3)}
+.ecard details{margin-top:10px;font-size:15px;color:var(--ink-2)}
+.ecard summary{cursor:pointer;font-variant:small-caps;letter-spacing:.16em;text-transform:lowercase;font-size:15px;color:var(--ink-2);list-style:none}
+.ecard summary::-webkit-details-marker{display:none}
+.ecard summary::after{content:" +"}.ecard details[open] summary::after{content:" −"}
+.ecard details ul{margin:8px 0 0;padding-left:18px}.ecard details li{margin:5px 0;line-height:1.45}
+.ecard details p{margin:8px 0 0;line-height:1.45}
+.watch{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
+.watch ul{margin:6px 0 0;padding-left:18px;font-size:16px;color:var(--ink);line-height:1.45}
+.watch li{margin:6px 0}
+@media (max-width:560px){.glance li{font-size:20px}.ecard h4{font-size:21px}}

@@ -15,13 +15,13 @@ const EXAMPLES = [
 
 export type Done = { result: BriefResult; id: string; bagName: string; numbers: QuickNumbers | null };
 
-export default function Ask() {
+export default function Ask({ initial = null }: { initial?: Done | null }) {
   const { h } = useHorizon();
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<Done | null>(null);
+  const [done, setDone] = useState<Done | null>(initial);
   const started = useRef(false);
 
   // ?q=… lets another page (or the design preview) hand a question straight to the tool.

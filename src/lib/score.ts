@@ -21,7 +21,7 @@ export async function runScoring(input: BriefInput, dossier: string) {
     messages: [
       {
         role: "user" as const,
-        content: `Bag: ${input.house} ${input.bag}${input.spec ? ` (${input.spec})` : ""}\nClient: ${input.clientType}, cohort ${COHORT_LABELS[input.cohort ?? "unknown"]}, ${input.horizonYears}-year horizon${input.budget ? `, budget ${input.budget}` : ""}.\n\n${SCORING_INSTRUCTIONS}\n\n=== DOSSIER ===\n${dossier}`,
+        content: `Bag: ${input.house} ${input.bag}${input.spec ? ` (${input.spec})` : ""}\n${input.questionType === "collection" ? `Question type: COLLECTION TIMING${input.season ? ` (${input.season})` : ""}. The client is choosing between pre-order now, buy in store at launch, or buy later on resale. Fill options.\n` : ""}Client: ${input.clientType}, cohort ${COHORT_LABELS[input.cohort ?? "unknown"]}, ${input.horizonYears}-year horizon${input.budget ? `, budget ${input.budget}` : ""}.\n\n${SCORING_INSTRUCTIONS}\n\n=== DOSSIER ===\n${dossier}`,
       },
     ],
   };

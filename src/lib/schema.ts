@@ -12,8 +12,9 @@ export const EvidenceItem = z.object({
 export const LayerScore = z.object({
   key: z.enum(layerKeys),
   score: z.number().int().describe("0 to 100."),
-  summary: z.string().describe("One sentence on why this score."),
-  evidence: z.array(EvidenceItem).describe("One to six items."),
+  summary: z.string().describe("One sentence on why this score, under 22 words."),
+  so_what: z.string().optional().describe("What it means for the buyer, under 14 words, e.g. 'Buy at the boutique, never at today\'s resale price.'"),
+  evidence: z.array(EvidenceItem).describe("One to six items. The FIRST item is the single strongest, most numeric fact; the reader may see only that one."),
 });
 
 export const SIGNAL_INTENTS = ["flip_1y", "hold_5y", "hold_10y", "wear"] as const;
@@ -24,9 +25,15 @@ export const Signal = z.object({
 });
 
 export const BriefResult = z.object({
+  takeaways: z.array(z.string()).optional().describe("Exactly three, each under 12 words, each a fact with a number where possible. The reader who reads nothing else reads these."),
   plain_answer: z.string().describe("The whole answer in one short sentence, under 16 words, written for someone who will read nothing else. No numbers unless one number IS the answer."),
   signals: z.array(Signal).describe("Exactly four entries, one per intent, in the order flip_1y, hold_5y, hold_10y, wear."),
   timing: z.string().describe("One sentence on WHEN to buy or sell: a price increase ahead, a season to wait for, a market that is cooling. Under 25 words."),
+  options: z.array(z.object({
+    label: z.string().describe("The buying moment, e.g. 'Pre-order now', 'Buy in store at launch', 'Buy on resale later'."),
+    verdict: z.enum(["yes", "no", "wait"]),
+    why: z.string().describe("One plain sentence, under 25 words, naming the deciding fact."),
+  })).optional().describe("Only for timing questions (pre-order vs launch vs later): exactly three options. Omit otherwise."),
   call: z.enum(CALLS),
   confidence: z.enum(["High", "Medium", "Low"]),
   one_line: z.string().describe("The call in plain English for a client, one sentence."),
@@ -61,5 +68,7 @@ export const BriefInput = z.object({
   cohort: z.enum(["unknown", "gen_alpha", "gen_z", "millennial", "gen_x", "boomer"]).default("unknown"),
   budget: z.string().trim().max(60).optional().or(z.literal("")),
   notes: z.string().trim().max(600).optional().or(z.literal("")),
+  questionType: z.enum(["bag", "family", "collection"]).default("bag"),
+  season: z.string().trim().max(120).optional().or(z.literal("")),
 });
 export type BriefInput = z.infer<typeof BriefInput>;

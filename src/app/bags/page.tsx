@@ -22,7 +22,7 @@ export default async function Bags() {
         {rows.map((b) => {
           const sig = toSignals(b.result);
           return (
-            <Link key={b.id} href={`/brief/${b.id}`} className="bag">
+            <Link key={b.id} href={`/?brief=${b.id}`} className="bag">
               <div className="bag-top">
                 <div><p className="lab">{new Date(b.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p><h3>{b.house} <i>{b.bag}</i></h3></div>
                 <span className="tag">{b.result.call}</span>

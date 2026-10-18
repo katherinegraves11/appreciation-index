@@ -106,6 +106,8 @@ export function researchPrompt(input: {
   budget?: string;
   notes?: string;
   trackerDossier?: string;
+  questionType?: string;
+  season?: string;
 }): string {
   const spec = input.spec ? ` Spec of interest: ${input.spec}.` : "";
   const budget = input.budget ? ` Budget: ${input.budget}.` : "";
@@ -114,7 +116,10 @@ export function researchPrompt(input: {
   const tracker = input.trackerDossier
     ? `\n\nBefore searching, read the TRACKER EVIDENCE below. It is verified, sourced data from the analyst's own database (resale listings and aggregates, momentum, creative directors, supply chain facts, history, WGSN forecasts). Treat it as primary evidence: cite it as "Tracker: <source>" with the source named in the row. Use web search only to fill gaps, refresh anything older than 90 days, and verify the current retail price.\n\n${input.trackerDossier}`
     : "\n\n(No tracker evidence was available for this request; research from the web.)";
-  return `Research the ${input.house} ${input.bag} for a ${input.clientType} with a ${input.horizonYears}-year horizon.${cohort}${spec}${budget}${notes}${tracker}
+  const collection = input.questionType === "collection"
+    ? `\n\nTHIS IS A COLLECTION TIMING QUESTION (${input.season || "the latest runway season"}): the client is choosing between pre-ordering now, buying in store when the bags land, or buying later on resale. These bags have no sold prices yet, so the brief is built from PIPELINE + PRECEDENT, and must say so. Use the tracker's COLLECTION PIPELINE block: how many looks each bag walked in (6–7 looks = a commercial pillar the house will produce in volume and keep in the line; 1–2 looks = a runway special, scarce, often pre-order only), the expected in-store window, and the show notes. Use PRECEDENT: what this designer's previous collections did on resale in their first 6–12 months (sold vs retail, asks easing or firming), and what the house's icons do. Then search specifically for: (a) press reviews of this show and which bags editors singled out; (b) pre-order, waitlist or allocation reports from boutiques and resellers; (c) the house's price-increase calendar and whether a rise falls before the delivery window; (d) pre-order mechanics at this house (deposit, cancellation, right of first refusal, no discount); (e) what TikTok and Instagram are saying about the show's bags (the tracker's BUZZ block is primary; search for press coverage of viral looks). Distinguish three buying moments in your notes: pre-order now, buy at launch in store, buy on resale 12+ months later.`
+    : "";
+  return `Research the ${input.house} ${input.bag} for a ${input.clientType} with a ${input.horizonYears}-year horizon.${cohort}${spec}${budget}${notes}${tracker}${collection}
 
 Use web search to build an evidence dossier covering all five layers. Run separate searches for each of these, because the client explicitly cares about them:
 1. Retail vs resale, first: current US retail price and the retail price path since 2021 (every increase, dated), then today's resale asks and realised sold prices for the same size, stated as % of current retail and % of retail-at-purchase. This comparison is integral to every brief: if the tracker gives it, cite it; if not, build it from sources and say which.
@@ -123,7 +128,7 @@ Use web search to build an evidence dossier covering all five layers. Run separa
 4. Ownership: parent group, and any merger, acquisition, stake sale, IPO, spin-off, or CEO change in the last 24 months. Check the Vogue Business People Moves Tracker for executive changes.
 5. Supply chain and materials: tannery or workshop acquisitions, artisan capacity, country of manufacture, tariff exposure, production constraints or waitlists, and whether the bag's material (exotic skin, calf, canvas, hardware) is becoming scarcer or more expensive at retail.
 6. Creative director: who, since when (confirm against the Vogue Business People Moves Tracker), how the debut was received, and whether this bag is an archive code or a new design.
-7. Social momentum: what TikTok, Instagram, and Pinterest are saying about this bag and house right now, whether it is rising or being called "over", which creators or celebrities are publicly associated with it, and whether search interest confirms the social noise.
+7. Social momentum: start from the tracker's BUZZ block (Google Trends week-over-week growth, TikTok and Instagram tag reads, logged events; cite as "Tracker: buzz"). Then what TikTok, Instagram, and Pinterest are saying about this bag and house right now, whether it is rising or being called "over", which creators or celebrities are publicly associated with it (as reported by press; no handles), and whether search interest confirms the social noise. Zero or flat search interest for a bag under a year old means "no demand signal yet", not "negative".
 8. Macro: tariffs, FX price gaps, luxury demand cycle, and relevant regulation.
 9. Fashion history: the house's landmark eras and collections, any past scandals or controversies attached to the house or its designers (with dates and sources), whether those still surface in current coverage, and which past decades current creative directors are referencing on the runway.
 
@@ -138,5 +143,11 @@ SIGNALS (the part the client actually reads). Produce four signals, one per inte
 - hold_10y (buy now, keep ten years): "yes" only for archive codes or Hermès-tier structural scarcity with a documented multi-year retail and resale path; otherwise "wait" or "no". Be stricter than hold_5y.
 - wear (buy to use, value is secondary): usually "yes"; "no" only if quality, durability or authenticity problems are documented; "wait" if a price increase or a better version is imminent.
 Each why names the single deciding fact (e.g. "Two sold at $17,995 against $8,400 retail, but only two"). plain_answer is the one sentence a busy person reads; timing says when to act. Never contradict the layer scores or the call.
+
+OPTIONS (timing questions only). When the client is choosing between buying moments (pre-order now / buy in store at launch / buy on resale later), fill options with exactly those three entries, each yes / no / wait with a one-sentence why, and make plain_answer answer that choice directly (e.g. "Pre-order only the two-look pieces; buy the pillars in store."). When the bag itself has no sold prices, say so in one why, and reason from precedent: the same designer's earlier drops (sold vs retail in their first year, asks easing), how many looks the bag walked in, the in-store window versus the house's next price rise. Confidence is Medium at most for a bag that has not sold yet. Omit options for ordinary questions.
+
+EDITORIAL RULES (the brief is read on a phone by a busy person; write like a WGSN key-takeaways box, not a memo). takeaways: exactly three, under 12 words each, one number each where the dossier has one, ordered by what decides the call. Each layer: summary is ONE sentence under 22 words; so_what is under 14 words and tells the buyer what to do or expect; evidence item one is the single strongest numeric fact with its source, the rest are supporting. bull_case, bear_case, what_would_change_this: at most three each, under 18 words each, no sub-clauses. spec_guidance: under 14 words each, imperative ("Buy the Maxi in black calfskin"). No em-dashes. No sentence longer than 25 words anywhere.
+
+BUZZ. The dossier's BUZZ block is the social layer's primary evidence: score, direction, number of platforms. One platform is a weak read; say so. Rising buzz with no confirmed sales supports "wait", never "yes", for flip_1y.
 
 Using only the dossier provided (and nothing from memory that is not in it), score the bag on the five layers and produce the client brief as structured data. Scores must be justified by evidence lines in the dossier. Every evidence item must carry the source it came from. If the dossier is thin on a layer, score conservatively and lower the confidence. Composite must equal the weighted average of the layer scores, rounded to the nearest integer. End with the disclaimer verbatim: "${DISCLAIMER}"`;

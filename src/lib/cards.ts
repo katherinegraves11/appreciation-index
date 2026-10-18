@@ -6,6 +6,7 @@ export type Card = {
   question: string;     // the question this card answers
   mood: "strong" | "mixed" | "weak";
   headline: string;     // one sentence
+  soWhat?: string;      // what it means for the buyer, one short line
   more?: string;        // optional second paragraph
   evidence: EvidenceItem[];
   bullets?: string[];
@@ -18,11 +19,11 @@ export function toCards(r: BriefResult): Card[] {
   const L = (k: string) => r.layers.find((l) => l.key === k);
   const resale = L("resale"), house = L("house"), creative = L("creative"), social = L("social"), macro = L("macro");
   const cards: Card[] = [];
-  if (resale) cards.push({ key: "money", title: "The money", question: "What does it cost new, and what does resale pay?", mood: mood(resale.score), headline: resale.summary, evidence: resale.evidence });
-  if (creative) cards.push({ key: "designer", title: "The designer", question: "Who made it, and does that era matter?", mood: mood(creative.score), headline: creative.summary, evidence: creative.evidence });
-  if (social) cards.push({ key: "culture", title: "The culture", question: "Is it having a moment, and is it lasting?", mood: mood(social.score), headline: social.summary, more: r.social_read, evidence: social.evidence });
-  if (house) cards.push({ key: "business", title: "The business", question: "Is the house stable? Who owns it? Can it make enough?", mood: mood(house.score), headline: house.summary, more: r.ownership_and_supply_read, evidence: house.evidence });
-  if (macro) cards.push({ key: "world", title: "The big picture", question: "Tariffs, currencies, the luxury mood.", mood: mood(macro.score), headline: macro.summary, evidence: macro.evidence });
+  if (resale) cards.push({ key: "money", title: "The money", question: "What does it cost new, and what does resale pay?", mood: mood(resale.score), headline: resale.summary, soWhat: resale.so_what, evidence: resale.evidence });
+  if (creative) cards.push({ key: "designer", title: "The designer", question: "Who made it, and does that era matter?", mood: mood(creative.score), headline: creative.summary, soWhat: creative.so_what, evidence: creative.evidence });
+  if (social) cards.push({ key: "culture", title: "The culture", question: "Is it having a moment, and is it lasting?", mood: mood(social.score), headline: social.summary, soWhat: social.so_what, more: r.social_read, evidence: social.evidence });
+  if (house) cards.push({ key: "business", title: "The business", question: "Is the house stable? Who owns it? Can it make enough?", mood: mood(house.score), headline: house.summary, soWhat: house.so_what, more: r.ownership_and_supply_read, evidence: house.evidence });
+  if (macro) cards.push({ key: "world", title: "The big picture", question: "Tariffs, currencies, the luxury mood.", mood: mood(macro.score), headline: macro.summary, soWhat: macro.so_what, evidence: macro.evidence });
   if (r.spec_guidance?.length) cards.push({ key: "buy", title: "If you buy", question: "Which version holds best.", mood: "mixed", headline: r.spec_guidance[0], bullets: r.spec_guidance.slice(1), evidence: [] });
   return cards;
 }

@@ -285,6 +285,7 @@ export type QuickNumbers = {
   retail_now: number | null; retail_launch: number | null; retail_size: string | null;
   ask_median: number | null; ask_n: number; sold_median: number | null; sold_n: number; sold_pct_of_retail: number | null;
   saves_avg: number | null; trend_pct: number | null; trr_sold_90d: number; icon: boolean;
+  buzz: BuzzNumbers | null;
 };
 export function quickNumbers(house: string, bag: string): QuickNumbers | null {
   const db = open(); if (!db) return null;
@@ -304,7 +305,96 @@ export function quickNumbers(house: string, bag: string): QuickNumbers | null {
     sold_median: (sold?.m as number) ?? null, sold_n: (sold?.n as number) ?? 0, sold_pct_of_retail: (sold?.p as number) ?? null,
     saves_avg: (trr?.saves as number) ?? null, trend_pct: trend?.a0 && trend?.a1 ? Math.round((((trend.a1 as number) - (trend.a0 as number)) / (trend.a0 as number)) * 1000) / 10 : null,
     trr_sold_90d: (trr?.sold90 as number) ?? 0, icon: !!icon,
+    buzz: buzzNumbers(house, bag),
   };
+}
+
+/* ---------------- THE BUZZ: cultural-moment layer (buzz_terms / buzz_reads / buzz_events) ---------------- */
+
+export type BuzzNumbers = {
+  score: number | null; direction: "rising" | "steady" | "fading" | null; platforms: number; level: "family" | "house" | null;
+  detail: string | null; movers: { term: string; platform: string; metric: string; value: number; note: string | null }[];
+  events: { date: string; type: string; note: string }[];
+};
+
+function bagFamilyTerm(db: DatabaseSync, hTerms: string[], bag: string): string | null {
+  const words = norm(bag).split(" ").filter((w) => w.length > 2 && !/^\d+$/.test(w) && !["bag", "bags", "the", "and", "with", "flap"].includes(w));
+  if (!words.length) return null;
+  try {
+    const row = db.prepare(`select family from buzz_terms where ${likeAny("house", hTerms)} and family is not null and (${words.map(() => "lower(family) like ?").join(" or ")}) group by family order by count(*) desc limit 1`)
+      .get(...likeParams(hTerms), ...words.map((w) => `%${w}%`)) as Row | undefined;
+    return (row?.family as string) ?? null;
+  } catch { return null; }
+}
+
+export function buzzNumbers(house: string, bag: string): BuzzNumbers | null {
+  const db = open(); if (!db) return null;
+  const hTerms = houseTerms(house);
+  const q = <T extends Row>(sql: string, params: (string | number)[] = []): T[] => { try { return db.prepare(sql).all(...params) as T[]; } catch { return []; } };
+  const fam = bagFamilyTerm(db, hTerms, bag);
+  const famScore = fam ? q<Row>(`select * from v_buzz_score where ${likeAny("house", hTerms)} and family = ?`, [...likeParams(hTerms), fam])[0] : undefined;
+  const houseScore = q<Row>(`select * from v_buzz_score where ${likeAny("house", hTerms)} and family is null`, likeParams(hTerms))[0];
+  const sc = famScore ?? houseScore;
+  const movers = q<Row>(
+    `select t.term, t.platform, t.metric, t.latest as value, r.note from v_buzz_trend t
+       join buzz_terms b on b.platform=t.platform and b.term=t.term
+       left join buzz_reads r on r.platform=t.platform and r.term=t.term and r.metric=t.metric and r.read_date=t.read_date
+      where ${likeAny("b.house", hTerms)} ${fam ? "and b.family = ?" : "and b.family is null"} and t.metric in ('growth_pct_7d','interest_0_100','posts_total','views_7d','posts_7d','videos_7d','mentions_7d') and t.latest is not null
+      group by t.platform, t.term, t.metric order by case when t.metric='growth_pct_7d' then 0 else 1 end, abs(t.latest) desc limit 8`,
+    [...likeParams(hTerms), ...(fam ? [fam] : [])]);
+  const events = q<Row>(`select event_date, event_type, derived_note from buzz_events where ${likeAny("house", hTerms)} ${fam ? "and (family = ? or family is null)" : ""} order by event_date desc limit 5`, [...likeParams(hTerms), ...(fam ? [fam] : [])]);
+  db.close();
+  if (!sc && !movers.length && !events.length) return null;
+  return {
+    score: (sc?.buzz_0_100 as number) ?? null, direction: ((sc?.direction as string) ?? null) as BuzzNumbers["direction"], platforms: (sc?.platforms as number) ?? 0,
+    level: famScore ? "family" : houseScore ? "house" : null, detail: (sc?.detail as string) ?? null,
+    movers: movers.map((m) => ({ term: m.term as string, platform: m.platform as string, metric: m.metric as string, value: m.value as number, note: (m.note as string) ?? null })),
+    events: events.map((e) => ({ date: e.event_date as string, type: e.event_type as string, note: e.derived_note as string })),
+  };
+}
+
+/** Text block for the research dossier. */
+export function buzzDossier(house: string, bag: string): string {
+  const b = buzzNumbers(house, bag);
+  if (!b) return "";
+  const lines: string[] = [];
+  lines.push(`Buzz score ${b.score ?? "n/a"}/100 (${b.direction ?? "no direction yet"}; ${b.platforms} platform${b.platforms === 1 ? "" : "s"}; ${b.level === "family" ? "bag-family level" : "house level, no bag-specific terms yet"}). Formula: 50 + 0.35×week-over-week growth% + volume bonus, averaged across platforms. One platform = weak read.`);
+  for (const m of b.movers) lines.push(`${m.platform} · "${m.term}" · ${m.metric} = ${m.value}${m.note ? ` (${m.note})` : ""}`);
+  for (const e of b.events) lines.push(`event ${e.date} · ${e.type}: ${e.note}`);
+  return section("BUZZ (tracker: Google Trends week-over-week, TikTok/Instagram reads, logged events; derived numbers only)", lines);
+}
+
+/** Runway-to-market evidence for collection / pre-order questions: the show, how often each bag walked, delivery window,
+ *  and precedent: what this house's recent new bags did on resale once they landed. */
+export function collectionDossier(house: string, season?: string): string {
+  const db = open(); if (!db) return "";
+  const hTerms = houseTerms(house);
+  const q = <T extends Row>(sql: string, params: (string | number)[] = []): T[] => { try { return db.prepare(sql).all(...params) as T[]; } catch { return []; } };
+  const notes = q<Row>(`select season, show_date, designer, new_bag_families, returning_icons, novelty_count, archive_refs, press_read, in_store_window, source_urls from show_notes where ${likeAny("house", hTerms)} order by show_date desc limit 2`, likeParams(hTerms));
+  const seasons = q<Row>(`select season, show_date, expected_in_store, count(*) looks_with_bags, count(distinct model_guess) distinct_bags, max(source_url) source_url from runway_pipeline where ${likeAny("house", hTerms)} group by season order by show_date desc limit 3`, likeParams(hTerms));
+  const latest = seasons[0]?.season as string | undefined;
+  const fams = latest ? q<Row>(`select model_guess, count(*) looks, group_concat(distinct material) materials, group_concat(distinct novelty) novelty from runway_pipeline where ${likeAny("house", hTerms)} and season = ? group by model_guess order by looks desc limit 14`, [...likeParams(hTerms), latest]) : [];
+  const famRows = q<Row>(`select family, n_looks, look_numbers, description from bag_families where ${likeAny("house", hTerms)} and (family like '%SS27%' or family like '%Spring 2027%' or family like '%Resort 27%') order by n_looks desc limit 14`, likeParams(hTerms));
+  const precedent = q<Row>(`select model, matched_size, retail_now, n_sold_same_size, median_sold, sold_pct_of_retail, last_read from v_sold_vs_retail where ${likeAny("house", hTerms)} order by last_read desc limit 12`, likeParams(hTerms));
+  const traj = q<Row>(`select model_guess, trajectory, count(*) n, round(avg(pct_change_since_first),1) avg_pct from item_trajectories where ${likeAny("house", hTerms)} and times_seen > 1 group by 1,2 order by n desc limit 16`, likeParams(hTerms));
+  const prices = q<Row>(`select model, year, retail_that_year from v_retail_history where ${likeAny("house", hTerms)} order by model, year limit 40`, likeParams(hTerms));
+  const cds = q<Row>(`select * from creative_directors where ${likeAny("house", hTerms)} order by rowid desc limit 2`, likeParams(hTerms));
+  db.close();
+  if (!notes.length && !seasons.length) return "";
+  const out: string[] = [];
+  out.push(section(`COLLECTION PIPELINE (tracker: Vogue Runway look-by-look capture${season ? `; client asked about ${season}` : ""})`, [
+    ...seasons.map((r) => `${r.season}: shown ${r.show_date}; ${r.looks_with_bags} looks carried a bag, ${r.distinct_bags} distinct bags; expected in store ${r.expected_in_store ?? "unknown"} (${r.source_url})`),
+    ...notes.map((n) => `Show notes ${n.season} (${n.show_date}, ${n.designer}): new families: ${n.new_bag_families}. Returning icons: ${n.returning_icons ?? "n/a"}. Novelty count ${n.novelty_count}. Archive refs: ${n.archive_refs ?? "n/a"}. Press read: ${n.press_read ?? "n/a"}. In-store window: ${n.in_store_window ?? "unknown"}. Sources: ${n.source_urls}`),
+  ]));
+  out.push(section("How often each bag walked (more looks = commercial pillar the house will produce in volume; 1–2 looks = runway special, scarce)", [
+    ...famRows.map((f) => `${f.family}: ${f.n_looks} looks (${f.look_numbers}). ${f.description}`),
+    ...(famRows.length ? [] : fams.map((f) => `${f.model_guess}: ${f.looks} looks; materials ${f.materials}; novelty ${f.novelty}`)),
+  ]));
+  out.push(section("PRECEDENT: what this house's bags did once they reached resale (size-matched confirmed sales vs today's retail)", precedent.map((p) => `${p.model} ${p.matched_size ?? ""}: ${p.n_sold_same_size} sold, median $${p.median_sold} = ${p.sold_pct_of_retail}% of $${p.retail_now} retail (last read ${p.last_read})`)));
+  out.push(section("PRECEDENT: listing trajectories on The RealReal (asks raised / marked down / sold, per model)", traj.map((t) => `${t.model_guess}: ${t.trajectory} ×${t.n}${t.avg_pct != null ? ` (avg ${t.avg_pct}% since first seen)` : ""}`)));
+  out.push(section("Retail price path by year (US reference size)", prices.map((p) => `${p.model} ${p.year}: $${p.retail_that_year}`)));
+  if (cds.length) out.push(section("Creative director (tracker)", cds.map((c) => JSON.stringify(c))));
+  return out.filter(Boolean).join("\n\n");
 }
 
 /** The race board: one row per house, from sold prices (holds value) and sell-through/saves (heat). */
