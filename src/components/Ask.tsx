@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { BriefResult } from "@/lib/schema";
 import type { QuickNumbers } from "@/lib/tracker";
 import Answer from "./Answer";
@@ -22,6 +22,15 @@ export default function Ask() {
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
+  const started = useRef(false);
+
+  // ?q=… lets another page (or the design preview) hand a question straight to the tool.
+  useEffect(() => {
+    if (started.current) return;
+    const pre = new URLSearchParams(window.location.search).get("q");
+    if (pre && pre.trim()) { started.current = true; setQ(pre); void ask(pre); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function ask(question: string) {
     if (!question.trim() || busy) return;
