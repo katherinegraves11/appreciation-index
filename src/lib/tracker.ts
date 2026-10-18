@@ -413,3 +413,18 @@ export function raceBoard(): RaceRow[] {
       heat: r.saves != null || r.delist != null ? Math.round(Math.min(100, ((r.saves as number) ?? 20) * 1.2 + ((r.delist as number) ?? 30))) : null }));
   } catch { db.close(); return []; }
 }
+
+
+/** PESTEL watch list (tracker table pestel_watch): the macro layer's standing evidence. */
+export function pestelDossier(house: string): string {
+  const db = open(); if (!db) return "";
+  const q = <T extends Row>(sql: string, params: (string | number)[] = []): T[] => { try { return db.prepare(sql).all(...params) as T[]; } catch { return []; } };
+  const rows = q<Row>(`select dimension, item, region, status, direction, why_it_matters, houses, next_check, source_name, source_url, updated_at from pestel_watch where active=1 order by case status when 'active' then 0 else 1 end, dimension`);
+  const recent = q<Row>(`select date, category, description, houses_affected, source_url from macro_events where date >= date('now','-45 days') order by date desc limit 8`);
+  db.close();
+  if (!rows.length && !recent.length) return "";
+  const rel = (h: string | null) => !h || /all/i.test(h) || h.toLowerCase().includes(house.toLowerCase().slice(0, 5));
+  const lines = rows.map((r) => `${r.dimension} · ${r.status}${r.direction ? ` (${r.direction})` : ""}${rel(r.houses as string) ? " · RELEVANT TO THIS HOUSE" : ""}: ${r.item}. Why: ${r.why_it_matters} [${r.source_name}, updated ${String(r.updated_at).slice(0, 10)}; ${r.source_url}]`);
+  const ev = recent.map((e) => `${e.date} · ${e.category}: ${e.description} (${e.houses_affected ?? "n/a"}) ${e.source_url}`);
+  return [section("PESTEL WATCH (tracker: standing list of world factors that move bag values; use for the macro layer and for timing)", lines), ev.length ? section("Recent macro events (last 45 days)", ev) : ""].filter(Boolean).join("\n\n");
+}
