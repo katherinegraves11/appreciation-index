@@ -1,0 +1,2091 @@
+{
+ "url": "http://localhost:3000/about",
+ "at": "2026-10-19T02:55:10.396Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.2,
+    0.19
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 1458,
+     "screens": 1.6,
+     "words": 350,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "How we decide.",
+     "words": 3,
+     "chars": 14,
+     "lines": 1,
+     "size": 54,
+     "vw": 3.8,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 198,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "How we decide.",
+     "words": 3,
+     "lines": 1,
+     "size": 54,
+     "font": "Libre Caslon Display"
+    },
+    "headings": [
+     {
+      "text": "APPReCIATION",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 30,
+      "vw": 2.1,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0.02,
+      "leading": 1.5,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.18,
+      "top": 22,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "How we decide.",
+      "words": 3,
+      "chars": 14,
+      "lines": 1,
+      "size": 54,
+      "vw": 3.8,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.72,
+      "top": 198,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "The four signals",
+      "words": 3,
+      "chars": 16,
+      "lines": 1,
+      "size": 34,
+      "vw": 2.4,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.68,
+      "top": 338,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "The dial (1 · 5 · 10 years)",
+      "words": 8,
+      "chars": 27,
+      "lines": 1,
+      "size": 34,
+      "vw": 2.4,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.68,
+      "top": 652,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h3",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 4,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 4,
+     "medianWords": 3,
+     "mixedFontHeadings": 3
+    },
+    "type": {
+     "families": [
+      {
+       "family": "EB Garamond",
+       "share": 0.88,
+       "mono": false
+      },
+      {
+       "family": "Libre Caslon Display",
+       "share": 0.12,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      15,
+      16,
+      17,
+      22,
+      24,
+      28,
+      30,
+      34,
+      54
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": {
+      "font": "EB Garamond",
+      "size": 16,
+      "leading": 1.45,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 6.1
+     },
+     "measureChars": 55,
+     "max": {
+      "size": 54,
+      "vw": 3.8,
+      "font": "Libre Caslon Display",
+      "text": "How we"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.98,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "about",
+      "above": "How we decide.",
+      "upper": false,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 16,
+      "top": 158
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f3ead8",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.53,
+      "l": 0.9
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#5a564d",
+       "share": 0.72
+      },
+      {
+       "color": "#2b2a26",
+       "share": 0.26
+      },
+      {
+       "color": "#6b665a",
+       "share": 0.01
+      },
+      {
+       "color": "#3b4a7a",
+       "share": 0
+      },
+      {
+       "color": "#9a4a3a",
+       "share": 0
+      }
+     ],
+     "button": null,
+     "lowContrast": [
+      {
+       "text": "Wait",
+       "ratio": 4.2,
+       "need": 4.5,
+       "size": 17,
+       "fg": "#8a6a1f",
+       "bg": "#f3ead8"
+      }
+     ]
+    },
+    "buttons": {
+     "count": 0,
+     "inHero": 0,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": []
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 1,
+     "hairlineSamples": [
+      "div.rule 1040px rule"
+     ],
+     "outlinedBoxes": 14,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 435
+      },
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 774
+      },
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 940
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 7,
+     "fixed": false,
+     "height": 77,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "eb garamond",
+     "libre caslon display"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 1458,
+    "margins": {
+     "left": 233,
+     "right": 252
+    },
+    "sections": [
+     {
+      "sel": "section.bookhead",
+      "tag": "section",
+      "top": 108,
+      "height": 196,
+      "words": 17,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "How we",
+       "size": 54,
+       "tag": "h1"
+      },
+      "left": 237,
+      "right": 561,
+      "textLeft": 237,
+      "textRight": 561,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.about",
+      "tag": "div",
+      "top": 338,
+      "height": 1014,
+      "words": 330,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "The four signals",
+       "size": 34,
+       "tag": "h3"
+      },
+      "left": 233,
+      "right": 252,
+      "textLeft": 233,
+      "textRight": 252,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "How we decide.",
+      "size": 54,
+      "top": 198,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [],
+    "leftBlocks": 0,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.13,
+    "voidBox": {
+     "x": 1200,
+     "y": 120,
+     "w": 240,
+     "h": 720
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": false,
+    "ground": "#f3ead8",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 30,
+     "right": 30
+    },
+    "hero": {
+     "text": "How we decide.",
+     "words": 3,
+     "chars": 14,
+     "lines": 1,
+     "size": 54,
+     "vw": 3.8,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 198,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 14,
+     "firstScreen": 8,
+     "ragged": [],
+     "voids": [
+      {
+       "gap": 48,
+       "at": 1230,
+       "panel": "The race"
+      }
+     ]
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 14,
+     "radii": [
+      [
+       0,
+       14
+      ]
+     ],
+     "heavyBorders": 14,
+     "borderSamples": [
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)"
+     ],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      15,
+      16,
+      17,
+      22,
+      24,
+      28,
+      34,
+      54
+     ]
+    },
+    "title": {
+     "text": "How we decide.",
+     "size": 54,
+     "top": 198
+    },
+    "colourShare": 0
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.3,
+    0.28,
+    0.24
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 2053,
+     "screens": 2,
+     "words": 350,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "How we decide.",
+     "words": 3,
+     "chars": 14,
+     "lines": 1,
+     "size": 35,
+     "vw": 4.6,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 258,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "How we decide.",
+     "words": 3,
+     "lines": 1,
+     "size": 35.3,
+     "font": "Libre Caslon Display"
+    },
+    "headings": [
+     {
+      "text": "APPReCIATION",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0.02,
+      "leading": 1.5,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 52,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "How we decide.",
+      "words": 3,
+      "chars": 14,
+      "lines": 1,
+      "size": 35.3,
+      "vw": 4.6,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 258,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "The four signals",
+      "words": 3,
+      "chars": 16,
+      "lines": 1,
+      "size": 34,
+      "vw": 4.4,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 379,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "The dial (1 · 5 · 10 years)",
+      "words": 8,
+      "chars": 27,
+      "lines": 1,
+      "size": 34,
+      "vw": 4.4,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 868,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h3",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 4,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 4,
+     "medianWords": 3,
+     "mixedFontHeadings": 3
+    },
+    "type": {
+     "families": [
+      {
+       "family": "EB Garamond",
+       "share": 0.88,
+       "mono": false
+      },
+      {
+       "family": "Libre Caslon Display",
+       "share": 0.12,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      15,
+      16,
+      17,
+      22,
+      24,
+      28,
+      30,
+      34,
+      35
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": {
+      "font": "EB Garamond",
+      "size": 16,
+      "leading": 1.45,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 6.1
+     },
+     "measureChars": 39,
+     "max": {
+      "size": 35.3,
+      "vw": 4.6,
+      "font": "Libre Caslon Display",
+      "text": "How we"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 1,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "about",
+      "above": "How we decide.",
+      "upper": false,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 16,
+      "top": 218
+     },
+     {
+      "text": "almost always. if a price rise is near.",
+      "above": "The dial (1 · 5 · 10 years)",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 16,
+      "top": 769
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f3ead8",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.53,
+      "l": 0.9
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#5a564d",
+       "share": 0.72
+      },
+      {
+       "color": "#2b2a26",
+       "share": 0.26
+      },
+      {
+       "color": "#6b665a",
+       "share": 0.01
+      },
+      {
+       "color": "#3b4a7a",
+       "share": 0
+      },
+      {
+       "color": "#9a4a3a",
+       "share": 0
+      }
+     ],
+     "button": null,
+     "lowContrast": [
+      {
+       "text": "Wait",
+       "ratio": 4.2,
+       "need": 4.5,
+       "size": 17,
+       "fg": "#8a6a1f",
+       "bg": "#f3ead8"
+      }
+     ]
+    },
+    "buttons": {
+     "count": 0,
+     "inHero": 0,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": []
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 1,
+     "hairlineSamples": [
+      "div.rule 728px rule"
+     ],
+     "outlinedBoxes": 14,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 475
+      },
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 990
+      },
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 1322
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 7,
+     "fixed": false,
+     "height": 137,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "eb garamond",
+     "libre caslon display"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 2053,
+    "margins": {
+     "left": 35,
+     "right": 44
+    },
+    "sections": [
+     {
+      "sel": "header.mast",
+      "tag": "header",
+      "top": 0,
+      "height": 137,
+      "words": 10,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Appr",
+       "size": 28,
+       "tag": "a"
+      },
+      "left": 253,
+      "right": 253,
+      "textLeft": 253,
+      "textRight": 253,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.bookhead",
+      "tag": "section",
+      "top": 168,
+      "height": 177,
+      "words": 17,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "How we",
+       "size": 35,
+       "tag": "h1"
+      },
+      "left": 57,
+      "right": 279,
+      "textLeft": 57,
+      "textRight": 279,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.about",
+      "tag": "div",
+      "top": 379,
+      "height": 1569,
+      "words": 330,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "The four signals",
+       "size": 34,
+       "tag": "h3"
+      },
+      "left": 23,
+      "right": 41,
+      "textLeft": 23,
+      "textRight": 41,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "How we decide.",
+      "size": 35,
+      "top": 258,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [],
+    "leftBlocks": 0,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": false,
+    "ground": "#f3ead8",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 23,
+     "right": 30
+    },
+    "hero": {
+     "text": "How we decide.",
+     "words": 3,
+     "chars": 14,
+     "lines": 1,
+     "size": 35,
+     "vw": 4.6,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 258,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 14,
+     "firstScreen": 4,
+     "ragged": [],
+     "voids": [
+      {
+       "gap": 94,
+       "at": 1779,
+       "panel": "The race"
+      }
+     ]
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 14,
+     "radii": [
+      [
+       0,
+       14
+      ]
+     ],
+     "heavyBorders": 14,
+     "borderSamples": [
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)"
+     ],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      15,
+      16,
+      17,
+      22,
+      24,
+      28,
+      34,
+      35
+     ]
+    },
+    "title": {
+     "text": "How we decide.",
+     "size": 35,
+     "top": 258
+    },
+    "colourShare": 0
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 4,
+   "filled": [
+    0.39,
+    0.32,
+    0.26,
+    0.37
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 3298,
+     "screens": 3.9,
+     "words": 346,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "How we decide.",
+     "words": 3,
+     "chars": 14,
+     "lines": 1,
+     "size": 30,
+     "vw": 7.7,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 258,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "How we decide.",
+     "words": 3,
+     "lines": 1,
+     "size": 30,
+     "font": "Libre Caslon Display"
+    },
+    "headings": [
+     {
+      "text": "APPReCIATION",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0.02,
+      "leading": 1.5,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 52,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "How we decide.",
+      "words": 3,
+      "chars": 14,
+      "lines": 1,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 258,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "The four signals",
+      "words": 3,
+      "chars": 16,
+      "lines": 1,
+      "size": 34,
+      "vw": 8.7,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 399,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "Sell within a year",
+      "words": 4,
+      "chars": 18,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 548,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "Hold five years",
+      "words": 3,
+      "chars": 15,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 723,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "Keep ten years",
+      "words": 3,
+      "chars": 14,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 899,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "Just to wear",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 1075,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "The dial (1 · 5 · 10 years)",
+      "words": 8,
+      "chars": 27,
+      "lines": 1,
+      "size": 34,
+      "vw": 8.7,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 1232,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "Asking vs new",
+      "words": 3,
+      "chars": 13,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 1407,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "Heat",
+      "words": 1,
+      "chars": 4,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 1573,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "Trend",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 1739,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "Proven sales",
+      "words": 2,
+      "chars": 12,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 1905,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "Price when new",
+      "words": 3,
+      "chars": 14,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 2071,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "Icon status",
+      "words": 2,
+      "chars": 11,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 2237,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "Designer",
+      "words": 1,
+      "chars": 8,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 2403,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "House",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 2569,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "The race",
+      "words": 2,
+      "chars": 8,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 2753,
+      "tag": "h4",
+      "kind": "heading"
+     },
+     {
+      "text": "Where the numbers come from",
+      "words": 5,
+      "chars": 27,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 2919,
+      "tag": "h4",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 18,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 18,
+     "medianWords": 3,
+     "mixedFontHeadings": 3
+    },
+    "type": {
+     "families": [
+      {
+       "family": "EB Garamond",
+       "share": 0.88,
+       "mono": false
+      },
+      {
+       "family": "Libre Caslon Display",
+       "share": 0.12,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      17,
+      22,
+      24,
+      28,
+      30,
+      34
+     ],
+     "sizeCount": 7,
+     "notLoaded": [],
+     "body": {
+      "font": "EB Garamond",
+      "size": 16,
+      "leading": 1.45,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 6.1
+     },
+     "measureChars": 39,
+     "max": {
+      "size": 34,
+      "vw": 8.7,
+      "font": "Libre Caslon Display",
+      "text": "The four signals"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 1,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f3ead8",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.53,
+      "l": 0.9
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#5a564d",
+       "share": 0.72
+      },
+      {
+       "color": "#2b2a26",
+       "share": 0.26
+      },
+      {
+       "color": "#6b665a",
+       "share": 0.01
+      },
+      {
+       "color": "#3b4a7a",
+       "share": 0
+      },
+      {
+       "color": "#9a4a3a",
+       "share": 0
+      }
+     ],
+     "button": null,
+     "lowContrast": [
+      {
+       "text": "Wait",
+       "ratio": 4.2,
+       "need": 4.5,
+       "size": 17,
+       "fg": "#8a6a1f",
+       "bg": "#f3ead8"
+      }
+     ]
+    },
+    "buttons": {
+     "count": 0,
+     "inHero": 0,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": []
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 1,
+     "hairlineSamples": [
+      "div.rule 350px rule"
+     ],
+     "outlinedBoxes": 14,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 521
+      },
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 1380
+      },
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 2044
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 7,
+     "fixed": false,
+     "height": 137,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "eb garamond",
+     "libre caslon display"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 3298,
+    "margins": {
+     "left": 27,
+     "right": 27
+    },
+    "sections": [
+     {
+      "sel": "header.mast",
+      "tag": "header",
+      "top": 0,
+      "height": 137,
+      "words": 10,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Appr",
+       "size": 28,
+       "tag": "a"
+      },
+      "left": 64,
+      "right": 64,
+      "textLeft": 64,
+      "textRight": 64,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.bookhead",
+      "tag": "section",
+      "top": 168,
+      "height": 197,
+      "words": 17,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "How we",
+       "size": 30,
+       "tag": "h1"
+      },
+      "left": 33,
+      "right": 33,
+      "textLeft": 33,
+      "textRight": 33,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.abox4",
+      "tag": "div",
+      "top": 521,
+      "height": 678,
+      "words": 81,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Sell within a year",
+       "size": 24,
+       "tag": "h4"
+      },
+      "left": 44,
+      "right": 44,
+      "textLeft": 44,
+      "textRight": 44,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.abox4",
+      "tag": "div",
+      "top": 1380,
+      "height": 648,
+      "words": 61,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Asking vs new",
+       "size": 24,
+       "tag": "h4"
+      },
+      "left": 47,
+      "right": 47,
+      "textLeft": 47,
+      "textRight": 47,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.abox4",
+      "tag": "div",
+      "top": 2044,
+      "height": 648,
+      "words": 61,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Price when new",
+       "size": 24,
+       "tag": "h4"
+      },
+      "left": 42,
+      "right": 42,
+      "textLeft": 42,
+      "textRight": 42,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.abox2",
+      "tag": "div",
+      "top": 2726,
+      "height": 386,
+      "words": 63,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "The race",
+       "size": 24,
+       "tag": "h4"
+      },
+      "left": 42,
+      "right": 42,
+      "textLeft": 42,
+      "textRight": 42,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "How we decide.",
+      "size": 30,
+      "top": 258,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [],
+    "leftBlocks": 0,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": false,
+    "ground": "#f3ead8",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 27,
+     "right": 27
+    },
+    "hero": {
+     "text": "How we decide.",
+     "words": 3,
+     "chars": 14,
+     "lines": 1,
+     "size": 30,
+     "vw": 7.7,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 258,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 14,
+     "firstScreen": 2,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 14,
+     "radii": [
+      [
+       0,
+       14
+      ]
+     ],
+     "heavyBorders": 14,
+     "borderSamples": [
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)"
+     ],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      17,
+      22,
+      24,
+      28,
+      30,
+      34
+     ]
+    },
+    "title": {
+     "text": "How we decide.",
+     "size": 30,
+     "top": 258
+    },
+    "colourShare": 0
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "mixed-font-headline",
+   "width": 1440,
+   "message": "3 headline(s) switch typeface or to italic mid-line (the \"one italic serif word\" move).",
+   "fix": "Set the whole headline in one face. Emphasis comes from the words.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "palette-cream",
+   "width": 1440,
+   "message": "Yellow-cream background (page background #f3ead8).",
+   "fix": "Use the drawn palette. If you want warmth, take a low-chroma stone or bone, not a yellow cream.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "contrast",
+   "width": 1440,
+   "message": "Low-contrast text: \"Wait\" 4.2:1 needs 4.5:1",
+   "fix": "Darken or lighten the text colour.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "heavy-borders",
+   "width": 1440,
+   "message": "14 panel borders are dark against their ground: #9a927f on #f3ead8 (2.59:1) | #9a927f on #f3ead8 (2.59:1) | #9a927f on #f3ead8 (2.59:1)",
+   "fix": "A panel border is a whisper: about 1.1–1.3:1 against its ground on a light screen (#e5e7eb–#ededed on white), and about 1.2–1.5:1 on a dark one (#1a1a1a on #000, #2e2e2e on #111). Darker lines turn the screen into a grid of boxes; keep the stronger line for controls.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "panel-void",
+   "width": 1440,
+   "message": "1 card(s) hold a blank band inside: 48px in \"The race\".",
+   "fix": "A card stretches to its neighbour only when it has content to fill. Keep a legend or a note directly under its chart (only an action or a total may sit at a stretched card's foot), let a short card keep its own height (align-items: start), and let a filtered block shrink to its rows."
+  },
+  {
+   "level": "WARN",
+   "id": "app-title-size",
+   "width": 1440,
+   "message": "The h1 is 54px (\"How we decide.\").",
+   "fix": "An app screen is not a landing page: the title is 18-32px (20-24px on a phone).",
+   "alsoAt": [
+    768,
+    390
+   ]
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-about/desktop-fold.jpg",
+   "pages": [
+    "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-about/desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-about/tablet-fold.jpg",
+   "pages": [
+    "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-about/tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-about/mobile-fold.jpg",
+   "pages": [
+    "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-about/mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

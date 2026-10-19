@@ -1,6 +1,6 @@
 {
  "url": "http://localhost:3000/race",
- "at": "2026-10-19T02:52:31.291Z",
+ "at": "2026-10-19T02:54:11.289Z",
  "allow": [],
  "viewports": [
   {
@@ -9,8 +9,8 @@
    "load": "load",
    "screens": 2,
    "filled": [
-    0.33,
-    0.32
+    0.15,
+    0.13
    ],
    "motion": {
     "elements": 0,
@@ -26,7 +26,7 @@
      "h": 900
     },
     "page": {
-     "height": 1791,
+     "height": 1776,
      "screens": 2,
      "words": 285,
      "img": 0,
@@ -60,12 +60,18 @@
      "tracking": 0,
      "leading": 1.05,
      "top": 198,
-     "tag": "h2",
+     "tag": "h1",
      "kind": "heading",
      "align": "left",
      "position": "left"
     },
-    "h1": null,
+    "h1": {
+     "text": "Where to put your money this season.",
+     "words": 7,
+     "lines": 1,
+     "size": 54,
+     "font": "Libre Caslon Display"
+    },
     "headings": [
      {
       "text": "APPReCIATION",
@@ -114,7 +120,7 @@
        "Libre Caslon Display",
        "Libre Caslon Display italic"
       ],
-      "tag": "h2",
+      "tag": "h1",
       "kind": "heading"
      }
     ],
@@ -250,19 +256,17 @@
       "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px",
       "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px"
      ],
-     "gradients": 1,
+     "gradients": 0,
      "scrims": 0,
-     "gradientSamples": [
-      "div.board → linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127)), linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127"
-     ],
+     "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 5,
+     "hairlines": 6,
      "hairlineSamples": [
-      "h2.vh 1040px",
       "div.pod-now 317px",
       "div.pod-fore 317px",
       "div.pod-cool 317px",
-      "div.rule 1040px rule"
+      "div.rule 1040px rule",
+      "span.axisline.v 678px rule"
      ],
      "outlinedBoxes": 1,
      "dashed": 1,
@@ -278,7 +282,7 @@
        "count": 3,
        "iconTopped": false,
        "rounded": false,
-       "top": 1317
+       "top": 1302
       }
      ]
     },
@@ -300,7 +304,7 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 1791,
+    "pageH": 1776,
     "margins": {
      "left": 213,
      "right": 332
@@ -310,14 +314,14 @@
       "sel": "section.bookhead",
       "tag": "section",
       "top": 108,
-      "height": 313,
+      "height": 298,
       "words": 71,
       "media": 0,
       "middle": 0,
       "heading": {
        "text": "Where to put your money",
        "size": 54,
-       "tag": "h2"
+       "tag": "h1"
       },
       "left": 206,
       "right": 343,
@@ -332,7 +336,7 @@
      {
       "sel": "div.houses",
       "tag": "div",
-      "top": 439,
+      "top": 424,
       "height": 124,
       "words": 30,
       "media": 0,
@@ -351,7 +355,7 @@
      {
       "sel": "div.podium",
       "tag": "div",
-      "top": 1317,
+      "top": 1302,
       "height": 260,
       "words": 89,
       "media": 0,
@@ -369,7 +373,14 @@
      }
     ],
     "gaps": [],
-    "h1s": [],
+    "h1s": [
+     {
+      "text": "Where to put your money this season.",
+      "size": 54,
+      "top": 198,
+      "firstScreen": true
+     }
+    ],
     "edgeText": [],
     "edges": [],
     "leftBlocks": 0,
@@ -410,7 +421,7 @@
      "tracking": 0,
      "leading": 1.05,
      "top": 198,
-     "tag": "h2",
+     "tag": "h1",
      "kind": "heading",
      "align": "left",
      "position": "left"
@@ -423,7 +434,7 @@
      "voids": [
       {
        "gap": 88,
-       "at": 1489,
+       "at": 1474,
        "panel": "cooling · be careful"
       }
      ]
@@ -476,7 +487,11 @@
       54
      ]
     },
-    "title": null,
+    "title": {
+     "text": "Where to put your money this season.",
+     "size": 54,
+     "top": 198
+    },
     "colourShare": 0.001
    },
    "consoleErrors": []
@@ -487,8 +502,8 @@
    "load": "load",
    "screens": 2,
    "filled": [
-    0.55,
-    0.5
+    0.3,
+    0.23
    ],
    "motion": {
     "elements": 0,
@@ -504,7 +519,7 @@
      "h": 1024
     },
     "page": {
-     "height": 1987,
+     "height": 1980,
      "screens": 1.9,
      "words": 285,
      "img": 0,
@@ -538,12 +553,18 @@
      "tracking": 0,
      "leading": 1.05,
      "top": 258,
-     "tag": "h2",
+     "tag": "h1",
      "kind": "heading",
      "align": "left",
      "position": "left"
     },
-    "h1": null,
+    "h1": {
+     "text": "Where to put your money this season.",
+     "words": 7,
+     "lines": 1,
+     "size": 35.3,
+     "font": "Libre Caslon Display"
+    },
     "headings": [
      {
       "text": "APPReCIATION",
@@ -592,7 +613,7 @@
        "Libre Caslon Display",
        "Libre Caslon Display italic"
       ],
-      "tag": "h2",
+      "tag": "h1",
       "kind": "heading"
      }
     ],
@@ -728,19 +749,17 @@
       "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px",
       "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px"
      ],
-     "gradients": 1,
+     "gradients": 0,
      "scrims": 0,
-     "gradientSamples": [
-      "div.board → linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127)), linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127"
-     ],
+     "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 5,
+     "hairlines": 6,
      "hairlineSamples": [
-      "h2.vh 728px",
       "div.pod-now 352px",
       "div.pod-fore 352px",
       "div.pod-cool 352px",
-      "div.rule 728px rule"
+      "div.rule 728px rule",
+      "span.axisline.v 686px rule"
      ],
      "outlinedBoxes": 1,
      "dashed": 1,
@@ -756,7 +775,7 @@
        "count": 3,
        "iconTopped": false,
        "rounded": false,
-       "top": 1358
+       "top": 1351
       }
      ]
     },
@@ -778,10 +797,10 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 1987,
+    "pageH": 1980,
     "margins": {
      "left": 20,
-     "right": 41
+     "right": 39
     },
     "sections": [
      {
@@ -811,14 +830,14 @@
       "sel": "section.bookhead",
       "tag": "section",
       "top": 168,
-      "height": 294,
+      "height": 279,
       "words": 71,
       "media": 0,
       "middle": 0,
       "heading": {
        "text": "Where to put your money",
        "size": 35,
-       "tag": "h2"
+       "tag": "h1"
       },
       "left": 26,
       "right": 138,
@@ -833,7 +852,7 @@
      {
       "sel": "div.houses",
       "tag": "div",
-      "top": 480,
+      "top": 465,
       "height": 124,
       "words": 30,
       "media": 0,
@@ -852,16 +871,16 @@
      {
       "sel": "div.board",
       "tag": "div",
-      "top": 634,
-      "height": 680,
+      "top": 619,
+      "height": 688,
       "words": 38,
       "media": 0,
       "middle": 38,
       "heading": null,
-      "left": 4,
-      "right": 63,
-      "textLeft": 4,
-      "textRight": 63,
+      "left": 20,
+      "right": 39,
+      "textLeft": 20,
+      "textRight": 39,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -871,7 +890,7 @@
      {
       "sel": "div.podium",
       "tag": "div",
-      "top": 1358,
+      "top": 1351,
       "height": 416,
       "words": 89,
       "media": 0,
@@ -889,14 +908,15 @@
      }
     ],
     "gaps": [],
-    "h1s": [],
-    "edgeText": [
+    "h1s": [
      {
-      "text": "hot right now →",
-      "side": "left",
-      "px": 4
+      "text": "Where to put your money this season.",
+      "size": 35,
+      "top": 258,
+      "firstScreen": true
      }
     ],
+    "edgeText": [],
     "edges": [],
     "leftBlocks": 0,
     "bodySize": 17,
@@ -931,7 +951,7 @@
      "tracking": 0,
      "leading": 1.05,
      "top": 258,
-     "tag": "h2",
+     "tag": "h1",
      "kind": "heading",
      "align": "left",
      "position": "left"
@@ -991,7 +1011,11 @@
       35
      ]
     },
-    "title": null,
+    "title": {
+     "text": "Where to put your money this season.",
+     "size": 35,
+     "top": 258
+    },
     "colourShare": 0.003
    },
    "consoleErrors": []
@@ -1002,8 +1026,8 @@
    "load": "load",
    "screens": 3,
    "filled": [
-    0.35,
-    0.56,
+    0.45,
+    0.28,
     0.4
    ],
    "motion": {
@@ -1020,7 +1044,7 @@
      "h": 844
     },
     "page": {
-     "height": 2130,
+     "height": 2075,
      "screens": 2.5,
      "words": 281,
      "img": 0,
@@ -1054,12 +1078,18 @@
      "tracking": 0,
      "leading": 1.05,
      "top": 258,
-     "tag": "h2",
+     "tag": "h1",
      "kind": "heading",
      "align": "left",
      "position": "left"
     },
-    "h1": null,
+    "h1": {
+     "text": "Where to put your money this season.",
+     "words": 7,
+     "lines": 2,
+     "size": 30,
+     "font": "Libre Caslon Display"
+    },
     "headings": [
      {
       "text": "APPReCIATION",
@@ -1108,7 +1138,7 @@
        "Libre Caslon Display",
        "Libre Caslon Display italic"
       ],
-      "tag": "h2",
+      "tag": "h1",
       "kind": "heading"
      }
     ],
@@ -1231,19 +1261,17 @@
       "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px",
       "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px"
      ],
-     "gradients": 1,
+     "gradients": 0,
      "scrims": 0,
-     "gradientSamples": [
-      "div.board → linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127)), linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127"
-     ],
+     "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 5,
+     "hairlines": 6,
      "hairlineSamples": [
-      "h2.vh 350px",
       "div.pod-now 350px",
       "div.pod-fore 350px",
       "div.pod-cool 350px",
-      "div.rule 350px rule"
+      "div.rule 350px rule",
+      "span.axisline.v 308px rule"
      ],
      "outlinedBoxes": 1,
      "dashed": 1,
@@ -1259,7 +1287,7 @@
        "count": 3,
        "iconTopped": false,
        "rounded": false,
-       "top": 1243
+       "top": 1188
       }
      ]
     },
@@ -1281,10 +1309,10 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 2130,
+    "pageH": 2075,
     "margins": {
      "left": 20,
-     "right": 26
+     "right": 25
     },
     "sections": [
      {
@@ -1314,14 +1342,14 @@
       "sel": "section.bookhead",
       "tag": "section",
       "top": 168,
-      "height": 371,
+      "height": 356,
       "words": 71,
       "media": 0,
       "middle": 0,
       "heading": {
        "text": "Where to put your money",
        "size": 30,
-       "tag": "h2"
+       "tag": "h1"
       },
       "left": 26,
       "right": 26,
@@ -1336,7 +1364,7 @@
      {
       "sel": "div.houses",
       "tag": "div",
-      "top": 557,
+      "top": 542,
       "height": 262,
       "words": 30,
       "media": 0,
@@ -1355,16 +1383,16 @@
      {
       "sel": "div.board",
       "tag": "div",
-      "top": 849,
-      "height": 350,
+      "top": 834,
+      "height": 310,
       "words": 38,
       "media": 0,
-      "middle": 36,
+      "middle": 32,
       "heading": null,
-      "left": 0,
-      "right": 27,
-      "textLeft": -20,
-      "textRight": 27,
+      "left": 20,
+      "right": 23,
+      "textLeft": 20,
+      "textRight": 23,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1374,7 +1402,7 @@
      {
       "sel": "div.podium",
       "tag": "div",
-      "top": 1243,
+      "top": 1188,
       "height": 648,
       "words": 89,
       "media": 0,
@@ -1393,7 +1421,7 @@
      {
       "sel": "p.hint.center",
       "tag": "p",
-      "top": 1913,
+      "top": 1858,
       "height": 128,
       "words": 43,
       "media": 0,
@@ -1411,7 +1439,14 @@
      }
     ],
     "gaps": [],
-    "h1s": [],
+    "h1s": [
+     {
+      "text": "Where to put your money this season.",
+      "size": 30,
+      "top": 258,
+      "firstScreen": true
+     }
+    ],
     "edgeText": [],
     "edges": [],
     "leftBlocks": 0,
@@ -1433,7 +1468,7 @@
     "topbar": null,
     "canvas": {
      "left": 20,
-     "right": 26
+     "right": 25
     },
     "hero": {
      "text": "Where to put your money this season.",
@@ -1447,28 +1482,28 @@
      "tracking": 0,
      "leading": 1.05,
      "top": 258,
-     "tag": "h2",
+     "tag": "h1",
      "kind": "heading",
      "align": "left",
      "position": "left"
     },
     "charts": 0,
     "layout": {
-     "panels": 5,
-     "firstScreen": 1,
+     "panels": 4,
+     "firstScreen": 0,
      "ragged": [],
      "voids": []
     },
     "tiles": 0,
     "panels": {
-     "count": 5,
+     "count": 4,
      "radii": [
       [
        0,
-       5
+       4
       ]
      ],
-     "heavyBorders": 5,
+     "heavyBorders": 4,
      "borderSamples": [
       "#9a927f on #f3ead8 (2.59:1)",
       "#9a927f on #f3ead8 (2.59:1)",
@@ -1506,8 +1541,12 @@
       30
      ]
     },
-    "title": null,
-    "colourShare": 0
+    "title": {
+     "text": "Where to put your money this season.",
+     "size": 30,
+     "top": 258
+    },
+    "colourShare": 0.001
    },
    "consoleErrors": []
   }
@@ -1519,17 +1558,6 @@
    "width": 1440,
    "message": "2 headline(s) switch typeface or to italic mid-line (the \"one italic serif word\" move).",
    "fix": "Set the whole headline in one face. Emphasis comes from the words.",
-   "alsoAt": [
-    768,
-    390
-   ]
-  },
-  {
-   "level": "FAIL",
-   "id": "gradient",
-   "width": 1440,
-   "message": "1 gradient fill(s): div.board → linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127)), linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127",
-   "fix": "Use a flat colour or a real image. The only gradient allowed by default is a neutral scrim over a photo for legibility.",
    "alsoAt": [
     768,
     390
@@ -1579,22 +1607,15 @@
    "fix": "A card stretches to its neighbour only when it has content to fill. Keep a legend or a note directly under its chart (only an action or a total may sit at a stretched card's foot), let a short card keep its own height (align-items: start), and let a filtered block shrink to its rows."
   },
   {
-   "level": "FAIL",
-   "id": "no-title",
+   "level": "WARN",
+   "id": "app-title-size",
    "width": 1440,
-   "message": "The screen has no h1.",
-   "fix": "Name the screen in an h1 at the top of the canvas (18–28px): \"Overview\", \"Payouts\", the project's name.",
+   "message": "The h1 is 54px (\"Where to put your money this season.\").",
+   "fix": "An app screen is not a landing page: the title is 18-32px (20-24px on a phone).",
    "alsoAt": [
     768,
     390
    ]
-  },
-  {
-   "level": "FAIL",
-   "id": "edge-text",
-   "width": 768,
-   "message": "1 text block(s) sit within 16px of the screen edge: \"hot right now →\" (4px from the left)",
-   "fix": "Keep text inside the page margin (16–32px or more). Only display type deliberately bled past the edge may touch it."
   }
  ],
  "images": [
