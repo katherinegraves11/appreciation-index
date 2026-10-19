@@ -339,7 +339,7 @@ export function buzzNumbers(house: string, bag: string): BuzzNumbers | null {
     `select t.term, t.platform, t.metric, t.latest as value, r.note from v_buzz_trend t
        join buzz_terms b on b.platform=t.platform and b.term=t.term
        left join buzz_reads r on r.platform=t.platform and r.term=t.term and r.metric=t.metric and r.read_date=t.read_date
-      where ${likeAny("b.house", hTerms)} ${fam ? "and b.family = ?" : "and b.family is null"} and t.metric in ('growth_pct_7d','interest_0_100','posts_total','views_7d','posts_7d','videos_7d','mentions_7d') and t.latest is not null
+      where ${likeAny("b.house", hTerms)} ${fam ? "and b.family = ?" : "and b.family is null"} and t.metric in ('growth_pct_7d','interest_0_100','posts_total','views_7d','posts_7d','videos_7d','mentions_7d','most_viewed_rank_ss27','fw_ss27_engagements','posts_visible') and t.latest is not null
       group by t.platform, t.term, t.metric order by case when t.metric='growth_pct_7d' then 0 else 1 end, abs(t.latest) desc limit 8`,
     [...likeParams(hTerms), ...(fam ? [fam] : [])]);
   const events = q<Row>(`select event_date, event_type, derived_note from buzz_events where ${likeAny("house", hTerms)} ${fam ? "and (family = ? or family is null)" : ""} order by event_date desc limit 5`, [...likeParams(hTerms), ...(fam ? [fam] : [])]);

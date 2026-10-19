@@ -87,12 +87,42 @@ export default function Answer({ result, bagName, briefId, numbers }: { result: 
         </>
       )}
 
-      {n?.buzz && (
-        <p className="buzzline">
-          <span className="lab">buzz</span> <b>{n.buzz.score ?? "—"}</b>/100 · {n.buzz.direction ?? "no direction yet"} · {n.buzz.platforms} platform{n.buzz.platforms === 1 ? "" : "s"}{n.buzz.level === "house" ? " · house-level read" : ""}
-          {n.buzz.movers.slice(0, 2).map((m, i) => <span key={i} className="mv"> · {m.platform} “{m.term}” {m.metric === "growth_pct_7d" ? `${m.value > 0 ? "+" : ""}${Math.round(m.value)}% this week` : `${m.metric.replace(/_/g, " ")} ${m.value}`}</span>)}
-        </p>
-      )}
+      <section className="buzz" aria-label="The buzz">
+        <p className="lab stripcap">the buzz · what people are saying</p>
+        {n?.buzz ? (
+          <div className="buzzbox">
+            <div className="bscore">
+              <div className="bnum">{n.buzz.score ?? "—"}<small>/100</small></div>
+              <div className="bdir">{n.buzz.direction ?? "no direction yet"}</div>
+              <div className="bsub">{n.buzz.platforms} platform{n.buzz.platforms === 1 ? "" : "s"}{n.buzz.level === "house" ? " · read at house level; no bag-specific terms yet" : " · read for this bag"}</div>
+            </div>
+            <div className="bplat">
+              {(n.buzz.detail ?? "").split(" ").filter(Boolean).map((d, i) => {
+                const m = d.match(/^([a-z-]+):(\d+)(?:\(([+-]?\d+)%\))?/i);
+                if (!m) return null;
+                const name: Record<string, string> = { google: "Google search", instagram: "Instagram", tiktok: "TikTok", "tiktok-cc": "TikTok trends", youtube: "YouTube", reddit: "Reddit", pinterest: "Pinterest", "vogue-runway": "Vogue Runway" };
+                return <div key={i} className="bchip"><b>{name[m[1]] ?? m[1]}</b><span>{m[2]}</span>{m[3] && <em>{Number(m[3]) > 0 ? "+" : ""}{m[3]}% this week</em>}</div>;
+              })}
+            </div>
+            {n.buzz.movers.length > 0 && (
+              <ul className="bmoves">
+                {n.buzz.movers.slice(0, 4).map((m, i) => (
+                  <li key={i}><b>“{m.term}”</b> on {m.platform.replace("-cc", " trends").replace("vogue-runway", "Vogue Runway")}: {m.metric === "growth_pct_7d" ? `${m.value > 0 ? "+" : ""}${Math.round(m.value)}% search interest this week` : m.metric === "posts_total" ? `${Math.round(m.value).toLocaleString()} posts` : m.metric === "most_viewed_rank_ss27" ? (m.value > 10 ? "outside the top 10 most-viewed SS27 shows on Vogue Runway" : `#${m.value} most-viewed SS27 show on Vogue Runway`) : m.metric === "interest_0_100" ? `search interest ${Math.round(m.value)}/100 this week` : m.metric.startsWith("fw_ss27_engagements") ? `${Math.round(m.value).toLocaleString()} fashion-month engagements` : m.metric === "posts_visible" ? `${m.value} posts visible on the tag page` : `${m.metric.replace(/_/g, " ")} ${m.value}`}</li>
+                ))}
+              </ul>
+            )}
+            {n.buzz.events.length > 0 && (
+              <div className="bevents">
+                <p className="lab">moments</p>
+                <ul>{n.buzz.events.slice(0, 3).map((e, i) => <li key={i}><span className="when">{e.date}</span> {e.note}</li>)}</ul>
+              </div>
+            )}
+            <p className="bnote">Score = 50 + week-over-week growth, plus a little for volume, averaged across the platforms we read. One platform is a weak read. Derived counts only; we store no posts or people.</p>
+          </div>
+        ) : (
+          <div className="buzzbox empty"><p>No buzz read yet for this bag. The daily run adds its hashtags and search terms the day after it is first asked about.</p></div>
+        )}
+      </section>
 
       <button type="button" className="why-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "hide the why" : "show me why"}</button>
       {open && (
