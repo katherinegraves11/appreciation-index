@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 function shortName(bag: string): string {
   const base = bag.replace(/\s*\(.*?\)\s*/g, " ").replace(/\s+/g, " ").trim();
   const words = base.split(" ");
-  return words.length > 4 ? words.slice(0, 4).join(" ") : base;
+  const cut = base.length > 24 ? 3 : 4;
+  return words.length > cut ? words.slice(0, cut).join(" ") : base;
 }
 
 const W: Record<string, string> = { yes: "Buy", no: "Don't", wait: "Wait" };
