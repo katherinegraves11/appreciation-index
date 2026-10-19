@@ -264,3 +264,5 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
   .verdict .spec{font-size:15px}
 }
 @media (max-width:768px){.mast{grid-template-columns:1fr;row-gap:6px;text-align:center}.mast nav,.mast .right{justify-content:center}}
+
+.bag .spec{margin:4px 0 0;font-size:14px;color:var(--ink-2);font-style:italic;line-height:1.35}

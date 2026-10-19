@@ -4,6 +4,13 @@ import { toSignals } from "@/lib/cards";
 
 export const dynamic = "force-dynamic";
 
+/** Keep card titles to two lines: strip parentheses and cut at four words; the full name shows underneath. */
+function shortName(bag: string): string {
+  const base = bag.replace(/\s*\(.*?\)\s*/g, " ").replace(/\s+/g, " ").trim();
+  const words = base.split(" ");
+  return words.length > 4 ? words.slice(0, 4).join(" ") : base;
+}
+
 const W: Record<string, string> = { yes: "Buy", no: "Don't", wait: "Wait" };
 
 /** My bags: every bag the book has answered on, newest first. (A per-user closet with owned / watching comes with sign-in.) */
@@ -24,7 +31,7 @@ export default async function Bags() {
           return (
             <Link key={b.id} href={`/?brief=${b.id}`} className="bag">
               <div className="bag-top">
-                <div><p className="lab">{new Date(b.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p><h3>{b.house} <i>{b.bag}</i></h3></div>
+                <div><p className="lab">{new Date(b.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p><h3>{b.house} <i>{shortName(b.bag)}</i></h3>{shortName(b.bag) !== b.bag && <p className="spec">{b.bag}</p>}</div>
                 <span className="tag">{b.result.call}</span>
               </div>
               <p className="line">{b.result.plain_answer || b.result.one_line}</p>

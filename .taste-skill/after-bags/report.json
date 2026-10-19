@@ -1,6 +1,6 @@
 {
  "url": "http://localhost:3000/bags",
- "at": "2026-10-19T02:54:40.295Z",
+ "at": "2026-10-19T02:56:23.484Z",
  "allow": [],
  "viewports": [
   {
@@ -9,7 +9,7 @@
    "load": "load",
    "screens": 3,
    "filled": [
-    0.3,
+    0.28,
     0.29,
     0.29
    ],
@@ -27,9 +27,9 @@
      "h": 900
     },
     "page": {
-     "height": 2266,
+     "height": 2245,
      "screens": 2.5,
-     "words": 780,
+     "words": 788,
      "img": 0,
      "video": 0,
      "canvas": 0,
@@ -138,18 +138,19 @@
      "families": [
       {
        "family": "EB Garamond",
-       "share": 0.88,
+       "share": 0.9,
        "mono": false
       },
       {
        "family": "Libre Caslon Display",
-       "share": 0.12,
+       "share": 0.1,
        "mono": false
       }
      ],
      "familyCount": 2,
      "sizes": [
       13,
+      14,
       15,
       16,
       17,
@@ -159,7 +160,7 @@
       30,
       54
      ],
-     "sizeCount": 9,
+     "sizeCount": 10,
      "notLoaded": [],
      "body": {
       "font": "EB Garamond",
@@ -212,15 +213,15 @@
      "textColors": [
       {
        "color": "#5a564d",
-       "share": 0.87
+       "share": 0.89
       },
       {
        "color": "#3b4a7a",
-       "share": 0.06
+       "share": 0.04
       },
       {
        "color": "#2b2a26",
-       "share": 0.04
+       "share": 0.03
       },
       {
        "color": "#9a4a3a",
@@ -340,7 +341,7 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 2266,
+    "pageH": 2245,
     "margins": {
      "left": 221,
      "right": 226
@@ -373,8 +374,8 @@
       "sel": "div.bags",
       "tag": "div",
       "top": 352,
-      "height": 1824,
-      "words": 755,
+      "height": 1803,
+      "words": 763,
       "media": 0,
       "middle": 61,
       "heading": {
@@ -414,7 +415,7 @@
      },
      {
       "x": 926,
-      "n": 10
+      "n": 11
      },
      {
       "x": 282,
@@ -433,7 +434,7 @@
       "n": 1
      }
     ],
-    "leftBlocks": 39,
+    "leftBlocks": 40,
     "bodySize": 16,
     "stage": false,
     "explains": false,
@@ -479,28 +480,28 @@
     "charts": 0,
     "layout": {
      "panels": 11,
-     "firstScreen": 3,
+     "firstScreen": 6,
      "ragged": [],
      "voids": [
       {
        "gap": 149,
-       "at": 1588,
+       "at": 1566,
        "panel": "Loewe Puzzle"
       },
       {
-       "gap": 134,
+       "gap": 112,
        "at": 700,
        "panel": "Chanel Spring 2027 runway bags"
       },
       {
-       "gap": 79,
-       "at": 754,
-       "panel": "Chanel Métiers d'Art Paris–New York 2025"
+       "gap": 74,
+       "at": 1642,
+       "panel": "Chanel Classic Flap"
       },
       {
-       "gap": 74,
-       "at": 1663,
-       "panel": "Chanel Classic Flap"
+       "gap": 43,
+       "at": 769,
+       "panel": "Chanel Métiers d'Art Paris–New York"
       }
      ]
     },
@@ -545,6 +546,7 @@
      "tinySamples": [],
      "sizes": [
       13,
+      14,
       15,
       16,
       17,
@@ -559,7 +561,7 @@
      "size": 54,
      "top": 198
     },
-    "colourShare": 0
+    "colourShare": 0.001
    },
    "consoleErrors": []
   },
@@ -569,9 +571,9 @@
    "load": "load",
    "screens": 3,
    "filled": [
-    0.27,
-    0.43,
-    0.28
+    0.33,
+    0.42,
+    0.29
    ],
    "motion": {
     "elements": 0,
@@ -587,9 +589,9 @@
      "h": 1024
     },
     "page": {
-     "height": 3036,
-     "screens": 3,
-     "words": 780,
+     "height": 3001,
+     "screens": 2.9,
+     "words": 788,
      "img": 0,
      "video": 0,
      "canvas": 0,
@@ -685,10 +687,10 @@
       "kind": "heading"
      },
      {
-      "text": "Chanel Métiers d'Art Paris–New York 2025 pony-hair pieces",
-      "words": 8,
-      "chars": 57,
-      "lines": 4,
+      "text": "Chanel Métiers d'Art Paris–New York",
+      "words": 5,
+      "chars": 35,
+      "lines": 2,
       "size": 26,
       "vw": 3.4,
       "font": "Libre Caslon Display",
@@ -735,10 +737,10 @@
       "kind": "heading"
      },
      {
-      "text": "Chanel Blazy-era Chanel runway pieces (Spring 2026 debut collection, Paris Fashion Week)",
-      "words": 12,
-      "chars": 88,
-      "lines": 5,
+      "text": "Chanel Blazy-era Chanel runway pieces",
+      "words": 5,
+      "chars": 37,
+      "lines": 2,
       "size": 26,
       "vw": 3.4,
       "font": "Libre Caslon Display",
@@ -751,7 +753,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.27,
-      "top": 908,
+      "top": 895,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -776,7 +778,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.18,
-      "top": 908,
+      "top": 895,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -801,7 +803,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.25,
-      "top": 1374,
+      "top": 1340,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -826,7 +828,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.23,
-      "top": 1374,
+      "top": 1340,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -851,7 +853,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.27,
-      "top": 1731,
+      "top": 1697,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -876,7 +878,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.18,
-      "top": 1731,
+      "top": 1697,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -901,7 +903,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.25,
-      "top": 2226,
+      "top": 2192,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -926,7 +928,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.19,
-      "top": 2226,
+      "top": 2192,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -951,7 +953,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.28,
-      "top": 2645,
+      "top": 2611,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -962,8 +964,8 @@
     ],
     "headingSummary": {
      "count": 13,
-     "maxLines": 5,
-     "over2Lines": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
      "statements": 0,
      "centered": 2,
      "medianWords": 3,
@@ -973,18 +975,19 @@
      "families": [
       {
        "family": "EB Garamond",
-       "share": 0.88,
+       "share": 0.9,
        "mono": false
       },
       {
        "family": "Libre Caslon Display",
-       "share": 0.12,
+       "share": 0.1,
        "mono": false
       }
      ],
      "familyCount": 2,
      "sizes": [
       13,
+      14,
       15,
       16,
       17,
@@ -994,7 +997,7 @@
       30,
       35
      ],
-     "sizeCount": 9,
+     "sizeCount": 10,
      "notLoaded": [],
      "body": {
       "font": "EB Garamond",
@@ -1047,15 +1050,15 @@
      "textColors": [
       {
        "color": "#5a564d",
-       "share": 0.87
+       "share": 0.89
       },
       {
        "color": "#3b4a7a",
-       "share": 0.06
+       "share": 0.04
       },
       {
        "color": "#2b2a26",
-       "share": 0.04
+       "share": 0.03
       },
       {
        "color": "#9a4a3a",
@@ -1175,7 +1178,7 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 3036,
+    "pageH": 3001,
     "margins": {
      "left": 41,
      "right": 50
@@ -1231,8 +1234,8 @@
       "sel": "div.bags",
       "tag": "div",
       "top": 392,
-      "height": 2553,
-      "words": 755,
+      "height": 2519,
+      "words": 763,
       "media": 0,
       "middle": 62,
       "heading": {
@@ -1264,7 +1267,7 @@
     "edges": [
      {
       "x": 41,
-      "n": 18
+      "n": 19
      },
      {
       "x": 414,
@@ -1287,7 +1290,7 @@
       "n": 1
      }
     ],
-    "leftBlocks": 39,
+    "leftBlocks": 40,
     "bodySize": 16,
     "stage": false,
     "explains": false,
@@ -1333,16 +1336,16 @@
      "voids": [
       {
        "gap": 125,
-       "at": 1989,
+       "at": 1955,
        "panel": "Loewe Puzzle"
       },
       {
-       "gap": 110,
-       "at": 1152,
+       "gap": 89,
+       "at": 1139,
        "panel": "Hermès Birkin"
       },
       {
-       "gap": 56,
+       "gap": 43,
        "at": 740,
        "panel": "Chanel Spring 2027 runway bags"
       }
@@ -1389,6 +1392,7 @@
      "tinySamples": [],
      "sizes": [
       13,
+      14,
       15,
       16,
       17,
@@ -1414,12 +1418,12 @@
    "screens": 7,
    "filled": [
     0.37,
+    0.36,
+    0.4,
+    0.48,
     0.41,
     0.41,
-    0.47,
-    0.43,
-    0.39,
-    0.42
+    0.43
    ],
    "motion": {
     "elements": 0,
@@ -1435,9 +1439,9 @@
      "h": 844
     },
     "page": {
-     "height": 5313,
+     "height": 5307,
      "screens": 6.3,
-     "words": 776,
+     "words": 784,
      "img": 0,
      "video": 0,
      "canvas": 0,
@@ -1533,10 +1537,10 @@
       "kind": "heading"
      },
      {
-      "text": "Chanel Métiers d'Art Paris–New York 2025 pony-hair pieces",
-      "words": 8,
-      "chars": 57,
-      "lines": 4,
+      "text": "Chanel Métiers d'Art Paris–New York",
+      "words": 5,
+      "chars": 35,
+      "lines": 2,
       "size": 26,
       "vw": 6.7,
       "font": "Libre Caslon Display",
@@ -1574,7 +1578,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.52,
-      "top": 967,
+      "top": 954,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -1583,10 +1587,10 @@
       "kind": "heading"
      },
      {
-      "text": "Chanel Blazy-era Chanel runway pieces (Spring 2026 debut collection, Paris Fashion Week)",
-      "words": 12,
-      "chars": 88,
-      "lines": 5,
+      "text": "Chanel Blazy-era Chanel runway pieces",
+      "words": 5,
+      "chars": 37,
+      "lines": 3,
       "size": 26,
       "vw": 6.7,
       "font": "Libre Caslon Display",
@@ -1599,7 +1603,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.52,
-      "top": 1384,
+      "top": 1371,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -1624,7 +1628,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.36,
-      "top": 1884,
+      "top": 1877,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -1649,7 +1653,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.49,
-      "top": 2274,
+      "top": 2267,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -1674,7 +1678,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.45,
-      "top": 2664,
+      "top": 2657,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -1699,7 +1703,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.52,
-      "top": 3054,
+      "top": 3047,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -1724,7 +1728,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.34,
-      "top": 3581,
+      "top": 3575,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -1749,7 +1753,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.49,
-      "top": 3986,
+      "top": 3979,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -1774,7 +1778,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.37,
-      "top": 4438,
+      "top": 4431,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -1799,7 +1803,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.56,
-      "top": 4890,
+      "top": 4883,
       "mixedFonts": [
        "Libre Caslon Display",
        "Libre Caslon Display italic"
@@ -1810,8 +1814,8 @@
     ],
     "headingSummary": {
      "count": 13,
-     "maxLines": 5,
-     "over2Lines": 2,
+     "maxLines": 3,
+     "over2Lines": 1,
      "statements": 0,
      "centered": 2,
      "medianWords": 3,
@@ -1821,18 +1825,19 @@
      "families": [
       {
        "family": "EB Garamond",
-       "share": 0.88,
+       "share": 0.89,
        "mono": false
       },
       {
        "family": "Libre Caslon Display",
-       "share": 0.12,
+       "share": 0.11,
        "mono": false
       }
      ],
      "familyCount": 2,
      "sizes": [
       13,
+      14,
       16,
       17,
       20,
@@ -1840,7 +1845,7 @@
       28,
       30
      ],
-     "sizeCount": 7,
+     "sizeCount": 8,
      "notLoaded": [],
      "body": {
       "font": "EB Garamond",
@@ -1882,11 +1887,11 @@
      "textColors": [
       {
        "color": "#5a564d",
-       "share": 0.87
+       "share": 0.89
       },
       {
        "color": "#3b4a7a",
-       "share": 0.06
+       "share": 0.04
       },
       {
        "color": "#2b2a26",
@@ -2010,7 +2015,7 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 5313,
+    "pageH": 5307,
     "margins": {
      "left": 41,
      "right": 43
@@ -2066,8 +2071,8 @@
       "sel": "a.bag",
       "tag": "a",
       "top": 418,
-      "height": 454,
-      "words": 59,
+      "height": 441,
+      "words": 63,
       "media": 0,
       "middle": 0,
       "heading": {
@@ -2088,7 +2093,7 @@
      {
       "sel": "a.bag",
       "tag": "a",
-      "top": 890,
+      "top": 877,
       "height": 399,
       "words": 57,
       "media": 0,
@@ -2111,9 +2116,9 @@
      {
       "sel": "a.bag",
       "tag": "a",
-      "top": 1307,
-      "height": 481,
-      "words": 74,
+      "top": 1294,
+      "height": 487,
+      "words": 78,
       "media": 0,
       "middle": 0,
       "heading": {
@@ -2134,7 +2139,7 @@
      {
       "sel": "a.bag",
       "tag": "a",
-      "top": 1807,
+      "top": 1800,
       "height": 372,
       "words": 55,
       "media": 0,
@@ -2157,7 +2162,7 @@
      {
       "sel": "a.bag",
       "tag": "a",
-      "top": 2197,
+      "top": 2190,
       "height": 372,
       "words": 52,
       "media": 0,
@@ -2180,7 +2185,7 @@
      {
       "sel": "a.bag",
       "tag": "a",
-      "top": 2587,
+      "top": 2580,
       "height": 372,
       "words": 59,
       "media": 0,
@@ -2203,7 +2208,7 @@
      {
       "sel": "a.bag",
       "tag": "a",
-      "top": 2977,
+      "top": 2970,
       "height": 510,
       "words": 104,
       "media": 0,
@@ -2226,7 +2231,7 @@
      {
       "sel": "a.bag",
       "tag": "a",
-      "top": 3504,
+      "top": 3498,
       "height": 386,
       "words": 60,
       "media": 0,
@@ -2249,7 +2254,7 @@
      {
       "sel": "a.bag",
       "tag": "a",
-      "top": 3909,
+      "top": 3902,
       "height": 434,
       "words": 80,
       "media": 0,
@@ -2272,7 +2277,7 @@
      {
       "sel": "a.bag",
       "tag": "a",
-      "top": 4361,
+      "top": 4354,
       "height": 434,
       "words": 77,
       "media": 0,
@@ -2295,7 +2300,7 @@
      {
       "sel": "a.bag",
       "tag": "a",
-      "top": 4813,
+      "top": 4806,
       "height": 410,
       "words": 78,
       "media": 0,
@@ -2329,7 +2334,7 @@
     "edges": [
      {
       "x": 41,
-      "n": 32
+      "n": 33
      },
      {
       "x": 112,
@@ -2340,7 +2345,7 @@
       "n": 2
      }
     ],
-    "leftBlocks": 39,
+    "leftBlocks": 40,
     "bodySize": 16,
     "stage": false,
     "explains": false,
@@ -2426,6 +2431,7 @@
      "tinySamples": [],
      "sizes": [
       13,
+      14,
       16,
       17,
       20,
@@ -2491,16 +2497,9 @@
   },
   {
    "level": "WARN",
-   "id": "below-fold",
-   "width": 1440,
-   "message": "Only 3 of 11 blocks start on the first 1440px screen.",
-   "fix": "Every block the brief names shows its header and first rows on the first desktop screen: size the headline block to its question, cap long lists with \"View all\", and put time-sensitive blocks before long tables."
-  },
-  {
-   "level": "WARN",
    "id": "panel-void",
    "width": 1440,
-   "message": "4 card(s) hold a blank band inside: 149px in \"Loewe Puzzle\", 134px in \"Chanel Spring 2027 runway bags\", 79px in \"Chanel Métiers d'Art Paris–New York 2025\".",
+   "message": "4 card(s) hold a blank band inside: 149px in \"Loewe Puzzle\", 112px in \"Chanel Spring 2027 runway bags\", 74px in \"Chanel Classic Flap\".",
    "fix": "A card stretches to its neighbour only when it has content to fill. Keep a legend or a note directly under its chart (only an action or a total may sit at a stretched card's foot), let a short card keep its own height (align-items: start), and let a filtered block shrink to its rows."
   },
   {
@@ -2517,15 +2516,8 @@
   {
    "level": "FAIL",
    "id": "headline-lines",
-   "width": 768,
-   "message": "2 headline(s) wrap past two lines at 768px: \"Chanel Métiers d'Art Paris–New York 2025 pony-ha\" → 4 lines (8 words, 26px); \"Chanel Blazy-era Chanel runway pieces (Spring 20\" → 5 lines (12 words, 26px)",
-   "fix": "Cut words first (a headline is a title, not a sentence). Then give it a wider measure. Lower the size only as a last resort and never below the scale you chose. A real statement paragraph belongs in a <p> or <blockquote> at 32px or less."
-  },
-  {
-   "level": "FAIL",
-   "id": "headline-lines",
    "width": 390,
-   "message": "2 headline(s) wrap past two lines at 390px: \"Chanel Métiers d'Art Paris–New York 2025 pony-ha\" → 4 lines (8 words, 26px); \"Chanel Blazy-era Chanel runway pieces (Spring 20\" → 5 lines (12 words, 26px)",
+   "message": "1 headline(s) wrap past two lines at 390px: \"Chanel Blazy-era Chanel runway pieces\" → 3 lines (5 words, 26px)",
    "fix": "Cut words first (a headline is a title, not a sentence). Then give it a wider measure. Lower the size only as a last resort and never below the scale you chose. A real statement paragraph belongs in a <p> or <blockquote> at 24px or less."
   }
  ],
