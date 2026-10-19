@@ -61,8 +61,8 @@ export type EvidenceItem = z.infer<typeof EvidenceItem>;
 
 export const BriefInput = z.object({
   house: z.string().trim().min(1).max(80),
-  bag: z.string().trim().min(1).max(120),
-  spec: z.string().trim().max(200).optional().or(z.literal("")),
+  bag: z.string().trim().min(1).max(160),
+  spec: z.string().trim().max(600).optional().or(z.literal("")),
   horizonYears: z.union([z.literal(5), z.literal(10)]),
   clientType: z.enum(["collector", "wearer", "stylist", "sourcer"]),
   cohort: z.enum(["unknown", "gen_alpha", "gen_z", "millennial", "gen_x", "boomer"]).default("unknown"),

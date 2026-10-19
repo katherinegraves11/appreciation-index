@@ -32,7 +32,13 @@ export async function POST(req: Request) {
         });
         send({ done: true, id, result: scored.result, input: { house: input.house, bag: input.bag, spec: input.spec || "" }, numbers: quickNumbers(input.house, input.bag) });
       } catch (err) {
-        send({ error: err instanceof Error ? err.message : "Something went wrong." });
+        const raw = err instanceof Error ? err.message : "";
+        console.error("[ask]", raw);
+        const friendly = /credit balance|billing/i.test(raw) ? "The research service is out of credit. Top up at console.anthropic.com and ask again."
+          : /too_big|ZodError|Invalid|expected string|parse/i.test(raw) ? "I read your question but tripped on the details. Ask again in a slightly shorter form, e.g. 'Louise Trotter's Bottega bags, worth pre-ordering?'"
+          : /overloaded|529|rate/i.test(raw) ? "The research service is busy. Try again in a minute."
+          : "Something went wrong on our side. Ask again; if it repeats, tell Katie.";
+        send({ error: friendly });
       } finally {
         controller.close();
       }

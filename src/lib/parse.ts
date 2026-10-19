@@ -38,10 +38,11 @@ export async function parseQuestion(question: string) {
   const p = response.parsed_output;
   if (!p) throw new Error("Could not read the question.");
   if (!p.understood || !p.house || !p.bag) return { ok: false as const, clarification: p.clarification || "Which bag do you mean? A house and a model, or just describe it: 'the new pony hair Chanel'." };
+  const clip = (v: string, n: number) => (v && v.length > n ? v.slice(0, n - 1).replace(/[,;\s]+\S*$/, "") + "…" : v);
   const input = BriefInput.parse({
-    house: p.house, bag: p.bag, spec: p.spec, horizonYears: p.horizonYears, clientType: p.clientType,
+    house: clip(p.house, 80), bag: clip(p.bag, 160), spec: clip(p.spec, 600), horizonYears: p.horizonYears, clientType: p.clientType,
     cohort: p.cohort, budget: p.budget, notes: `Client's own words: ${question.slice(0, 500)}`,
-    questionType: p.questionType || "bag", season: p.season || "",
+    questionType: p.questionType || "bag", season: clip(p.season || "", 120),
   });
   return { ok: true as const, input, interpretation: p.interpretation || "" };
 }
