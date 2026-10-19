@@ -7,7 +7,8 @@
     "build": "NODE_OPTIONS=--no-experimental-strip-types next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "sync-tracker": "sh ./scripts_sync_tracker.sh"
+    "sync-tracker": "sh ./scripts_sync_tracker.sh",
+    "open": "sh scripts/open.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",
