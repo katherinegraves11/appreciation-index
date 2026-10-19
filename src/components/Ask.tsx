@@ -13,7 +13,7 @@ const EXAMPLES = [
   "Should I buy the new Chanel everyone has, the big soft flap?",
 ];
 
-export type Done = { result: BriefResult; id: string; bagName: string; numbers: QuickNumbers | null };
+export type Done = { result: BriefResult; id: string; bagName: string; numbers: QuickNumbers | null; cached?: boolean; answeredAt?: string };
 
 export default function Ask({ initial = null }: { initial?: Done | null }) {
   const { h } = useHorizon();
@@ -32,11 +32,11 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function ask(question: string) {
+  async function ask(question: string, fresh = false) {
     if (!question.trim() || busy) return;
     setBusy(true); setError(null); setDone(null); setStatus("Reading your question…");
     try {
-      const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question, horizon: h }) });
+      const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question, horizon: h, fresh }) });
       if (!res.ok || !res.body) { const j = await res.json().catch(() => ({})); throw new Error(j.error || `Request failed (${res.status}).`); }
       const reader = res.body.getReader(); const dec = new TextDecoder(); let buf = "";
       while (true) {
@@ -45,12 +45,12 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
         const lines = buf.split("\n"); buf = lines.pop() ?? "";
         for (const line of lines) {
           if (!line.trim()) continue;
-          const evt = JSON.parse(line) as { status?: string; error?: string; clarification?: string; done?: boolean; id?: string; result?: BriefResult; input?: { house: string; bag: string; spec: string }; numbers?: QuickNumbers | null };
+          const evt = JSON.parse(line) as { status?: string; error?: string; clarification?: string; done?: boolean; id?: string; result?: BriefResult; input?: { house: string; bag: string; spec: string }; numbers?: QuickNumbers | null; cached?: boolean; answered_at?: string };
           if (evt.status) setStatus(evt.status);
           if (evt.clarification) { setError(evt.clarification); setBusy(false); setStatus(null); return; }
           if (evt.error) throw new Error(evt.error);
           if (evt.done && evt.result && evt.id && evt.input) {
-            setDone({ result: evt.result, id: evt.id, bagName: `${evt.input.house} · ${evt.input.bag}${evt.input.spec ? ` · ${evt.input.spec}` : ""}`, numbers: evt.numbers ?? null });
+            setDone({ result: evt.result, id: evt.id, bagName: `${evt.input.house} · ${evt.input.bag}${evt.input.spec ? ` · ${evt.input.spec}` : ""}`, numbers: evt.numbers ?? null, cached: !!evt.cached, answeredAt: evt.answered_at });
             setStatus(null); setBusy(false); return;
           }
         }
@@ -87,10 +87,13 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
         <div className="thinking" aria-live="polite">
           <div className="dots"><span /><span /><span /></div>
           <p>{status}</p>
-          <p className="k">two to four minutes · it reads the resale market, the house, the designer and what people are saying</p>
+          <p className="k">about three minutes · it reads the tracker first, then searches only for what is missing</p>
         </div>
       )}
       {error && <div className="status error" role="alert">{error}</div>}
+      {done?.cached && (
+        <p className="cachedline">Answered {done.answeredAt ? new Date(done.answeredAt).toLocaleDateString("en-US", { month: "long", day: "numeric" }) : "recently"}. <button type="button" className="linkbtn" onClick={() => ask(q || done.bagName, true)}>Run a fresh read</button> (about three minutes).</p>
+      )}
       {done && <Answer result={done.result} bagName={done.bagName} briefId={done.id} numbers={done.numbers} />}
     </>
   );

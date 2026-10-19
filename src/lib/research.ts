@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { anthropic, MODEL } from "./anthropic";
+import { anthropic, RESEARCH_MODEL } from "./anthropic";
 import { ANALYST_SYSTEM, researchPrompt } from "./rubric";
 import { buildTrackerDossier, buzzDossier, collectionDossier, ownershipDossier, pestelDossier } from "./tracker";
 import type { BriefInput } from "./schema";
@@ -44,14 +44,14 @@ export async function runResearch(
   const usage = { input_tokens: 0, output_tokens: 0 };
   let searches = 0;
 
-  for (let round = 0; round < 3; round++) {
+  for (let round = 0; round < 2; round++) {
     const stream = anthropic.messages.stream({
-      model: MODEL,
-      max_tokens: 32000,
+      model: RESEARCH_MODEL,
+      max_tokens: 16000,
       system: [{ type: "text", text: ANALYST_SYSTEM, cache_control: { type: "ephemeral" } }],
       thinking: { type: "adaptive" },
       output_config: { effort: "medium" },
-      tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 12 }],
+      tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 7 }],
       messages,
     });
 

@@ -4,13 +4,15 @@ import { runScoring } from "@/lib/score";
 import { saveBrief } from "@/lib/db";
 import { MODEL } from "@/lib/anthropic";
 import { quickNumbers } from "@/lib/tracker";
+import { listBriefs } from "@/lib/db";
 
 export const maxDuration = 300;
 export const runtime = "nodejs";
 
 /** POST /api/ask {question} → NDJSON: {status} … {parsed} … {done, id, result} */
 export async function POST(req: Request) {
-  const body = (await req.json().catch(() => null)) as { question?: string } | null;
+  const body = (await req.json().catch(() => null)) as { question?: string; horizon?: number; fresh?: boolean } | null;
+  const fresh = !!body?.fresh || /\b(fresh|again|update|latest|re-?run|refresh)\b/i.test(body?.question ?? "");
   const question = (body?.question ?? "").trim();
   if (question.length < 3) return new Response(JSON.stringify({ error: "Ask about a bag." }), { status: 400, headers: { "content-type": "application/json" } });
   const encoder = new TextEncoder();
@@ -23,6 +25,15 @@ export async function POST(req: Request) {
         if (!parsed.ok) { send({ clarification: parsed.clarification }); return; }
         const input = parsed.input;
         send({ parsed: { house: input.house, bag: input.bag, spec: input.spec || "" }, interpretation: parsed.interpretation, status: parsed.interpretation ? `${parsed.interpretation} Looking it up…` : `Looking up the ${input.house} ${input.bag}…` });
+        if (!fresh) {
+          const norm = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+          const recent = (await listBriefs(80)).find((b) => norm(b.house) === norm(input.house) && norm(b.bag) === norm(input.bag) && Date.now() - new Date(b.created_at).getTime() < 7 * 86400000);
+          if (recent) {
+            send({ status: "We answered this recently. Showing that read…" });
+            send({ done: true, id: recent.id, result: recent.result, input: { house: recent.house, bag: recent.bag, spec: recent.spec || "" }, numbers: quickNumbers(recent.house, recent.bag), cached: true, answered_at: recent.created_at });
+            return;
+          }
+        }
         const research = await runResearch(input, (line) => send({ status: line }));
         send({ status: "Weighing it up…" });
         const scored = await runScoring(input, research.dossier);

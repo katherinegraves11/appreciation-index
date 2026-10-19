@@ -132,6 +132,8 @@ Use web search to build an evidence dossier covering all five layers. Run separa
 8. Macro: start from the tracker's PESTEL WATCH block (tariffs, unrest, FX, demand cycle, EUDR and exotics regulation, digital product passports, platform law; cite as "Tracker: PESTEL watch") and refresh only the rows marked active or relevant to this house; then tariffs, FX price gaps, luxury demand cycle, and relevant regulation.
 9. Fashion history: the house's landmark eras and collections, any past scandals or controversies attached to the house or its designers (with dates and sources), whether those still surface in current coverage, and which past decades current creative directors are referencing on the runway.
 
+Search budget: at most seven searches in total, and no search for anything the tracker already states with a date and source. Spend them on what is missing or older than 90 days: realised sold prices if the tracker has none, the latest quarter's results, the creative-director status, and one social read. Keep the notes tight: a fact, its number, its source and date.
+
 Write the dossier as organized notes under those nine headings. For every fact, include the source name and date. Mark anything you could not verify as UNVERIFIED. Do not score yet and do not write the brief yet; this step is evidence only.`;
 }
 
