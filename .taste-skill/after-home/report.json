@@ -1,0 +1,1353 @@
+{
+ "url": "http://localhost:3000/",
+ "at": "2026-10-19T02:52:21.516Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 1,
+   "filled": [
+    0.21
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 900,
+     "screens": 1,
+     "words": 94,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Is it worth buying right now? in five years? in ten years?",
+     "words": 12,
+     "chars": 58,
+     "lines": 2,
+     "size": 104,
+     "vw": 7.2,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 0.98,
+     "top": 210,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Is it worth buying right now?",
+     "words": 6,
+     "lines": 2,
+     "size": 104,
+     "font": "Libre Caslon Display"
+    },
+    "headings": [
+     {
+      "text": "APPReCIATION",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 30,
+      "vw": 2.1,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0.02,
+      "leading": 1.5,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.18,
+      "top": 22,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Is it worth buying right now?",
+      "words": 6,
+      "chars": 29,
+      "lines": 2,
+      "size": 104,
+      "vw": 7.2,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": -0.005,
+      "leading": 0.98,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.72,
+      "top": 210,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 2,
+     "medianWords": 1,
+     "mixedFontHeadings": 2
+    },
+    "type": {
+     "families": [
+      {
+       "family": "EB Garamond",
+       "share": 0.91,
+       "mono": false
+      },
+      {
+       "family": "Libre Caslon Display",
+       "share": 0.09,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      15,
+      16,
+      17,
+      28,
+      30,
+      104
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "EB Garamond",
+      "size": 15,
+      "leading": 1.5,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 6.1
+     },
+     "measureChars": 63,
+     "max": {
+      "size": 104,
+      "vw": 7.2,
+      "font": "Libre Caslon Display",
+      "text": "Is it worth buying"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.02,
+     "centerShare": 0.92,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "ask about a bag",
+      "above": "Is it worth buying right now?",
+      "upper": false,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 16,
+      "top": 154
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f3ead8",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.53,
+      "l": 0.9
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#5a564d",
+       "share": 0.78
+      },
+      {
+       "color": "#2b2a26",
+       "share": 0.21
+      },
+      {
+       "color": "#f3ead8",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#2b2a26",
+      "hsl": {
+       "h": 48,
+       "s": 0.06,
+       "l": 0.16
+      },
+      "fg": "#f3ead8"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 5,
+     "inHero": 5,
+     "radius": "pill",
+     "height": 39,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "1 year",
+      "Is the pony hair Chanel bag everyone's t",
+      "Will a Birkin 30 be worth more in ten ye",
+      "Is the Alaïa Le Teckel still worth it no",
+      "Should I buy the new Chanel everyone has"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 2,
+     "hairlineSamples": [
+      "form.ask 760px",
+      "div.rule 1040px rule"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 7,
+     "fixed": false,
+     "height": 77,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "eb garamond",
+     "libre caslon display"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 900,
+    "margins": {
+     "left": 242,
+     "right": 265
+    },
+    "sections": [],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Is it worth buying right now?",
+      "size": 104,
+      "top": 210,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [],
+    "leftBlocks": 0,
+    "bodySize": 15,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.17,
+    "voidBox": {
+     "x": 0,
+     "y": 120,
+     "w": 300,
+     "h": 720
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": false,
+    "ground": "#f3ead8",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 20,
+     "right": 20
+    },
+    "hero": {
+     "text": "Is it worth buying right now? in five years? in ten years?",
+     "words": 12,
+     "chars": 58,
+     "lines": 2,
+     "size": 104,
+     "vw": 7.2,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 0.98,
+     "top": 210,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 0,
+     "firstScreen": 0,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 0,
+     "radii": [],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      15,
+      16,
+      17,
+      28,
+      104
+     ]
+    },
+    "title": {
+     "text": "Is it worth buying right now?",
+     "size": 104,
+     "top": 210
+    },
+    "colourShare": 0
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 1,
+   "filled": [
+    0.22
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 1024,
+     "screens": 1,
+     "words": 94,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Is it worth buying right now? in five years? in ten years?",
+     "words": 12,
+     "chars": 58,
+     "lines": 1,
+     "size": 61,
+     "vw": 8,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 0.98,
+     "top": 270,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Is it worth buying right now?",
+     "words": 6,
+     "lines": 1,
+     "size": 61.4,
+     "font": "Libre Caslon Display"
+    },
+    "headings": [
+     {
+      "text": "APPReCIATION",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0.02,
+      "leading": 1.5,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 52,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Is it worth buying right now?",
+      "words": 6,
+      "chars": 29,
+      "lines": 1,
+      "size": 61.4,
+      "vw": 8,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": -0.005,
+      "leading": 0.98,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.82,
+      "top": 270,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 2,
+     "medianWords": 1,
+     "mixedFontHeadings": 2
+    },
+    "type": {
+     "families": [
+      {
+       "family": "EB Garamond",
+       "share": 0.91,
+       "mono": false
+      },
+      {
+       "family": "Libre Caslon Display",
+       "share": 0.09,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      15,
+      16,
+      17,
+      28,
+      30,
+      61
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "EB Garamond",
+      "size": 15,
+      "leading": 1.5,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 6.1
+     },
+     "measureChars": 63,
+     "max": {
+      "size": 61.4,
+      "vw": 8,
+      "font": "Libre Caslon Display",
+      "text": "Is it worth buying"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.02,
+     "centerShare": 1,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "ask about a bag",
+      "above": "Is it worth buying right now?",
+      "upper": false,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 16,
+      "top": 214
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f3ead8",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.53,
+      "l": 0.9
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#5a564d",
+       "share": 0.78
+      },
+      {
+       "color": "#2b2a26",
+       "share": 0.21
+      },
+      {
+       "color": "#f3ead8",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#2b2a26",
+      "hsl": {
+       "h": 48,
+       "s": 0.06,
+       "l": 0.16
+      },
+      "fg": "#f3ead8"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 5,
+     "inHero": 5,
+     "radius": "pill",
+     "height": 39,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "1 year",
+      "Is the pony hair Chanel bag everyone's t",
+      "Will a Birkin 30 be worth more in ten ye",
+      "Is the Alaïa Le Teckel still worth it no",
+      "Should I buy the new Chanel everyone has"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 2,
+     "hairlineSamples": [
+      "form.ask 728px",
+      "div.rule 728px rule"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 7,
+     "fixed": false,
+     "height": 137,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "eb garamond",
+     "libre caslon display"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 1024,
+    "margins": {
+     "left": 48,
+     "right": 38
+    },
+    "sections": [
+     {
+      "sel": "header.mast",
+      "tag": "header",
+      "top": 0,
+      "height": 137,
+      "words": 10,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Appr",
+       "size": 28,
+       "tag": "a"
+      },
+      "left": 253,
+      "right": 253,
+      "textLeft": 253,
+      "textRight": 253,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "main",
+      "tag": "main",
+      "top": 168,
+      "height": 520,
+      "words": 83,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Is it worth buying",
+       "size": 61,
+       "tag": "h1"
+      },
+      "left": 20,
+      "right": 20,
+      "textLeft": 63,
+      "textRight": 38,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Is it worth buying right now?",
+      "size": 61,
+      "top": 270,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [],
+    "leftBlocks": 0,
+    "bodySize": 15,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": false,
+    "ground": "#f3ead8",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 20,
+     "right": 20
+    },
+    "hero": {
+     "text": "Is it worth buying right now? in five years? in ten years?",
+     "words": 12,
+     "chars": 58,
+     "lines": 1,
+     "size": 61,
+     "vw": 8,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 0.98,
+     "top": 270,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 0,
+     "firstScreen": 0,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 0,
+     "radii": [],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      15,
+      16,
+      17,
+      28,
+      61
+     ]
+    },
+    "title": {
+     "text": "Is it worth buying right now?",
+     "size": 61,
+     "top": 270
+    },
+    "colourShare": 0
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.31,
+    0.28
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 936,
+     "screens": 1.1,
+     "words": 90,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Is it worth buying right now? in five years? in ten years?",
+     "words": 12,
+     "chars": 58,
+     "lines": 2,
+     "size": 40,
+     "vw": 10.3,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 0.98,
+     "top": 270,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Is it worth buying right now?",
+     "words": 6,
+     "lines": 2,
+     "size": 40,
+     "font": "Libre Caslon Display"
+    },
+    "headings": [
+     {
+      "text": "APPReCIATION",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0.02,
+      "leading": 1.5,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 52,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Is it worth buying right now?",
+      "words": 6,
+      "chars": 29,
+      "lines": 2,
+      "size": 40,
+      "vw": 10.3,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": -0.005,
+      "leading": 0.98,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 270,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 2,
+     "medianWords": 1,
+     "mixedFontHeadings": 2
+    },
+    "type": {
+     "families": [
+      {
+       "family": "EB Garamond",
+       "share": 0.91,
+       "mono": false
+      },
+      {
+       "family": "Libre Caslon Display",
+       "share": 0.09,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      15,
+      16,
+      17,
+      28,
+      30,
+      40
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "EB Garamond",
+      "size": 15,
+      "leading": 1.5,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 6.1
+     },
+     "measureChars": 47,
+     "max": {
+      "size": 40,
+      "vw": 10.3,
+      "font": "Libre Caslon Display",
+      "text": "Is it worth buying"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.03,
+     "centerShare": 1,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "ask about a bag",
+      "above": "Is it worth buying right now?",
+      "upper": false,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 16,
+      "top": 214
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f3ead8",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.53,
+      "l": 0.9
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#5a564d",
+       "share": 0.79
+      },
+      {
+       "color": "#2b2a26",
+       "share": 0.2
+      },
+      {
+       "color": "#f3ead8",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#2b2a26",
+      "hsl": {
+       "h": 48,
+       "s": 0.06,
+       "l": 0.16
+      },
+      "fg": "#f3ead8"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 5,
+     "inHero": 5,
+     "radius": "pill",
+     "height": 61,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "1 year",
+      "Is the pony hair Chanel bag everyone's t",
+      "Will a Birkin 30 be worth more in ten ye",
+      "Is the Alaïa Le Teckel still worth it no",
+      "Should I buy the new Chanel everyone has"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 2,
+     "hairlineSamples": [
+      "form.ask 350px",
+      "div.rule 350px rule"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 7,
+     "fixed": false,
+     "height": 137,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "eb garamond",
+     "libre caslon display"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 936,
+    "margins": {
+     "left": 20,
+     "right": 20
+    },
+    "sections": [
+     {
+      "sel": "header.mast",
+      "tag": "header",
+      "top": 0,
+      "height": 137,
+      "words": 10,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Appr",
+       "size": 28,
+       "tag": "a"
+      },
+      "left": 64,
+      "right": 64,
+      "textLeft": 64,
+      "textRight": 64,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "main",
+      "tag": "main",
+      "top": 168,
+      "height": 678,
+      "words": 83,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Is it worth buying",
+       "size": 40,
+       "tag": "h1"
+      },
+      "left": 20,
+      "right": 20,
+      "textLeft": 21,
+      "textRight": 21,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Is it worth buying right now?",
+      "size": 40,
+      "top": 270,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [],
+    "leftBlocks": 0,
+    "bodySize": 15,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": false,
+    "ground": "#f3ead8",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 20,
+     "right": 20
+    },
+    "hero": {
+     "text": "Is it worth buying right now? in five years? in ten years?",
+     "words": 12,
+     "chars": 58,
+     "lines": 2,
+     "size": 40,
+     "vw": 10.3,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 0.98,
+     "top": 270,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 0,
+     "firstScreen": 0,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 0,
+     "radii": [],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      15,
+      16,
+      17,
+      28,
+      40
+     ]
+    },
+    "title": {
+     "text": "Is it worth buying right now?",
+     "size": 40,
+     "top": 270
+    },
+    "colourShare": 0
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "mixed-font-headline",
+   "width": 1440,
+   "message": "2 headline(s) switch typeface or to italic mid-line (the \"one italic serif word\" move).",
+   "fix": "Set the whole headline in one face. Emphasis comes from the words.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "palette-cream",
+   "width": 1440,
+   "message": "Yellow-cream background (page background #f3ead8, text #f3ead8).",
+   "fix": "Use the drawn palette. If you want warmth, take a low-chroma stone or bone, not a yellow cream.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "app-title-size",
+   "width": 1440,
+   "message": "The h1 is 104px (\"Is it worth buying right now?\").",
+   "fix": "An app screen is not a landing page: the title is 18-32px (20-24px on a phone).",
+   "alsoAt": [
+    768,
+    390
+   ]
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-home/desktop-fold.jpg",
+   "pages": [
+    "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-home/desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-home/tablet-fold.jpg",
+   "pages": [
+    "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-home/tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-home/mobile-fold.jpg",
+   "pages": [
+    "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-home/mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

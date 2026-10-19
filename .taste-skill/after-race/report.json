@@ -1,0 +1,1629 @@
+{
+ "url": "http://localhost:3000/race",
+ "at": "2026-10-19T02:52:31.291Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.33,
+    0.32
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 1791,
+     "screens": 2,
+     "words": 285,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Where to put your money this season.",
+     "words": 7,
+     "chars": 36,
+     "lines": 1,
+     "size": 54,
+     "vw": 3.8,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 198,
+     "tag": "h2",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": null,
+    "headings": [
+     {
+      "text": "APPReCIATION",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 30,
+      "vw": 2.1,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0.02,
+      "leading": 1.5,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.18,
+      "top": 22,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Where to put your money this season.",
+      "words": 7,
+      "chars": 36,
+      "lines": 1,
+      "size": 54,
+      "vw": 3.8,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.72,
+      "top": 198,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 2,
+     "medianWords": 1,
+     "mixedFontHeadings": 2
+    },
+    "type": {
+     "families": [
+      {
+       "family": "EB Garamond",
+       "share": 0.77,
+       "mono": false
+      },
+      {
+       "family": "Libre Caslon Display",
+       "share": 0.23,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      15,
+      16,
+      17,
+      20,
+      28,
+      30,
+      54
+     ],
+     "sizeCount": 7,
+     "notLoaded": [],
+     "body": {
+      "font": "EB Garamond",
+      "size": 17,
+      "leading": 1.5,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 6.1
+     },
+     "measureChars": 60,
+     "max": {
+      "size": 54,
+      "vw": 3.8,
+      "font": "Libre Caslon Display",
+      "text": "Where to put your money"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.56,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "the race · october 2026",
+      "above": "Where to put your money this season.",
+      "upper": false,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 16,
+      "top": 158
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f3ead8",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.53,
+      "l": 0.9
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#2b2a26",
+       "share": 0.51
+      },
+      {
+       "color": "#5a564d",
+       "share": 0.48
+      },
+      {
+       "color": "#3b4a7a",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#f3ead8",
+      "hsl": {
+       "h": 40,
+       "s": 0.53,
+       "l": 0.9
+      },
+      "fg": "#2b2a26"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 13,
+     "inHero": 13,
+     "radius": "pill",
+     "height": 38,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Hermès",
+      "Chanel",
+      "Louis Vuitton",
+      "Gucci",
+      "Prada"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 3,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px",
+      "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px",
+      "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px"
+     ],
+     "gradients": 1,
+     "scrims": 0,
+     "gradientSamples": [
+      "div.board → linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127)), linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127"
+     ],
+     "gradientText": 0,
+     "hairlines": 5,
+     "hairlineSamples": [
+      "h2.vh 1040px",
+      "div.pod-now 317px",
+      "div.pod-fore 317px",
+      "div.pod-cool 317px",
+      "div.rule 1040px rule"
+     ],
+     "outlinedBoxes": 1,
+     "dashed": 1,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 1317
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 7,
+     "fixed": false,
+     "height": 77,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "eb garamond",
+     "libre caslon display"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 1791,
+    "margins": {
+     "left": 213,
+     "right": 332
+    },
+    "sections": [
+     {
+      "sel": "section.bookhead",
+      "tag": "section",
+      "top": 108,
+      "height": 313,
+      "words": 71,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Where to put your money",
+       "size": 54,
+       "tag": "h2"
+      },
+      "left": 206,
+      "right": 343,
+      "textLeft": 206,
+      "textRight": 343,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.houses",
+      "tag": "div",
+      "top": 439,
+      "height": 124,
+      "words": 30,
+      "media": 0,
+      "middle": 7,
+      "heading": null,
+      "left": 315,
+      "right": 358,
+      "textLeft": 315,
+      "textRight": 373,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.podium",
+      "tag": "div",
+      "top": 1317,
+      "height": 260,
+      "words": 89,
+      "media": 0,
+      "middle": 63,
+      "heading": null,
+      "left": 220,
+      "right": 332,
+      "textLeft": 220,
+      "textRight": 332,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [],
+    "edgeText": [],
+    "edges": [],
+    "leftBlocks": 0,
+    "bodySize": 17,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.17,
+    "voidBox": {
+     "x": 1140,
+     "y": 120,
+     "w": 300,
+     "h": 720
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": false,
+    "ground": "#f3ead8",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 60,
+     "right": 200
+    },
+    "hero": {
+     "text": "Where to put your money this season.",
+     "words": 7,
+     "chars": 36,
+     "lines": 1,
+     "size": 54,
+     "vw": 3.8,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 198,
+     "tag": "h2",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 4,
+     "firstScreen": 1,
+     "ragged": [],
+     "voids": [
+      {
+       "gap": 88,
+       "at": 1489,
+       "panel": "cooling · be careful"
+      }
+     ]
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 4,
+     "radii": [
+      [
+       0,
+       4
+      ]
+     ],
+     "heavyBorders": 4,
+     "borderSamples": [
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)"
+     ],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      15,
+      16,
+      17,
+      20,
+      28,
+      54
+     ]
+    },
+    "title": null,
+    "colourShare": 0.001
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.55,
+    0.5
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 1987,
+     "screens": 1.9,
+     "words": 285,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Where to put your money this season.",
+     "words": 7,
+     "chars": 36,
+     "lines": 1,
+     "size": 35,
+     "vw": 4.6,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 258,
+     "tag": "h2",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": null,
+    "headings": [
+     {
+      "text": "APPReCIATION",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0.02,
+      "leading": 1.5,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 52,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Where to put your money this season.",
+      "words": 7,
+      "chars": 36,
+      "lines": 1,
+      "size": 35.3,
+      "vw": 4.6,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 258,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 2,
+     "medianWords": 1,
+     "mixedFontHeadings": 2
+    },
+    "type": {
+     "families": [
+      {
+       "family": "EB Garamond",
+       "share": 0.77,
+       "mono": false
+      },
+      {
+       "family": "Libre Caslon Display",
+       "share": 0.23,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      15,
+      16,
+      17,
+      20,
+      28,
+      30,
+      35
+     ],
+     "sizeCount": 7,
+     "notLoaded": [],
+     "body": {
+      "font": "EB Garamond",
+      "size": 17,
+      "leading": 1.5,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 6.1
+     },
+     "measureChars": 60,
+     "max": {
+      "size": 35.3,
+      "vw": 4.6,
+      "font": "Libre Caslon Display",
+      "text": "Where to put your money"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.59,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "the race · october 2026",
+      "above": "Where to put your money this season.",
+      "upper": false,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 16,
+      "top": 218
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f3ead8",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.53,
+      "l": 0.9
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#2b2a26",
+       "share": 0.51
+      },
+      {
+       "color": "#5a564d",
+       "share": 0.48
+      },
+      {
+       "color": "#3b4a7a",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#f3ead8",
+      "hsl": {
+       "h": 40,
+       "s": 0.53,
+       "l": 0.9
+      },
+      "fg": "#2b2a26"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 13,
+     "inHero": 13,
+     "radius": "pill",
+     "height": 38,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Hermès",
+      "Chanel",
+      "Louis Vuitton",
+      "Gucci",
+      "Prada"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 3,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px",
+      "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px",
+      "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px"
+     ],
+     "gradients": 1,
+     "scrims": 0,
+     "gradientSamples": [
+      "div.board → linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127)), linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127"
+     ],
+     "gradientText": 0,
+     "hairlines": 5,
+     "hairlineSamples": [
+      "h2.vh 728px",
+      "div.pod-now 352px",
+      "div.pod-fore 352px",
+      "div.pod-cool 352px",
+      "div.rule 728px rule"
+     ],
+     "outlinedBoxes": 1,
+     "dashed": 1,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 1358
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 7,
+     "fixed": false,
+     "height": 137,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "eb garamond",
+     "libre caslon display"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 1987,
+    "margins": {
+     "left": 20,
+     "right": 41
+    },
+    "sections": [
+     {
+      "sel": "header.mast",
+      "tag": "header",
+      "top": 0,
+      "height": 137,
+      "words": 10,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Appr",
+       "size": 28,
+       "tag": "a"
+      },
+      "left": 253,
+      "right": 253,
+      "textLeft": 253,
+      "textRight": 253,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.bookhead",
+      "tag": "section",
+      "top": 168,
+      "height": 294,
+      "words": 71,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Where to put your money",
+       "size": 35,
+       "tag": "h2"
+      },
+      "left": 26,
+      "right": 138,
+      "textLeft": 26,
+      "textRight": 138,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.houses",
+      "tag": "div",
+      "top": 480,
+      "height": 124,
+      "words": 30,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 22,
+      "right": 22,
+      "textLeft": 37,
+      "textRight": 37,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.board",
+      "tag": "div",
+      "top": 634,
+      "height": 680,
+      "words": 38,
+      "media": 0,
+      "middle": 38,
+      "heading": null,
+      "left": 4,
+      "right": 63,
+      "textLeft": 4,
+      "textRight": 63,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.podium",
+      "tag": "div",
+      "top": 1358,
+      "height": 416,
+      "words": 89,
+      "media": 0,
+      "middle": 29,
+      "heading": null,
+      "left": 20,
+      "right": 41,
+      "textLeft": 20,
+      "textRight": 41,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [],
+    "edgeText": [
+     {
+      "text": "hot right now →",
+      "side": "left",
+      "px": 4
+     }
+    ],
+    "edges": [],
+    "leftBlocks": 0,
+    "bodySize": 17,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": false,
+    "ground": "#f3ead8",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 20,
+     "right": 30
+    },
+    "hero": {
+     "text": "Where to put your money this season.",
+     "words": 7,
+     "chars": 36,
+     "lines": 1,
+     "size": 35,
+     "vw": 4.6,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 258,
+     "tag": "h2",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 4,
+     "firstScreen": 1,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 4,
+     "radii": [
+      [
+       0,
+       4
+      ]
+     ],
+     "heavyBorders": 4,
+     "borderSamples": [
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)"
+     ],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      15,
+      16,
+      17,
+      20,
+      28,
+      35
+     ]
+    },
+    "title": null,
+    "colourShare": 0.003
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.35,
+    0.56,
+    0.4
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 2130,
+     "screens": 2.5,
+     "words": 281,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Where to put your money this season.",
+     "words": 7,
+     "chars": 36,
+     "lines": 2,
+     "size": 30,
+     "vw": 7.7,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 258,
+     "tag": "h2",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": null,
+    "headings": [
+     {
+      "text": "APPReCIATION",
+      "words": 1,
+      "chars": 12,
+      "lines": 1,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0.02,
+      "leading": 1.5,
+      "upper": false,
+      "italic": true,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 52,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Where to put your money this season.",
+      "words": 7,
+      "chars": 36,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Libre Caslon Display",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 258,
+      "mixedFonts": [
+       "Libre Caslon Display",
+       "Libre Caslon Display italic"
+      ],
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 2,
+     "medianWords": 1,
+     "mixedFontHeadings": 2
+    },
+    "type": {
+     "families": [
+      {
+       "family": "EB Garamond",
+       "share": 0.77,
+       "mono": false
+      },
+      {
+       "family": "Libre Caslon Display",
+       "share": 0.23,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      17,
+      20,
+      28,
+      30
+     ],
+     "sizeCount": 5,
+     "notLoaded": [],
+     "body": {
+      "font": "EB Garamond",
+      "size": 17,
+      "leading": 1.5,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 6.1
+     },
+     "measureChars": 41,
+     "max": {
+      "size": 30,
+      "vw": 7.7,
+      "font": "Libre Caslon Display",
+      "text": "e"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.58,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f3ead8",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.53,
+      "l": 0.9
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#2b2a26",
+       "share": 0.51
+      },
+      {
+       "color": "#5a564d",
+       "share": 0.48
+      },
+      {
+       "color": "#3b4a7a",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#f3ead8",
+      "hsl": {
+       "h": 40,
+       "s": 0.53,
+       "l": 0.9
+      },
+      "fg": "#2b2a26"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 13,
+     "inHero": 13,
+     "radius": "pill",
+     "height": 38,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Hermès",
+      "Chanel",
+      "Louis Vuitton",
+      "Gucci",
+      "Prada"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 3,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px",
+      "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px",
+      "span.hchip.hot → color(srgb 0.709804 0.545098 0.227451 / 0.25) 0px 0px 0px 6px"
+     ],
+     "gradients": 1,
+     "scrims": 0,
+     "gradientSamples": [
+      "div.board → linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127)), linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127"
+     ],
+     "gradientText": 0,
+     "hairlines": 5,
+     "hairlineSamples": [
+      "h2.vh 350px",
+      "div.pod-now 350px",
+      "div.pod-fore 350px",
+      "div.pod-cool 350px",
+      "div.rule 350px rule"
+     ],
+     "outlinedBoxes": 1,
+     "dashed": 1,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 1243
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 7,
+     "fixed": false,
+     "height": 137,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "eb garamond",
+     "libre caslon display"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 2130,
+    "margins": {
+     "left": 20,
+     "right": 26
+    },
+    "sections": [
+     {
+      "sel": "header.mast",
+      "tag": "header",
+      "top": 0,
+      "height": 137,
+      "words": 10,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Appr",
+       "size": 28,
+       "tag": "a"
+      },
+      "left": 64,
+      "right": 64,
+      "textLeft": 64,
+      "textRight": 64,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.bookhead",
+      "tag": "section",
+      "top": 168,
+      "height": 371,
+      "words": 71,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Where to put your money",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 26,
+      "right": 26,
+      "textLeft": 26,
+      "textRight": 26,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.houses",
+      "tag": "div",
+      "top": 557,
+      "height": 262,
+      "words": 30,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 25,
+      "right": 25,
+      "textLeft": 40,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.board",
+      "tag": "div",
+      "top": 849,
+      "height": 350,
+      "words": 38,
+      "media": 0,
+      "middle": 36,
+      "heading": null,
+      "left": 0,
+      "right": 27,
+      "textLeft": -20,
+      "textRight": 27,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.podium",
+      "tag": "div",
+      "top": 1243,
+      "height": 648,
+      "words": 89,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 20,
+      "right": 35,
+      "textLeft": 20,
+      "textRight": 35,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "p.hint.center",
+      "tag": "p",
+      "top": 1913,
+      "height": 128,
+      "words": 43,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 22,
+      "right": 22,
+      "textLeft": 22,
+      "textRight": 22,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [],
+    "edgeText": [],
+    "edges": [],
+    "leftBlocks": 0,
+    "bodySize": 17,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": false,
+    "ground": "#f3ead8",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 20,
+     "right": 26
+    },
+    "hero": {
+     "text": "Where to put your money this season.",
+     "words": 7,
+     "chars": 36,
+     "lines": 2,
+     "size": 30,
+     "vw": 7.7,
+     "font": "Libre Caslon Display",
+     "weight": 400,
+     "tracking": 0,
+     "leading": 1.05,
+     "top": 258,
+     "tag": "h2",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 5,
+     "firstScreen": 1,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 5,
+     "radii": [
+      [
+       0,
+       5
+      ]
+     ],
+     "heavyBorders": 5,
+     "borderSamples": [
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)",
+      "#9a927f on #f3ead8 (2.59:1)"
+     ],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      17,
+      20,
+      28,
+      30
+     ]
+    },
+    "title": null,
+    "colourShare": 0
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "mixed-font-headline",
+   "width": 1440,
+   "message": "2 headline(s) switch typeface or to italic mid-line (the \"one italic serif word\" move).",
+   "fix": "Set the whole headline in one face. Emphasis comes from the words.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "gradient",
+   "width": 1440,
+   "message": "1 gradient fill(s): div.board → linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127)), linear-gradient(rgb(154, 146, 127), rgb(154, 146, 127",
+   "fix": "Use a flat colour or a real image. The only gradient allowed by default is a neutral scrim over a photo for legibility.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "palette-cream",
+   "width": 1440,
+   "message": "Yellow-cream background (page background #f3ead8, button #f3ead8).",
+   "fix": "Use the drawn palette. If you want warmth, take a low-chroma stone or bone, not a yellow cream.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "unused-canvas",
+   "width": 1440,
+   "message": "The content stops 200px short of the right edge while it starts 60px from the sidebar.",
+   "fix": "Let the grid fill the canvas (columns in fr units), or centre a capped canvas with equal margins. A dead strip on one side reads as unfinished."
+  },
+  {
+   "level": "WARN",
+   "id": "heavy-borders",
+   "width": 1440,
+   "message": "4 panel borders are dark against their ground: #9a927f on #f3ead8 (2.59:1) | #9a927f on #f3ead8 (2.59:1) | #9a927f on #f3ead8 (2.59:1)",
+   "fix": "A panel border is a whisper: about 1.1–1.3:1 against its ground on a light screen (#e5e7eb–#ededed on white), and about 1.2–1.5:1 on a dark one (#1a1a1a on #000, #2e2e2e on #111). Darker lines turn the screen into a grid of boxes; keep the stronger line for controls.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "below-fold",
+   "width": 1440,
+   "message": "Only 1 of 4 blocks start on the first 1440px screen.",
+   "fix": "Every block the brief names shows its header and first rows on the first desktop screen: size the headline block to its question, cap long lists with \"View all\", and put time-sensitive blocks before long tables."
+  },
+  {
+   "level": "WARN",
+   "id": "panel-void",
+   "width": 1440,
+   "message": "1 card(s) hold a blank band inside: 88px in \"cooling · be careful\".",
+   "fix": "A card stretches to its neighbour only when it has content to fill. Keep a legend or a note directly under its chart (only an action or a total may sit at a stretched card's foot), let a short card keep its own height (align-items: start), and let a filtered block shrink to its rows."
+  },
+  {
+   "level": "FAIL",
+   "id": "no-title",
+   "width": 1440,
+   "message": "The screen has no h1.",
+   "fix": "Name the screen in an h1 at the top of the canvas (18–28px): \"Overview\", \"Payouts\", the project's name.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "edge-text",
+   "width": 768,
+   "message": "1 text block(s) sit within 16px of the screen edge: \"hot right now →\" (4px from the left)",
+   "fix": "Keep text inside the page margin (16–32px or more). Only display type deliberately bled past the edge may touch it."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-race/desktop-fold.jpg",
+   "pages": [
+    "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-race/desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-race/tablet-fold.jpg",
+   "pages": [
+    "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-race/tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-race/mobile-fold.jpg",
+   "pages": [
+    "/Users/katiegraves/Desktop/bag-index/.taste-skill/after-race/mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

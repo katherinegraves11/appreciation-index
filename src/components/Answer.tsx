@@ -31,7 +31,8 @@ export default function Answer({ result, bagName, briefId, numbers }: { result: 
   return (
     <div className="answer">
       <section className="verdict">
-        <p className="lab who">{bagName.toLowerCase()}</p>
+        <p className="lab who">{bagName.split(" · ").slice(0, 2).join(" · ").toLowerCase()}</p>
+        {bagName.split(" · ").length > 2 && <p className="spec">{bagName.split(" · ").slice(2).join(" · ")}</p>}
         <h2>{first} {rest.length > 0 && <i>{rest.join(" ")}</i>}</h2>
         {result.timing && <p className="timing">{result.timing}</p>}
         <div className="stamps"><span className="stamp">{result.call}</span><span className="stamp">confidence {result.confidence.toLowerCase()}</span></div>

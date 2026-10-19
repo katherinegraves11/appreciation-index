@@ -26,7 +26,7 @@ export const Signal = z.object({
 
 export const BriefResult = z.object({
   takeaways: z.array(z.string()).optional().describe("Exactly three, each under 12 words, each a fact with a number where possible. The reader who reads nothing else reads these."),
-  plain_answer: z.string().describe("The whole answer in one short sentence, under 16 words, written for someone who will read nothing else. No numbers unless one number IS the answer."),
+  plain_answer: z.string().describe("The whole answer in one short sentence, under 11 words, written for someone who will read nothing else. No numbers unless one number IS the answer."),
   signals: z.array(Signal).describe("Exactly four entries, one per intent, in the order flip_1y, hold_5y, hold_10y, wear."),
   timing: z.string().describe("One sentence on WHEN to buy or sell: a price increase ahead, a season to wait for, a market that is cooling. Under 25 words."),
   options: z.array(z.object({

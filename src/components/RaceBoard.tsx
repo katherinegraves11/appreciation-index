@@ -45,6 +45,7 @@ export default function RaceBoard({ rows }: { rows: RaceRow[] }) {
       </div>
       <div className="board" role="img" aria-label="House race board">
         <span className="quad tl">hot now, not proven</span><span className="quad tr">hot now and holds value</span><span className="quad bl">cooling off</span><span className="quad br">quiet, holds value</span>
+        <span className="axisline v" aria-hidden="true" /><span className="axisline h" aria-hidden="true" />
         <span className="axis x">holds its value →</span><span className="axis y">hot right now →</span>
         {rows.map((r) => (
           <span key={r.house} className={`hchip ${hot.includes(r.house) ? "hot" : ""}`} hidden={!!off[r.house]} style={{ left: `${x(r)}%`, top: `${y(r)}%` }}

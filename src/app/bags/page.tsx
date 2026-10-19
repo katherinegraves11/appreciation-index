@@ -15,7 +15,7 @@ export default async function Bags() {
     <main>
       <section className="bookhead">
         <p className="lab">my bags · {rows.length} answered</p>
-        <h2 className="vh"><span className="h1txt">What needs a decision <i>this month.</i></span><span className="h5h10txt">What to <i>simply keep.</i></span></h2>
+        <h1 className="vh"><span className="h1txt">What needs a decision <i>this month.</i></span><span className="h5h10txt">What to <i>simply keep.</i></span></h2>
         <p className="hint">Every bag you have asked about, with its four signals. Ask about a new one from the home page.</p>
       </section>
       <div className="bags">

@@ -1,7 +1,7 @@
 export default function About() {
   return (
     <main>
-      <section className="bookhead"><p className="lab">about</p><h2 className="vh">How we <i>decide.</i></h2><p className="hint">Every answer uses the same five ideas. Here is what each one means.</p></section>
+      <section className="bookhead"><p className="lab">about</p><h1 className="vh">How we <i>decide.</i></h1><p className="hint">Every answer uses the same five ideas. Here is what each one means.</p></section>
       <div className="about">
         <h3 className="ah">The four signals</h3>
         <p className="asub">Every answer gives one of these for each: <b className="b">Buy</b> do it · <b className="w">Wait</b> not yet · <b className="d">Don&apos;t</b> not for this.</p>
