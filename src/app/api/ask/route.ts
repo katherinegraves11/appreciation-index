@@ -34,9 +34,12 @@ export async function POST(req: Request) {
             return;
           }
         }
+        const t1 = Date.now();
         const research = await runResearch(input, (line) => send({ status: line }));
+        const t2 = Date.now();
         send({ status: "Weighing it up…" });
         const scored = await runScoring(input, research.dossier);
+        console.log(`[ask] ${input.house} ${input.bag}: research ${Math.round((t2 - t1) / 1000)}s, scoring ${Math.round((Date.now() - t2) / 1000)}s`);
         const id = await saveBrief({
           input, dossier: research.dossier, sources: research.sources, result: scored.result, model: MODEL,
           usage: { input_tokens: research.usage.input_tokens + scored.usage.input_tokens, output_tokens: research.usage.output_tokens + scored.usage.output_tokens },

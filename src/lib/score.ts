@@ -17,7 +17,7 @@ export async function runScoring(input: BriefInput, dossier: string) {
     max_tokens: 16000,
     system: [{ type: "text" as const, text: ANALYST_SYSTEM, cache_control: { type: "ephemeral" as const } }],
     thinking: { type: "adaptive" as const },
-    output_config: { effort: "high" as const, format: zodOutputFormat(BriefResult) },
+    output_config: { effort: "medium" as const, format: zodOutputFormat(BriefResult) },
     messages: [
       {
         role: "user" as const,
