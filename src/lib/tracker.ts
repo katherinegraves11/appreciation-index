@@ -345,6 +345,17 @@ export function buzzNumbers(house: string, bag: string): BuzzNumbers | null {
       where ${likeAny("b.house", hTerms)} ${fam ? "and b.family = ?" : "and b.family is null"} and t.metric in ('growth_pct_7d','interest_0_100','posts_total','views_7d','posts_7d','videos_7d','mentions_7d','most_viewed_rank_ss27','fw_ss27_engagements','posts_visible') and t.latest is not null
       group by t.platform, t.term, t.metric order by case when t.metric='growth_pct_7d' then 0 else 1 end, abs(t.latest) desc limit 8`,
     [...likeParams(hTerms), ...(fam ? [fam] : [])]);
+  // If the family has no hashtag counts yet, borrow the house's so the board always shows what people are posting.
+  const hasTags = movers.some((m) => (m.platform === "instagram" || m.platform === "tiktok" || m.platform === "tiktok-cc") && String(m.metric).startsWith("posts"));
+  if (fam && !hasTags) {
+    const houseTags = q<Row>(
+      `select t.term, t.platform, t.metric, t.latest as value, r.note from v_buzz_trend t
+         join buzz_terms b on b.platform=t.platform and b.term=t.term
+         left join buzz_reads r on r.platform=t.platform and r.term=t.term and r.metric=t.metric and r.read_date=t.read_date
+        where ${likeAny("b.house", hTerms)} and b.family is null and t.platform in ('instagram','tiktok','tiktok-cc') and t.metric in ('posts_total','posts_7d','views_7d','posts_visible') and t.latest is not null
+        group by t.platform, t.term, t.metric order by t.latest desc limit 6`, likeParams(hTerms));
+    movers.push(...houseTags);
+  }
   const events = q<Row>(`select event_date, event_type, derived_note from buzz_events where ${likeAny("house", hTerms)} ${fam ? "and (family = ? or family is null)" : ""} order by event_date desc limit 5`, [...likeParams(hTerms), ...(fam ? [fam] : [])]);
   const trends = q<Row>(`select scan_date, derived_note, source from daily_signals where (${likeAny("house", hTerms)} or house in ('Multi','Culture')) and (signal like 'tiktok%' or signal like '%viral%' or signal like '%trend%' or signal like 'fashion_month%' or signal like 'buyer_pick' or signal like 'bestseller%') and scan_date >= date('now','-45 days') order by scan_date desc limit 6`, likeParams(hTerms));
   db.close();
