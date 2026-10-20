@@ -466,3 +466,18 @@ export function bagLinks(house: string, bag: string): { house_url: string | null
   db.close();
   return { house_url: (hp?.source_url as string) ?? null, runway_url: (rw?.source_url as string) ?? null };
 }
+
+
+/** Every bag with a current boutique price, for the Browse page. */
+export type CatalogueRow = { house: string; model: string; retail_now: number | null; sold_pct: number | null; sold_n: number };
+export function catalogue(): CatalogueRow[] {
+  const db = open(); if (!db) return [];
+  const q = <T extends Row>(sql: string): T[] => { try { return db.prepare(sql).all() as T[]; } catch { return []; } };
+  const rows = q<Row>(`select c.house, c.model, min(c.retail_now) retail_now,
+       (select sold_pct_of_retail from v_sold_vs_retail s where s.house=c.house and s.model=c.model limit 1) sold_pct,
+       (select n_sold_same_size from v_sold_vs_retail s where s.house=c.house and s.model=c.model limit 1) sold_n
+     from v_retail_current c group by c.house, c.model
+     order by case c.house when 'Hermès' then 0 when 'Chanel' then 1 when 'Louis Vuitton' then 2 when 'Dior' then 3 when 'Bottega Veneta' then 4 when 'The Row' then 5 when 'Loewe' then 6 when 'Celine' then 7 else 9 end, c.house, c.model`);
+  db.close();
+  return rows.map((r) => ({ house: r.house as string, model: r.model as string, retail_now: (r.retail_now as number) ?? null, sold_pct: (r.sold_pct as number) ?? null, sold_n: (r.sold_n as number) ?? 0 }));
+}

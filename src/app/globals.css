@@ -312,3 +312,39 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 .seeit a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:1px}
 .seeit a:hover{border-color:var(--ink)}
 @media (max-width:600px){.verdict .vplate{width:96px;height:84px}.bag .cplate{display:none}}
+
+/* ask by photo */
+.photodrop{width:min(100%,760px);margin:4px auto 0}
+.dropzone{border:1px dashed var(--line);padding:12px 16px;text-align:center;font-size:16px;color:var(--ink-2);cursor:pointer;transition:border-color .2s,background .2s}
+.dropzone b{color:var(--ink);font-weight:400;font-variant:small-caps;letter-spacing:.12em}
+.dropzone.over,.dropzone:hover{border-color:var(--ink);background:color-mix(in srgb,var(--gold) 6%,transparent)}
+.dropzone.busy{opacity:.7;cursor:progress}
+.dropzone:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.photonote{margin:6px 0 0;text-align:center;font-size:13px;color:var(--ink-3);font-style:italic}
+.idcard{position:relative;border:1px solid var(--line);padding:16px 18px;display:grid;grid-template-columns:96px 1fr 64px;gap:16px;align-items:center;text-align:left}
+.idcard::after{content:"";position:absolute;inset:4px;border:1px solid var(--line);opacity:.5;pointer-events:none}
+.idthumb{width:96px;height:96px;object-fit:cover;border:1px solid var(--line)}
+.idname{margin:2px 0 0;font-size:22px;line-height:1.2}
+.idname b{font-weight:400;font-family:var(--serif)}
+.idname i{font-family:var(--serif);color:var(--indigo)}
+.idspec{font-size:16px;color:var(--ink-2);font-style:italic}
+.idera{margin:2px 0 0;font-size:15px;color:var(--ink-2)}
+.idtell{margin:4px 0 0;font-size:15px;color:var(--ink-3);font-style:italic}
+.idactions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.idactions .go{font:inherit;font-variant:small-caps;letter-spacing:.14em;font-size:15px;background:var(--ink);color:var(--paper);border:0;padding:8px 14px;cursor:pointer}
+.idactions .alt{font:inherit;font-size:14px;background:transparent;border:1px solid var(--line);color:var(--ink-2);padding:6px 10px;border-radius:999px;cursor:pointer}
+.idactions .alt:hover{border-color:var(--ink);color:var(--ink)}
+.idplate{color:var(--ink-3)}
+@media (max-width:600px){.idcard{grid-template-columns:72px 1fr}.idplate{display:none}.idthumb{width:72px;height:72px}}
+
+/* browse */
+.shelf{margin:26px auto 0;max-width:1100px}
+.shelfh{font-family:var(--serif);font-weight:400;font-size:26px;margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.shelfrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.shelfitem{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 8px 10px;text-decoration:none;color:var(--ink);border:1px solid transparent;transition:border-color .2s}
+.shelfitem:hover{border-color:var(--line)}
+.shelfitem .plate{color:var(--ink-2)}
+.sname{font-family:var(--serif);font-size:18px;line-height:1.1;text-align:center;margin-top:4px}
+.sprice{font-size:14px;color:var(--ink-2)}
+.sret{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--wait);margin-top:2px}
+.sret.good{color:var(--buy)}.sret.weak{color:var(--dont)}
