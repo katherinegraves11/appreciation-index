@@ -8,4 +8,4 @@ else
   nohup npm run start > /tmp/appreciation-index.log 2>&1 &
   for i in 1 2 3 4 5 6 7 8 9 10; do sleep 1; curl -s -m 2 -o /dev/null http://localhost:3000/ && break; done
 fi
-open http://localhost:3000
+open -a "Google Chrome" http://localhost:3000 2>/dev/null || open http://localhost:3000
