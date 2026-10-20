@@ -317,6 +317,7 @@ export type BuzzNumbers = {
   score: number | null; direction: "rising" | "steady" | "fading" | null; platforms: number; level: "family" | "house" | null;
   detail: string | null; movers: { term: string; platform: string; metric: string; value: number; note: string | null }[];
   events: { date: string; type: string; note: string }[];
+  trends: { date: string; note: string; source: string }[];
 };
 
 function bagFamilyTerm(db: DatabaseSync, hTerms: string[], bag: string): string | null {
@@ -345,13 +346,15 @@ export function buzzNumbers(house: string, bag: string): BuzzNumbers | null {
       group by t.platform, t.term, t.metric order by case when t.metric='growth_pct_7d' then 0 else 1 end, abs(t.latest) desc limit 8`,
     [...likeParams(hTerms), ...(fam ? [fam] : [])]);
   const events = q<Row>(`select event_date, event_type, derived_note from buzz_events where ${likeAny("house", hTerms)} ${fam ? "and (family = ? or family is null)" : ""} order by event_date desc limit 5`, [...likeParams(hTerms), ...(fam ? [fam] : [])]);
+  const trends = q<Row>(`select scan_date, derived_note, source from daily_signals where (${likeAny("house", hTerms)} or house in ('Multi','Culture')) and (signal like 'tiktok%' or signal like '%viral%' or signal like '%trend%' or signal like 'fashion_month%' or signal like 'buyer_pick' or signal like 'bestseller%') and scan_date >= date('now','-45 days') order by scan_date desc limit 6`, likeParams(hTerms));
   db.close();
-  if (!sc && !movers.length && !events.length) return null;
+  if (!sc && !movers.length && !events.length && !trends.length) return null;
   return {
     score: (sc?.buzz_0_100 as number) ?? null, direction: ((sc?.direction as string) ?? null) as BuzzNumbers["direction"], platforms: (sc?.platforms as number) ?? 0,
     level: famScore ? "family" : houseScore ? "house" : null, detail: (sc?.detail as string) ?? null,
     movers: movers.map((m) => ({ term: m.term as string, platform: m.platform as string, metric: m.metric as string, value: m.value as number, note: (m.note as string) ?? null })),
     events: events.map((e) => ({ date: e.event_date as string, type: e.event_type as string, note: e.derived_note as string })),
+    trends: trends.map((t) => ({ date: t.scan_date as string, note: t.derived_note as string, source: t.source as string })),
   };
 }
 

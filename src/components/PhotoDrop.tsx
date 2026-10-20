@@ -17,7 +17,7 @@ async function shrink(file: File, max = 1024): Promise<string> {
   } finally { URL.revokeObjectURL(url); }
 }
 
-export default function PhotoDrop({ onAsk, disabled, horizon }: { onAsk: (question: string) => void; disabled?: boolean; horizon: 1 | 5 | 10 }) {
+export default function PhotoDrop({ onAsk, disabled, horizon }: { onAsk: (question: string, preview?: string | null) => void; disabled?: boolean; horizon: 1 | 5 | 10 }) {
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -70,8 +70,8 @@ export default function PhotoDrop({ onAsk, disabled, horizon }: { onAsk: (questi
             {id.designer_era && <p className="idera">{id.designer_era}</p>}
             <p className="idtell">{id.tell}</p>
             <div className="idactions">
-              <button type="button" className="go" onClick={() => onAsk(question(name))}>Ask about this bag</button>
-              {id.alternatives.slice(0, 3).map((a) => <button key={a} type="button" className="alt" onClick={() => onAsk(question(a))}>or: {a}</button>)}
+              <button type="button" className="go" onClick={() => onAsk(question(name), preview)}>Ask about this bag</button>
+              {id.alternatives.slice(0, 3).map((a) => <button key={a} type="button" className="alt" onClick={() => onAsk(question(a), preview)}>or: {a}</button>)}
               <button type="button" className="alt" onClick={() => { setId(null); setPreview(null); }}>different photo</button>
             </div>
           </div>

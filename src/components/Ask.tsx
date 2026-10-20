@@ -23,6 +23,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(initial);
+  const [photo, setPhoto] = useState<string | null>(null);
   const started = useRef(false);
 
   // ?q=… lets another page (or the design preview) hand a question straight to the tool.
@@ -72,15 +73,15 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
           <span className="h10txt">Will it be worth more <i>in ten years?</i></span>
         </h1>
         <Dial />
-        <form className="ask" onSubmit={(e) => { e.preventDefault(); ask(q); }}>
+        <form className="ask" onSubmit={(e) => { e.preventDefault(); setPhoto(null); ask(q); }}>
           <input id="q" type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Describe the bag in your own words" autoComplete="off" aria-label="Your question" disabled={busy} />
           <button type="submit" disabled={busy || !q.trim()}>{busy ? "thinking" : "appreciate"}</button>
         </form>
-        {!done && !busy && <PhotoDrop horizon={h} disabled={busy} onAsk={(question) => { setQ(question); ask(question); }} />}
+        {!done && !busy && <PhotoDrop horizon={h} disabled={busy} onAsk={(question, preview) => { setPhoto(preview ?? null); setQ(question); ask(question); }} />}
         {!done && !busy && (
           <>
             <p className="hint"><span className="h1txt">Ask about any bag. We say whether to buy it now, and why.</span><span className="h5h10txt">Ask about any bag. We say whether it will be worth more, and why.</span> <a href="/about">How we decide</a></p>
-            <div className="chips">{EXAMPLES.map((ex) => <button key={ex} type="button" className="chip" onClick={() => { setQ(ex); ask(ex); }}>{ex}</button>)}</div>
+            <div className="chips">{EXAMPLES.map((ex) => <button key={ex} type="button" className="chip" onClick={() => { setPhoto(null); setQ(ex); ask(ex); }}>{ex}</button>)}</div>
           </>
         )}
       </section>
@@ -96,7 +97,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
       {done?.cached && (
         <p className="cachedline">Answered {done.answeredAt ? new Date(done.answeredAt).toLocaleDateString("en-US", { month: "long", day: "numeric" }) : "recently"}. <button type="button" className="linkbtn" onClick={() => ask(q || done.bagName, true)}>Run a fresh read</button> (about three minutes).</p>
       )}
-      {done && <Answer result={done.result} bagName={done.bagName} briefId={done.id} numbers={done.numbers} />}
+      {done && <Answer result={done.result} bagName={done.bagName} briefId={done.id} numbers={done.numbers} photo={photo} />}
     </>
   );
 }

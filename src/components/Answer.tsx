@@ -22,7 +22,7 @@ const GLYPH: Record<string, React.ReactNode> = {
 };
 const money = (v: number | null | undefined) => (v == null ? "—" : `$${Math.round(v).toLocaleString()}`);
 
-export default function Answer({ result, bagName, briefId, numbers }: { result: BriefResult; bagName: string; briefId?: string; numbers: QuickNumbers | null }) {
+export default function Answer({ result, bagName, briefId, numbers, photo }: { result: BriefResult; bagName: string; briefId?: string; numbers: QuickNumbers | null; photo?: string | null }) {
   const [open, setOpen] = useState(false);
   const signals = toSignals(result);
   const cards = toCards(result);
@@ -32,7 +32,7 @@ export default function Answer({ result, bagName, briefId, numbers }: { result: 
   return (
     <div className="answer">
       <section className="verdict">
-        <BagPlate name={bagName} size={132} className="vplate" />
+        {photo ? <img src={photo} alt="" className="vphoto" /> : <BagPlate name={bagName} size={132} className="vplate" />}
         <p className="lab who">{bagName.split(" · ").slice(0, 2).join(" · ").toLowerCase()}</p>
         {bagName.split(" · ").length > 2 && <p className="spec">{bagName.split(" · ").slice(2).join(" · ")}</p>}
         <h2>{first} {rest.length > 0 && <i>{rest.join(" ")}</i>}</h2>
@@ -90,43 +90,6 @@ export default function Answer({ result, bagName, briefId, numbers }: { result: 
         </>
       )}
 
-      <section className="buzz" aria-label="The buzz">
-        <p className="lab bhead">the buzz · what people are saying</p>
-        {n?.buzz ? (
-          <div className="buzzbox">
-            <div className="bscore">
-              <div className="bnum">{n.buzz.score ?? "—"}<small>/100</small></div>
-              <div className="bdir">{n.buzz.direction ?? "no direction yet"}</div>
-              <div className="bsub">{n.buzz.platforms} platform{n.buzz.platforms === 1 ? "" : "s"}{n.buzz.level === "house" ? " · read at house level; no bag-specific terms yet" : " · read for this bag"}</div>
-            </div>
-            <div className="bplat">
-              {(n.buzz.detail ?? "").split(" ").filter(Boolean).map((d, i) => {
-                const m = d.match(/^([a-z-]+):(\d+)(?:\(([+-]?\d+)%\))?/i);
-                if (!m) return null;
-                const name: Record<string, string> = { google: "Google search", instagram: "Instagram", tiktok: "TikTok", "tiktok-cc": "TikTok trends", youtube: "YouTube", reddit: "Reddit", pinterest: "Pinterest", "vogue-runway": "Vogue Runway" };
-                return <div key={i} className="bchip"><b>{name[m[1]] ?? m[1]}</b><span>{m[2]}</span>{m[3] && <em>{m[3].startsWith("+") || m[3].startsWith("-") ? m[3] : `+${m[3]}`}% this week</em>}</div>;
-              })}
-            </div>
-            {n.buzz.movers.length > 0 && (
-              <ul className="bmoves">
-                {n.buzz.movers.slice(0, 4).map((m, i) => (
-                  <li key={i}><b>“{m.term}”</b> <span className="on">{m.platform.replace("-cc", " trends").replace("vogue-runway", "Vogue Runway").replace("google", "Google").replace("instagram", "Instagram").replace("tiktok", "TikTok")}</span><br />{m.metric === "growth_pct_7d" ? `${m.value > 0 ? "+" : ""}${Math.round(m.value)}% search interest this week` : m.metric === "posts_total" ? `${Math.round(m.value).toLocaleString()} posts` : m.metric === "most_viewed_rank_ss27" ? (m.value > 10 ? "outside the top 10 most-viewed SS27 shows on Vogue Runway" : `#${m.value} most-viewed SS27 show on Vogue Runway`) : m.metric === "interest_0_100" ? `search interest ${Math.round(m.value)}/100 this week` : m.metric.startsWith("fw_ss27_engagements") ? `${(m.note ?? "").includes("upper bound") ? "under " : ""}${Math.round(m.value).toLocaleString()} fashion-month engagements on Instagram${(m.note ?? "").includes("upper bound") ? " (outside the top 20 brands)" : ""}` : m.metric === "posts_visible" ? `${m.value} posts visible on the tag page` : `${m.metric.replace(/_/g, " ")} ${m.value}`}</li>
-                ))}
-              </ul>
-            )}
-            {n.buzz.events.length > 0 && (
-              <div className="bevents">
-                <p className="lab">moments</p>
-                <ul>{n.buzz.events.slice(0, 3).map((e, i) => <li key={i}><span className="when">{e.date}</span> {e.note}</li>)}</ul>
-              </div>
-            )}
-            <p className="bnote">Score = 50 + week-over-week growth, plus a little for volume, averaged across the platforms we read. One platform is a weak read. Derived counts only; we store no posts or people.</p>
-          </div>
-        ) : (
-          <div className="buzzbox empty"><p>No buzz read yet for this bag. The daily run adds its hashtags and search terms the day after it is first asked about.</p></div>
-        )}
-      </section>
-
       <button type="button" className="why-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "hide the why" : "show me why"}</button>
       {open && (
         <div className="edit">
@@ -134,6 +97,53 @@ export default function Answer({ result, bagName, briefId, numbers }: { result: 
             <p className="lab">at a glance</p>
             <ol>{(result.takeaways && result.takeaways.length ? result.takeaways : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}>{t}</li>)}</ol>
           </section>
+
+          {(() => {
+            const b = n?.buzz;
+            const mood = !b || b.direction == null ? "quiet" : b.direction === "rising" ? (b.score != null && b.score >= 70 ? "on fire" : "warming up") : b.direction === "fading" ? "cooling off" : "steady";
+            const plat = (b?.detail ?? "").split(" ").filter(Boolean).map((d) => { const m = d.match(/^([a-z-]+):(\d+)(?:\(([+-]?\d+)%\))?/i); return m ? { key: m[1], score: Number(m[2]), growth: m[3] ? Number(m[3]) : null } : null; }).filter(Boolean) as { key: string; score: number; growth: number | null }[];
+            const name: Record<string, string> = { google: "Google search", instagram: "Instagram", tiktok: "TikTok", "tiktok-cc": "TikTok trends", youtube: "YouTube", reddit: "Reddit", pinterest: "Pinterest", "vogue-runway": "Vogue Runway" };
+            const missing = ["tiktok", "instagram", "google"].filter((k) => !plat.some((p) => p.key === k || (k === "tiktok" && p.key === "tiktok-cc")));
+            const tags = (b?.movers ?? []).filter((m) => (m.platform === "instagram" || m.platform === "tiktok" || m.platform === "tiktok-cc") && (m.metric === "posts_total" || m.metric === "posts_7d" || m.metric === "views_7d" || m.metric === "posts_visible"));
+            const searches = (b?.movers ?? []).filter((m) => m.platform === "google" && m.metric === "growth_pct_7d");
+            const fmt = (v: number) => v >= 1e6 ? `${(v / 1e6).toFixed(1).replace(/\.0$/, "")}M` : v >= 1e3 ? `${Math.round(v / 1e3)}K` : `${Math.round(v)}`;
+            const why = plat.map((p) => `${name[p.key] ?? p.key} ${p.score}${p.growth != null ? ` (${p.growth > 0 ? "+" : ""}${p.growth}% this week)` : ""}`).join(" · ");
+            return (
+              <section className="buzz2">
+                <header className="bz-head">
+                  <div><p className="lab">the buzz · what the internet is saying</p><h4>{b ? <>The crowd is <i>{mood}</i>.</> : <>No crowd read <i>yet</i>.</>}</h4></div>
+                  {b && <div className="bz-score"><b>{b.score ?? "—"}</b><span>/100 · {b.direction ?? "no direction"}</span></div>}
+                </header>
+                {b ? (
+                  <>
+                    <p className="bz-why">Where the {b.score} comes from: {why || "one platform"}.{missing.length ? ` ${missing.map((k) => name[k]).join(" and ")} not read yet${missing.includes("tiktok") ? " (needs the TikTok trends sign-in)" : ""}.` : ""}{b.level === "house" ? " Read at house level; no hashtags for this exact bag yet." : ""}</p>
+                    {tags.length > 0 && (<p className="lab bz-lab">hashtags people are posting</p>)}
+                    {tags.length > 0 && (
+                      <div className="bz-tags">
+                        {tags.slice(0, 8).map((t, i) => <span key={i} className="htag"><b>#{t.term}</b><span>{fmt(t.value)} {t.metric === "views_7d" ? "views" : "posts"}</span><em>{name[t.platform] ?? t.platform}</em></span>)}
+                      </div>
+                    )}
+                    {searches.length > 0 && (
+                      <p className="bz-search">{searches.slice(0, 3).map((m, i) => <span key={i} className={`srch ${m.value > 0 ? "up" : "down"}`}>“{m.term}” {m.value > 0 ? "↑" : "↓"} {Math.abs(Math.round(m.value))}% in search this week</span>)}</p>
+                    )}
+                    {b.trends.length > 0 && (
+                      <div className="bz-moments viral">
+                        <p className="lab">going viral · what the feeds are on about</p>
+                        <ol>{b.trends.slice(0, 4).map((t, i) => <li key={i}><span className="when">{new Date(t.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span><span className="what">{t.note.length > 260 ? t.note.slice(0, 257).replace(/\s+\S*$/, "") + "…" : t.note} <span className="src">{t.source}</span></span></li>)}</ol>
+                      </div>
+                    )}
+                    {b.events.length > 0 && (
+                      <div className="bz-moments">
+                        <p className="lab">events people are talking about</p>
+                        <ol>{b.events.slice(0, 4).map((e, i) => <li key={i}><span className="when">{new Date(e.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span><span className="what">{e.note}</span></li>)}</ol>
+                      </div>
+                    )}
+                    <p className="bnote">Score = 50 + week-over-week growth, plus a little for volume, averaged across the platforms we read. Derived counts only; no posts or people are stored.</p>
+                  </>
+                ) : <p className="bz-why">The daily run adds this bag&apos;s hashtags and search terms the day after it is first asked about.</p>}
+              </section>
+            );
+          })()}
 
           <div className="ecards">
             {cards.filter((c) => c.key !== "buy").map((c) => {
