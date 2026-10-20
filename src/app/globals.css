@@ -293,3 +293,22 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 .bevents .when{font-variant:small-caps;letter-spacing:.08em;color:var(--ink-3);margin-right:6px}
 .bnote{grid-column:1 / -1;margin:4px 0 0;font-size:13.5px;color:var(--ink-3);font-style:italic;line-height:1.4}
 @media (max-width:720px){.buzzbox{grid-template-columns:1fr}.bscore{border-right:0;border-bottom:1px solid var(--line);padding:0 0 12px}.bmoves{grid-column:1}}
+
+.buzz .bhead{text-align:center;margin:0 0 12px}
+.buzzbox{grid-template-columns:220px 1fr;row-gap:16px}
+.bmoves{grid-column:1 / -1;list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px 24px;border-top:1px solid var(--line);padding-top:12px;font-size:15.5px;line-height:1.4}
+.bmoves li{margin:0}
+.bmoves b{font-family:var(--serif);font-weight:400;font-size:18px}
+.bmoves .on{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-left:6px}
+
+/* the bag, drawn: engraved silhouette plates */
+.plate{color:var(--ink-2);display:block}
+.verdict .vplate{margin:0 auto 10px}
+.bag-top{position:relative}
+.bag .cplate{position:absolute;right:0;top:26px;color:var(--ink-3)}
+.bag .tag{margin-right:0}
+.seeit{margin:14px auto 0;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;font-size:15.5px;align-items:center}
+.seeit .lab{margin-right:4px}
+.seeit a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:1px}
+.seeit a:hover{border-color:var(--ink)}
+@media (max-width:600px){.verdict .vplate{width:96px;height:84px}.bag .cplate{display:none}}

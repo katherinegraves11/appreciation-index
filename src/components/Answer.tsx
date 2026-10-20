@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { BriefResult } from "@/lib/schema";
 import type { QuickNumbers } from "@/lib/tracker";
 import { toCards, toSignals, INTENT_LABEL } from "@/lib/cards";
+import BagPlate, { seeItLinks } from "./BagPlate";
 
 const WORD: Record<string, string> = { yes: "Buy", no: "Don't", wait: "Wait" };
 const CLS: Record<string, string> = { yes: "buy", no: "dont", wait: "wait" };
@@ -31,11 +32,13 @@ export default function Answer({ result, bagName, briefId, numbers }: { result: 
   return (
     <div className="answer">
       <section className="verdict">
+        <BagPlate name={bagName} size={132} className="vplate" />
         <p className="lab who">{bagName.split(" · ").slice(0, 2).join(" · ").toLowerCase()}</p>
         {bagName.split(" · ").length > 2 && <p className="spec">{bagName.split(" · ").slice(2).join(" · ")}</p>}
         <h2>{first} {rest.length > 0 && <i>{rest.join(" ")}</i>}</h2>
         {result.timing && <p className="timing">{result.timing}</p>}
         <div className="stamps"><span className="stamp">{result.call}</span><span className="stamp">confidence {result.confidence.toLowerCase()}</span></div>
+        <p className="seeit"><span className="lab">see it</span>{seeItLinks(bagName.split(" · ")[0] ?? "", bagName.split(" · ")[1] ?? "", n?.links).map((l, i) => <a key={i} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)}</p>
       </section>
 
       {result.options && result.options.length > 0 && (
@@ -88,7 +91,7 @@ export default function Answer({ result, bagName, briefId, numbers }: { result: 
       )}
 
       <section className="buzz" aria-label="The buzz">
-        <p className="lab stripcap">the buzz · what people are saying</p>
+        <p className="lab bhead">the buzz · what people are saying</p>
         {n?.buzz ? (
           <div className="buzzbox">
             <div className="bscore">
@@ -101,13 +104,13 @@ export default function Answer({ result, bagName, briefId, numbers }: { result: 
                 const m = d.match(/^([a-z-]+):(\d+)(?:\(([+-]?\d+)%\))?/i);
                 if (!m) return null;
                 const name: Record<string, string> = { google: "Google search", instagram: "Instagram", tiktok: "TikTok", "tiktok-cc": "TikTok trends", youtube: "YouTube", reddit: "Reddit", pinterest: "Pinterest", "vogue-runway": "Vogue Runway" };
-                return <div key={i} className="bchip"><b>{name[m[1]] ?? m[1]}</b><span>{m[2]}</span>{m[3] && <em>{Number(m[3]) > 0 ? "+" : ""}{m[3]}% this week</em>}</div>;
+                return <div key={i} className="bchip"><b>{name[m[1]] ?? m[1]}</b><span>{m[2]}</span>{m[3] && <em>{m[3].startsWith("+") || m[3].startsWith("-") ? m[3] : `+${m[3]}`}% this week</em>}</div>;
               })}
             </div>
             {n.buzz.movers.length > 0 && (
               <ul className="bmoves">
                 {n.buzz.movers.slice(0, 4).map((m, i) => (
-                  <li key={i}><b>“{m.term}”</b> on {m.platform.replace("-cc", " trends").replace("vogue-runway", "Vogue Runway")}: {m.metric === "growth_pct_7d" ? `${m.value > 0 ? "+" : ""}${Math.round(m.value)}% search interest this week` : m.metric === "posts_total" ? `${Math.round(m.value).toLocaleString()} posts` : m.metric === "most_viewed_rank_ss27" ? (m.value > 10 ? "outside the top 10 most-viewed SS27 shows on Vogue Runway" : `#${m.value} most-viewed SS27 show on Vogue Runway`) : m.metric === "interest_0_100" ? `search interest ${Math.round(m.value)}/100 this week` : m.metric.startsWith("fw_ss27_engagements") ? `${Math.round(m.value).toLocaleString()} fashion-month engagements` : m.metric === "posts_visible" ? `${m.value} posts visible on the tag page` : `${m.metric.replace(/_/g, " ")} ${m.value}`}</li>
+                  <li key={i}><b>“{m.term}”</b> <span className="on">{m.platform.replace("-cc", " trends").replace("vogue-runway", "Vogue Runway").replace("google", "Google").replace("instagram", "Instagram").replace("tiktok", "TikTok")}</span><br />{m.metric === "growth_pct_7d" ? `${m.value > 0 ? "+" : ""}${Math.round(m.value)}% search interest this week` : m.metric === "posts_total" ? `${Math.round(m.value).toLocaleString()} posts` : m.metric === "most_viewed_rank_ss27" ? (m.value > 10 ? "outside the top 10 most-viewed SS27 shows on Vogue Runway" : `#${m.value} most-viewed SS27 show on Vogue Runway`) : m.metric === "interest_0_100" ? `search interest ${Math.round(m.value)}/100 this week` : m.metric.startsWith("fw_ss27_engagements") ? `${(m.note ?? "").includes("upper bound") ? "under " : ""}${Math.round(m.value).toLocaleString()} fashion-month engagements on Instagram${(m.note ?? "").includes("upper bound") ? " (outside the top 20 brands)" : ""}` : m.metric === "posts_visible" ? `${m.value} posts visible on the tag page` : `${m.metric.replace(/_/g, " ")} ${m.value}`}</li>
                 ))}
               </ul>
             )}

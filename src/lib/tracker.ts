@@ -286,6 +286,7 @@ export type QuickNumbers = {
   ask_median: number | null; ask_n: number; sold_median: number | null; sold_n: number; sold_pct_of_retail: number | null;
   saves_avg: number | null; trend_pct: number | null; trr_sold_90d: number; icon: boolean;
   buzz: BuzzNumbers | null;
+  links: { house_url: string | null; runway_url: string | null };
 };
 export function quickNumbers(house: string, bag: string): QuickNumbers | null {
   const db = open(); if (!db) return null;
@@ -306,6 +307,7 @@ export function quickNumbers(house: string, bag: string): QuickNumbers | null {
     saves_avg: (trr?.saves as number) ?? null, trend_pct: trend?.a0 && trend?.a1 ? Math.round((((trend.a1 as number) - (trend.a0 as number)) / (trend.a0 as number)) * 1000) / 10 : null,
     trr_sold_90d: (trr?.sold90 as number) ?? 0, icon: !!icon,
     buzz: buzzNumbers(house, bag),
+    links: bagLinks(house, bag),
   };
 }
 
@@ -451,4 +453,16 @@ export function ownershipDossier(house: string): string {
     ...dec.map((d) => `Decision log ${d.decision_date} · ${d.house} · ${d.actor}: ${d.decision}. → ${d.implication_for_bags} [${d.source_name}; ${d.source_url}]`),
   ];
   return section("OWNERSHIP & STAKEHOLDERS (tracker: who controls the house, who decides, what they decided)", lines);
+}
+
+
+/** Where the real thing can be seen: the house's own product page (if the reference price came from one) and the latest runway look. */
+export function bagLinks(house: string, bag: string): { house_url: string | null; runway_url: string | null } {
+  const db = open(); if (!db) return { house_url: null, runway_url: null };
+  const hTerms = houseTerms(house); const bagTerm = norm(bag).split(" ").filter((w) => w.length > 2)[0] ?? norm(bag);
+  const g = <T extends Row>(sql: string, params: (string | number)[] = []): T | undefined => { try { return db.prepare(sql).get(...params) as T | undefined; } catch { return undefined; } };
+  const hp = g<Row>(`select source_url from retail_reference where ${likeAny("house", hTerms)} and lower(model) like ? and (source_url like '%/product%' or source_url like '%/products/%' or source_url like '%/p/%') and source_url not like 'private:%' order by effective_date desc limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
+  const rw = g<Row>(`select source_url from runway_pipeline where ${likeAny("house", hTerms)} and (lower(model_guess) like ? or lower(bag_description) like ?) and source_url like '%vogue.com%' order by show_date desc limit 1`, [...likeParams(hTerms), `%${bagTerm}%`, `%${bagTerm}%`]);
+  db.close();
+  return { house_url: (hp?.source_url as string) ?? null, runway_url: (rw?.source_url as string) ?? null };
 }

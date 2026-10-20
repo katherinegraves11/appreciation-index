@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listBriefs } from "@/lib/db";
+import BagPlate from "@/components/BagPlate";
 import { toSignals } from "@/lib/cards";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +34,7 @@ export default async function Bags() {
             <Link key={b.id} href={`/?brief=${b.id}`} className="bag">
               <div className="bag-top">
                 <div><p className="lab">{new Date(b.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p><h3>{b.house} <i>{shortName(b.bag)}</i></h3>{shortName(b.bag) !== b.bag && <p className="spec">{b.bag}</p>}</div>
-                <span className="tag">{b.result.call}</span>
+                <span className="tag">{b.result.call}</span><BagPlate name={`${b.house} ${b.bag}`} size={72} className="cplate" />
               </div>
               <p className="line">{b.result.plain_answer || b.result.one_line}</p>
               <ul className="mini">
