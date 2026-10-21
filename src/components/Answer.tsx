@@ -11,7 +11,7 @@ const CLS: Record<string, string> = { yes: "buy", no: "dont", wait: "wait" };
 const DEF: Record<string, string> = {
   flip_1y: "Buy now, sell by this time next year.",
   hold_5y: "Buy now, sell around 2031.",
-  hold_10y: "Buy now and keep. Only true icons earn this.",
+  hold_10y: "Buy now and keep. Only shapes the house has made for decades earn this.",
   wear: "Buy to use. Value comes second.",
 };
 const GLYPH: Record<string, React.ReactNode> = {
@@ -22,13 +22,32 @@ const GLYPH: Record<string, React.ReactNode> = {
 };
 const money = (v: number | null | undefined) => (v == null ? "—" : `$${Math.round(v).toLocaleString()}`);
 
+/** Words a buyer should never have to decode. The scorer is told the same list; this is the net. */
+const PLAIN: [RegExp, string][] = [
+  [/\barchive codes?\b/gi, "shapes the house has made for decades"],
+  [/\bera premium\b/gi, "the bump a designer's bags get after they leave"],
+  [/\basks? (typically |usually )?eases?\b/gi, "sellers drop the price after the first season"],
+  [/\bclears? at\b/gi, "sells for about"],
+  [/\bsell-through\b/gi, "how fast they sell"],
+  [/\bliquidity default\b/gi, "easiest to resell"],
+  [/\bliquid(ity)?\b/gi, "easy to resell"],
+  [/\bretention\b/gi, "value kept"],
+  [/\bcomposite\b/gi, "overall score"],
+  [/\basking prices?\b/gi, "what sellers want"],
+  [/\brealised\b/gi, "actual"],
+];
+export function plain(t: string | undefined | null): string { let x = t ?? ""; for (const [re, to] of PLAIN) x = x.replace(re, to); return x; }
+/** What a consignor keeps on The RealReal at a given sale price (published tiers, rounded; an estimate, not a quote). */
+const payoutRate = (price: number) => price >= 10000 ? 0.85 : price >= 5000 ? 0.8 : price >= 2500 ? 0.75 : price >= 1500 ? 0.7 : price >= 750 ? 0.6 : 0.55;
+const fmtDate = (d: string) => { const [y, m] = d.split("-"); const M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; return m ? `${M[Number(m) - 1]} ${y}` : y; };
+
 export default function Answer({ result, bagName, briefId, numbers, photo }: { result: BriefResult; bagName: string; briefId?: string; numbers: QuickNumbers | null; photo?: string | null }) {
   const [open, setOpen] = useState(false);
   const signals = toSignals(result);
   const cards = toCards(result);
   const n = numbers;
-  const plain = result.plain_answer || result.one_line;
-  const [first, ...rest] = plain.split(/(?<=\.)\s+/);
+  const plainAnswer = plain(result.plain_answer || result.one_line);
+  const [first, ...rest] = plainAnswer.split(/(?<=\.)\s+/);
   return (
     <div className="answer">
       <section className="verdict">
@@ -36,7 +55,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         <p className="lab who">{bagName.split(" · ").slice(0, 2).join(" · ").toLowerCase()}</p>
         {bagName.split(" · ").length > 2 && <p className="spec">{bagName.split(" · ").slice(2).join(" · ")}</p>}
         <h2>{first} {rest.length > 0 && <i>{rest.join(" ")}</i>}</h2>
-        {result.timing && <p className="timing">{result.timing}</p>}
+        {result.timing && <p className="timing">{plain(result.timing)}</p>}
         <div className="stamps"><span className="stamp">{result.call}</span><span className="stamp">confidence {result.confidence.toLowerCase()}</span></div>
         <p className="seeit"><span className="lab">see it</span>{seeItLinks(bagName.split(" · ")[0] ?? "", bagName.split(" · ")[1] ?? "", n?.links).map((l, i) => <a key={i} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)}</p>
       </section>
@@ -50,7 +69,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
                 <svg className="frame" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" stroke="currentColor"><rect x="1.5" y="1.5" width="97" height="97" rx="3" strokeWidth=".6" /><rect x="4" y="4" width="92" height="92" rx="2" strokeWidth=".3" /></svg>
                 <p className="lab intent">{o.label.toLowerCase()}</p>
                 <p className="word">{WORD[o.verdict]}</p>
-                <p className="why">{o.why}</p>
+                <p className="why">{plain(o.why)}</p>
               </section>
             ))}
           </div>
@@ -65,7 +84,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             <p className="lab intent">{(INTENT_LABEL[s.intent]?.title ?? s.intent).toLowerCase()}</p>
             <p className="def">{DEF[s.intent]}</p>
             <p className="word">{WORD[s.verdict]}</p>
-            <p className="why">{s.why}</p>
+            <p className="why">{plain(s.why)}</p>
           </section>
         ))}
       </div>
@@ -74,19 +93,21 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         <>
           <p className="lab stripcap"><span className="h1txt">right now · from the tracker</span><span className="h5h10txt">the long view · from the tracker</span></p>
           <div className="strip">
-            <span className="h1txt" style={{ display: "contents" }}>
-              <div><div className="lab">asking vs new</div><div className="v">{n.ask_median && n.retail_now ? `${Math.round((100 * n.ask_median) / n.retail_now)}%` : "—"}</div><div className="l">Sellers ask {money(n.ask_median)}. New is {money(n.retail_now)}.</div></div>
-              <div><div className="lab">heat</div><div className="v">{n.saves_avg ?? "—"}</div><div className="l">Saves per listing on The RealReal. More saves, more buyers watching.</div></div>
-              <div><div className="lab">trend</div><div className="v">{n.trend_pct == null ? "—" : `${n.trend_pct > 0 ? "+" : ""}${n.trend_pct}%`}</div><div className="l">Where asking prices moved since the last snapshot.</div></div>
-              <div><div className="lab">proven sales</div><div className="v">{n.sold_n || n.trr_sold_90d || 0}</div><div className="l">{n.sold_median ? `Median sold ${money(n.sold_median)}, ${n.sold_pct_of_retail}% of new.` : "Sales we can actually see. None yet."}</div></div>
-            </span>
+            {n.sell && (() => { const sl = n.sell; const rate = payoutRate(sl.median_sold); const net = Math.round(sl.median_sold * rate - sl.retail); return (
+              <div className={`sell ${net >= 0 ? "up" : "down"}`}><div className="lab">buy at the boutique, resell now</div><div className="v">{net >= 0 ? "+" : "−"}{money(Math.abs(net))}</div><div className="l">Pay {money(sl.retail)} at the boutique{sl.retail_spec ? ` (${sl.retail_spec})` : ""}, before sales tax. Resale buyers paid {money(sl.median_sold)} in the last {sl.window_days} days for the same edition in pristine or tagged condition: actual sales, not asking prices. The RealReal keeps about {Math.round((1 - rate) * 100)}% at that price, so that is {net >= 0 ? "profit after fees" : "a loss after fees"}. {sl.n} sale{sl.n === 1 ? "" : "s"} behind it{sl.n < 10 ? ", which is thin" : sl.n < 30 ? ", a fair sample" : ", a solid sample"}. {/(hermès|hermes|chanel)/i.test(bagName) ? "Getting one is the hard part: these are allocated, and selling a new bag can cost you the access that got it." : "Check the boutique will sell you one at that price."}</div></div>
+            ); })()}
+            {n.sold_n > 0 && n.sold_median && <div><div className="lab">sold for</div><div className="v">{money(n.sold_median)}</div><div className="l">{n.retail_now ? `against ${money(n.retail_now)} new, so ${Math.round(n.sold_pct_of_retail ?? 0)}% of the store price.` : "actual sales, same size."} {n.sold_n} sale{n.sold_n === 1 ? "" : "s"} we can see.</div></div>}
+            {!n.sold_n && n.trr_sold_90d > 0 && <div><div className="lab">sales seen</div><div className="v">{n.trr_sold_90d}</div><div className="l">sold on The RealReal in 90 days, sizes and finishes mixed. No same-size sale yet.</div></div>}
+            {n.retail_now && <div><div className="lab">new, today</div><div className="v">{money(n.retail_now)}</div><div className="l">{n.retail_launch && n.retail_launch !== n.retail_now ? `Was ${money(n.retail_launch)} at launch.` : "Boutique price."}{n.retail_size ? ` ${n.retail_size}.` : ""}</div></div>}
+            {n.ask_median && n.retail_now && <div><div className="lab">sellers want</div><div className="v">{Math.round((100 * n.ask_median) / n.retail_now)}%</div><div className="l">of new: {money(n.ask_median)} across {n.ask_n} listings. Wanting is not getting.</div></div>}
+            {n.trend_pct != null && <div><div className="lab">asking trend</div><div className="v">{n.trend_pct > 0 ? "+" : ""}{n.trend_pct}%</div><div className="l">where what sellers want moved since the last snapshot.</div></div>}
             <span className="h5h10txt" style={{ display: "contents" }}>
-              <div><div className="lab">price when new</div><div className="v">{n.retail_launch && n.retail_now ? `${money(n.retail_launch)} → ${money(n.retail_now)}` : money(n.retail_now)}</div><div className="l">What the house charged at launch and today{n.retail_size ? ` (${n.retail_size})` : ""}.</div></div>
-              <div><div className="lab">sold vs new</div><div className="v">{n.sold_pct_of_retail ? `${Math.round(n.sold_pct_of_retail)}%` : "—"}</div><div className="l">{n.sold_n ? `${n.sold_n} confirmed sales, median ${money(n.sold_median)}.` : "No confirmed sales in the tracker yet."}</div></div>
-              <div><div className="lab">icon status</div><div className="v">{n.icon ? "Yes" : "Not yet"}</div><div className="l">A shape the house keeps making for decades. Icons hold; novelties fade.</div></div>
-              <div><div className="lab">asking vs new</div><div className="v">{n.ask_median && n.retail_now ? `${Math.round((100 * n.ask_median) / n.retail_now)}%` : "—"}</div><div className="l">{n.ask_n} listings, median ask {money(n.ask_median)}.</div></div>
+              <div><div className="lab">made for decades?</div><div className="v">{n.icon ? "Yes" : "Not yet"}</div><div className="l">Shapes the house keeps making hold value; novelties fade.</div></div>
             </span>
           </div>
+          {n.path && (
+            <p className="anchor"><span className="lab">the anchor</span> {bagName.split(" · ")[0]} raised the {bagName.split(" · ")[1] ?? "bag"} from {money(n.path.from_price)} ({fmtDate(n.path.from_date)}) to {money(n.path.to_price)} ({fmtDate(n.path.to_date)}). A bag bought at the old price now looks like a deal{n.sold_pct_of_retail ? `, and resale has followed to ${Math.round(n.sold_pct_of_retail)}% of today's price` : ""}.</p>
+          )}
         </>
       )}
 
@@ -95,7 +116,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         <div className="edit">
           <section className="glance">
             <p className="lab">at a glance</p>
-            <ol>{(result.takeaways && result.takeaways.length ? result.takeaways : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}>{t}</li>)}</ol>
+            <ol>{(result.takeaways && result.takeaways.length ? result.takeaways : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}>{plain(t)}</li>)}</ol>
           </section>
 
           {(() => {
@@ -151,8 +172,8 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
               return (
                 <article key={c.key} className={`ecard ${c.mood}`}>
                   <header><h4>{c.title}</h4><span className="stamp">{c.mood === "strong" ? "good sign" : c.mood === "weak" ? "weak spot" : "mixed"}</span></header>
-                  <p className="h">{c.headline}</p>
-                  {c.soWhat && <p className="so">{c.soWhat}</p>}
+                  <p className="h">{plain(c.headline)}</p>
+                  {c.soWhat && <p className="so">{plain(c.soWhat)}</p>}
                   {proof && <p className="proof">{proof.text} <span className="src">{proof.url ? <a href={proof.url} target="_blank" rel="noreferrer">{proof.source}</a> : proof.source}</span></p>}
                   {(more.length > 0 || c.more) && (
                     <details>

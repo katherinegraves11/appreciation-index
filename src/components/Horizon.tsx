@@ -24,7 +24,7 @@ export function Dial() {
   return (
     <div className="dial" role="radiogroup" aria-label="Horizon">
       {([1, 5, 10] as Horizon[]).map((v) => (
-        <button key={v} type="button" role="radio" aria-checked={h === v} onClick={() => setH(v)}>{v === 1 ? "1 year" : `${v} years`}</button>
+        <button key={v} type="button" role="radio" aria-checked={h === v} onClick={() => setH(v)}>{v === 1 ? "1 year" : `${v} years`}<small>{v === 1 ? "worth the money today?" : v === 5 ? "will I get my money back?" : "worth more than I paid?"}</small></button>
       ))}
     </div>
   );

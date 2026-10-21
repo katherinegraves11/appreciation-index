@@ -266,7 +266,7 @@ export function hotList(): string {
   try {
     const rows = db.prepare(`
       select house, model_guess, era_guess, count(*) n, sum(sold) sold,
-             round(avg(cast(nullif(substr(title, instr(title,'saves=')+6, 3),'') as real))) saves,
+             round(avg(cast(nullif(rtrim(substr(substr(title, instr(title,'saves=')+6), 1, 6), ';] abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,'),'') as real))) saves,
              round(avg(price)) avg_ask,
              group_concat(distinct case when lower(title) like '%pony%' or lower(title) like '%cheetah%' then 'pony hair / cheetah' end) finish
       from trr_item_reads where read_date >= date('now','-45 days') and model_guess is not null and model_guess <> ''
@@ -287,18 +287,27 @@ export type QuickNumbers = {
   saves_avg: number | null; trend_pct: number | null; trr_sold_90d: number; icon: boolean;
   buzz: BuzzNumbers | null;
   links: { house_url: string | null; runway_url: string | null };
+  path: { from_price: number; from_date: string; to_price: number; to_date: string; size: string | null } | null;
+  sell: { retail: number; retail_spec: string; median_sold: number; n: number; window_days: number; matched_on: string } | null;
 };
-export function quickNumbers(house: string, bag: string): QuickNumbers | null {
+/** SQL fragment + params requiring every meaningful word of the bag name to appear in a column (no first-word guessing). */
+function modelMatch(col: string, bag: string): { sql: string; params: string[] } {
+  const stop = new Set(["bag", "bags", "the", "and", "with", "flap", "runway", "pieces", "collection"]);
+  const words = norm(bag).split(" ").filter((w) => w.length > 1 && !stop.has(w) && !/^\d{4}$/.test(w));
+  if (!words.length) return { sql: "0", params: [] };
+  return { sql: "(" + words.map(() => `lower(${col}) like ?`).join(" and ") + ")", params: words.map((w) => `%${w}%`) };
+}
+export function quickNumbers(house: string, bag: string, spec?: string): QuickNumbers | null {
   const db = open(); if (!db) return null;
-  const hTerms = houseTerms(house); const bagTerm = norm(bag).split(" ").filter((w) => w.length > 2)[0] ?? norm(bag);
+  const hTerms = houseTerms(house); const mm = modelMatch("model", bag); const mg = modelMatch("model_guess", bag); const bagTerm = norm(bag).split(" ").filter((w) => w.length > 2)[0] ?? norm(bag);
   const g = <T extends Row>(sql: string, params: (string | number)[] = []): T | undefined => { try { return db.prepare(sql).get(...params) as T | undefined; } catch { return undefined; } };
-  const rc = g<Row>(`select retail_now, size_or_spec from v_retail_current where ${likeAny("house", hTerms)} and lower(model) like ? limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
-  const launch = g<Row>(`select price from retail_reference where ${likeAny("house", hTerms)} and lower(model) like ? and price_type='launch' order by effective_date limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
-  const sold = g<Row>(`select n_sold_same_size n, median_sold m, sold_pct_of_retail p from v_sold_vs_retail where ${likeAny("house", hTerms)} and lower(model) like ? limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
-  const ask = g<Row>(`select n_listings_same_size n, median_ask_same_size m from v_retention_scoreboard_sized where ${likeAny("house", hTerms)} and lower(model) like ? limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
-  const trr = g<Row>(`select round(avg(cast(nullif(substr(title, instr(title,'saves=')+6,3),'') as real))) saves, sum(sold) sold90 from trr_item_reads where ${likeAny("house", hTerms)} and lower(model_guess) like ? and read_date >= date('now','-90 days')`, [...likeParams(hTerms), `%${bagTerm}%`]);
-  const trend = g<Row>(`select a.median_ask a0, b.median_ask a1 from resale_aggregates a join resale_aggregates b on a.source=b.source and a.house=b.house and a.model=b.model where ${likeAny("a.house", hTerms)} and lower(a.model) like ? and a.snapshot_date < b.snapshot_date order by b.snapshot_date desc, a.snapshot_date desc limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
-  const icon = g<Row>(`select launch_year from bags where ${likeAny("house", hTerms)} and lower(model) like ? and launch_year <= 2010 limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
+  const rc = g<Row>(`select retail_now, size_or_spec from v_retail_current where ${likeAny("house", hTerms)} and ${mm.sql} limit 1`, [...likeParams(hTerms), ...mm.params]);
+  const launch = g<Row>(`select price from retail_reference where ${likeAny("house", hTerms)} and ${mm.sql} and price_type='launch' order by effective_date limit 1`, [...likeParams(hTerms), ...mm.params]);
+  const sold = g<Row>(`select n_sold_same_size n, median_sold m, sold_pct_of_retail p from v_sold_vs_retail where ${likeAny("house", hTerms)} and ${mm.sql} limit 1`, [...likeParams(hTerms), ...mm.params]);
+  const ask = g<Row>(`select n_listings_same_size n, median_ask_same_size m from v_retention_scoreboard_sized where ${likeAny("house", hTerms)} and ${mm.sql} limit 1`, [...likeParams(hTerms), ...mm.params]);
+  const trr = g<Row>(`select round(avg(cast(nullif(rtrim(substr(substr(title, instr(title,'saves=')+6), 1, 6), ';] abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,'),'') as real))) saves, sum(sold) sold90 from trr_item_reads where ${likeAny("house", hTerms)} and ${mg.sql} and read_date >= date('now','-90 days')`, [...likeParams(hTerms), ...mg.params]);
+  const trend = g<Row>(`select a.median_ask a0, b.median_ask a1 from resale_aggregates a join resale_aggregates b on a.source=b.source and a.house=b.house and a.model=b.model where ${likeAny("a.house", hTerms)} and ${modelMatch('a.model', bag).sql} and a.snapshot_date < b.snapshot_date order by b.snapshot_date desc, a.snapshot_date desc limit 1`, [...likeParams(hTerms), ...modelMatch('a.model', bag).params]);
+  const icon = g<Row>(`select launch_year from bags where ${likeAny("house", hTerms)} and ${mm.sql} and launch_year <= 2010 limit 1`, [...likeParams(hTerms), ...mm.params]);
   db.close();
   return {
     retail_now: (rc?.retail_now as number) ?? null, retail_launch: (launch?.price as number) ?? null, retail_size: (rc?.size_or_spec as string) ?? null,
@@ -308,7 +317,57 @@ export function quickNumbers(house: string, bag: string): QuickNumbers | null {
     trr_sold_90d: (trr?.sold90 as number) ?? 0, icon: !!icon,
     buzz: buzzNumbers(house, bag),
     links: bagLinks(house, bag),
+    path: pricePath(house, bag),
+    sell: sellNow(house, bag, spec),
   };
+}
+
+/** Like for like for the access buyer: the exact edition (model + finish words) and size, pristine or tagged, sold in the last 45 days,
+ *  against the retail row for that same spec. Null under three sales, so the tile never shows a thin or mismatched number. */
+export function sellNow(house: string, bag: string, spec?: string): QuickNumbers["sell"] {
+  const db = open(); if (!db) return null;
+  const hTerms = houseTerms(house);
+  const q = <T extends Row>(sql: string, params: (string | number)[] = []): T[] => { try { return db.prepare(sql).all(...params) as T[]; } catch { return []; } };
+  const stop = new Set(["bag", "bags", "the", "and", "with", "flap", "runway", "pieces", "collection", "print", "hobo", "mini", "small", "medium", "large", "maxi", "jumbo"]);
+  const rawSpec = norm(spec ?? "").split(" ").filter((w) => w.length > 2 && !stop.has(w) && !/^\d+$/.test(w));
+  // finish words match as "any of", with adjacent words also tried joined ("pony hair" → "ponyhair"), because listing titles vary
+  const specWords = Array.from(new Set([...rawSpec, ...rawSpec.slice(0, -1).map((w, i) => w + rawSpec[i + 1])])).slice(0, 6);
+  // size: a size word first; a two-digit number only if it is not already the model's own number (Chanel 25, Chanel 19)
+  const all = norm(`${bag} ${spec ?? ""}`);
+  const modelNums = new Set((norm(bag).match(/\b\d{2}\b/g) ?? []));
+  const sizeWord = (all.match(/\b(mini|small|medium|large|maxi|jumbo)\b/) ?? [])[0] ?? ((all.match(/\b\d{2}\b/g) ?? []).find((n) => !modelNums.has(n)) ?? null);
+  const tryMatch = (words: string[], label: string) => {
+    const mm = modelMatch("model", bag);
+    const anyOf = (col: string) => words.length ? `and (${words.map(() => `lower(replace(${col},' ','')) like ?`).join(" or ")})` : "";
+    const retailRows = q<Row>(`select price, size_or_spec from retail_reference where ${likeAny("house", hTerms)} and ${mm.sql} and region='US' and price_type in ('current','launch') ${anyOf("size_or_spec")} ${sizeWord ? "and lower(size_or_spec) like ?" : ""} order by effective_date desc limit 1`,
+      [...likeParams(hTerms), ...mm.params, ...words.map((w) => `%${w}%`), ...(sizeWord ? [`%${sizeWord}%`] : [])]);
+    if (!retailRows.length) return null;
+    const mg = modelMatch("model_guess", bag);
+    const sold = q<Row>(`select price from trr_item_reads where ${likeAny("house", hTerms)} and ${mg.sql} and sold=1 and price is not null and read_date >= date('now','-45 days')
+        and (coalesce(condition,'') in ('Pristine','Excellent') or title like '%w/Tags%' or title like '%w/ Tags%')
+        ${anyOf("title")} ${sizeWord ? "and lower(title) like ?" : ""} order by price`,
+      [...likeParams(hTerms), ...mg.params, ...words.map((w) => `%${w}%`), ...(sizeWord ? [`%${sizeWord}%`] : [])]);
+    if (sold.length < 3) return null;
+    const prices = sold.map((r) => r.price as number); const median = prices[Math.floor(prices.length / 2)];
+    return { retail: retailRows[0].price as number, retail_spec: (retailRows[0].size_or_spec as string) ?? "", median_sold: median, n: prices.length, window_days: 45, matched_on: label };
+  };
+  const out = (specWords.length ? tryMatch(specWords, `${bag} ${specWords.join(" ")}${sizeWord ? ` ${sizeWord}` : ""}`) : null) ?? tryMatch([], `${bag}${sizeWord ? ` ${sizeWord}` : ""}, plain`);
+  db.close();
+  return out;
+}
+
+/** The anchor: the oldest and newest US reference-size prices within 30 months, when the price went up. */
+export function pricePath(house: string, bag: string): QuickNumbers["path"] {
+  const db = open(); if (!db) return null;
+  const hTerms = houseTerms(house); const mm = modelMatch("model", bag);
+  try {
+    const rows = db.prepare(`select price, effective_date, size_or_spec from retail_reference where ${likeAny("house", hTerms)} and ${mm.sql} and region='US' and is_reference_size=1 and effective_date >= date('now','-30 months') order by effective_date`).all(...likeParams(hTerms), ...mm.params) as Row[];
+    db.close();
+    if (rows.length < 2) return null;
+    const a = rows[0], b = rows[rows.length - 1];
+    if ((b.price as number) <= (a.price as number)) return null;
+    return { from_price: a.price as number, from_date: String(a.effective_date), to_price: b.price as number, to_date: String(b.effective_date), size: (b.size_or_spec as string) ?? null };
+  } catch { db.close(); return null; }
 }
 
 /* ---------------- THE BUZZ: cultural-moment layer (buzz_terms / buzz_reads / buzz_events) ---------------- */
@@ -420,13 +479,13 @@ export function raceBoard(): RaceRow[] {
   try {
     const rows = db.prepare(`
       with hold as (select house, count(*) models, round(avg(sold_pct_of_retail)) sold_pct from v_sold_vs_retail group by house),
-      heat as (select house, round(avg(cast(nullif(substr(title, instr(title,'saves=')+6,3),'') as real))) saves, sum(sold) sold90 from trr_item_reads where read_date >= date('now','-90 days') group by house),
+      heat as (select house, round(avg(cast(nullif(rtrim(substr(substr(title, instr(title,'saves=')+6), 1, 6), ';] abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,'),'') as real))) saves, sum(sold) sold90 from trr_item_reads where read_date >= date('now','-90 days') group by house),
       dl as (select brand house, round(100.0*sum(gone)/sum(listed_before),1) delist from v_disappearance group by brand)
       select h.house, h.models, h.sold_pct, t.saves, t.sold90, d.delist
       from hold h left join heat t on t.house=h.house left join dl d on d.house=h.house order by h.sold_pct desc`).all() as Row[];
     db.close();
     return rows.map((r) => ({ house: String(r.house), models: Number(r.models), sold_pct: (r.sold_pct as number) ?? null, saves: (r.saves as number) ?? null, sold_90d: Number(r.sold90 ?? 0), delist_pct: (r.delist as number) ?? null,
-      heat: r.saves != null || r.delist != null ? Math.round(Math.min(100, ((r.saves as number) ?? 20) * 1.2 + ((r.delist as number) ?? 30))) : null }));
+      heat: r.saves != null ? Math.round(Math.min(100, (r.saves as number) * 1.2 + ((r.delist as number) ?? 0))) : null }));
   } catch { db.close(); return []; }
 }
 
@@ -473,10 +532,10 @@ export function ownershipDossier(house: string): string {
 /** Where the real thing can be seen: the house's own product page (if the reference price came from one) and the latest runway look. */
 export function bagLinks(house: string, bag: string): { house_url: string | null; runway_url: string | null } {
   const db = open(); if (!db) return { house_url: null, runway_url: null };
-  const hTerms = houseTerms(house); const bagTerm = norm(bag).split(" ").filter((w) => w.length > 2)[0] ?? norm(bag);
+  const hTerms = houseTerms(house); const mm = modelMatch("model", bag);
   const g = <T extends Row>(sql: string, params: (string | number)[] = []): T | undefined => { try { return db.prepare(sql).get(...params) as T | undefined; } catch { return undefined; } };
-  const hp = g<Row>(`select source_url from retail_reference where ${likeAny("house", hTerms)} and lower(model) like ? and (source_url like '%/product%' or source_url like '%/products/%' or source_url like '%/p/%') and source_url not like 'private:%' order by effective_date desc limit 1`, [...likeParams(hTerms), `%${bagTerm}%`]);
-  const rw = g<Row>(`select source_url from runway_pipeline where ${likeAny("house", hTerms)} and (lower(model_guess) like ? or lower(bag_description) like ?) and source_url like '%vogue.com%' order by show_date desc limit 1`, [...likeParams(hTerms), `%${bagTerm}%`, `%${bagTerm}%`]);
+  const hp = g<Row>(`select source_url from retail_reference where ${likeAny("house", hTerms)} and ${mm.sql} and (source_url like '%/product%' or source_url like '%/products/%' or source_url like '%/p/%') and source_url not like 'private:%' order by effective_date desc limit 1`, [...likeParams(hTerms), ...mm.params]);
+  const rw = g<Row>(`select source_url from runway_pipeline where ${likeAny("house", hTerms)} and (${modelMatch('model_guess', bag).sql} or ${modelMatch('bag_description', bag).sql}) and source_url like '%vogue.com%' order by show_date desc limit 1`, [...likeParams(hTerms), ...modelMatch('model_guess', bag).params, ...modelMatch('bag_description', bag).params]);
   db.close();
   return { house_url: (hp?.source_url as string) ?? null, runway_url: (rw?.source_url as string) ?? null };
 }

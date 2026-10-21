@@ -140,6 +140,5 @@ export function seeItLinks(house: string, bag: string, extra?: { house_url?: str
   ];
   if (extra?.house_url) links.push({ label: `${house}.com`, href: extra.house_url });
   if (extra?.runway_url) links.push({ label: "Runway look · Vogue", href: extra.runway_url });
-  links.push({ label: "Photos", href: `https://www.google.com/search?tbm=isch&q=${q}` });
   return links;
 }

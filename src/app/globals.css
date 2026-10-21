@@ -377,3 +377,14 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 .bz-lab{margin:16px 0 0}
 .bz-moments .src{font-size:12.5px;color:var(--ink-3);font-style:italic;margin-left:4px}
 .bz-moments.viral .what{color:var(--ink)}
+
+/* dial subtitles + anchor line */
+.dial button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 16px 7px}
+.dial button small{font-family:var(--text);font-variant:normal;letter-spacing:0;text-transform:none;font-size:12px;line-height:1.1;color:inherit;opacity:.85;font-style:italic}
+.dialnote{margin:-2px 0 6px;font-size:15px;color:var(--ink-2);font-style:italic}
+.anchor{max-width:72ch;margin:14px auto 0;text-align:center;font-size:17px;line-height:1.5;color:var(--ink)}
+.anchor .lab{margin-right:6px}
+@media (max-width:600px){.dial button small{display:none}}
+
+.strip .sell.up .v{color:var(--buy)}.strip .sell.down .v{color:var(--dont)}
+.strip .sell{border:1px solid var(--line);padding:10px 12px;margin:-10px 0}

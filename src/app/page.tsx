@@ -10,7 +10,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ b
   let initial: Done | null = null;
   if (brief) {
     const b = await getBrief(brief).catch(() => null);
-    if (b) initial = { result: b.result, id: b.id, bagName: `${b.house} · ${b.bag}${b.spec ? ` · ${b.spec}` : ""}`, numbers: quickNumbers(b.house, b.bag) };
+    if (b) initial = { result: b.result, id: b.id, bagName: `${b.house} · ${b.bag}${b.spec ? ` · ${b.spec}` : ""}`, numbers: quickNumbers(b.house, b.bag, b.spec || undefined) };
   }
   return (
     <main>
