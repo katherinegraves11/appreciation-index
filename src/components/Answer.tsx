@@ -38,6 +38,17 @@ const PLAIN: [RegExp, string][] = [
   [/\brealised\b/gi, "actual"],
 ];
 export function plain(t: string | undefined | null): string { let x = t ?? ""; for (const [re, to] of PLAIN) x = x.replace(re, to); return x; }
+/** Small engraved glyphs that give each section a face: a speech bubble for the culture board, a ledger for the numbers, a bell for moments. */
+const Glyph = ({ kind }: { kind: "chat" | "ledger" | "bell" | "anchor" | "proof" }) => (
+  <svg className="sg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {kind === "chat" && <><path d="M4 6h16v9H9l-4 3v-3H4z" /><path d="M8 10.5h8M8 13h5" opacity=".7" /></>}
+    {kind === "ledger" && <><rect x="5" y="4" width="14" height="16" rx="1.5" /><path d="M8 9h8M8 12h8M8 15h5" opacity=".7" /></>}
+    {kind === "bell" && <><path d="M7 16V11a5 5 0 0 1 10 0v5l1.5 2h-13z" /><path d="M10 20a2 2 0 0 0 4 0" /></>}
+    {kind === "anchor" && <><circle cx="12" cy="5" r="2" /><path d="M12 7v13M6 13a6 6 0 0 0 12 0M4 12l2 1M20 12l-2 1" /></>}
+    {kind === "proof" && <><path d="M6 4h9l3 3v13H6z" /><path d="M9 11h6M9 14h6M9 17h4" opacity=".7" /></>}
+  </svg>
+);
+
 /** What a consignor keeps on The RealReal at a given sale price (published tiers, rounded; an estimate, not a quote). */
 const payoutRate = (price: number) => price >= 10000 ? 0.85 : price >= 5000 ? 0.8 : price >= 2500 ? 0.75 : price >= 1500 ? 0.7 : price >= 750 ? 0.6 : 0.55;
 const fmtDate = (d: string) => { const [y, m] = d.split("-"); const M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; return m ? `${M[Number(m) - 1]} ${y}` : y; };
@@ -58,12 +69,12 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         <h2>{first} {rest.length > 0 && <i>{rest.join(" ")}</i>}</h2>
         {result.timing && (() => { const t = plain(result.timing); const [a, ...r] = t.split(/(?<=[.;:])\s+/); return <p className="timing"><b>{a}</b>{r.length ? " " + r.join(" ") : ""}</p>; })()}
         <div className="stamps"><span className="stamp">{result.call}</span><span className="stamp">confidence {result.confidence.toLowerCase()}</span></div>
-        <p className="seeit"><span className="lab">see it</span>{seeItLinks(bagName.split(" · ")[0] ?? "", bagName.split(" · ")[1] ?? "", n?.links).map((l, i) => <a key={i} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)}</p>
+        <p className="seeit"><span className="lab">go look at it</span>{seeItLinks(bagName.split(" · ")[0] ?? "", bagName.split(" · ")[1] ?? "", n?.links).map((l, i) => <a key={i} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)}</p>
       </section>
 
       {result.options && result.options.length > 0 && (
         <>
-          <p className="lab stripcap">when to buy</p>
+          <p className="lab stripcap">the timing question</p>
           <div className="tiles options" aria-label="When to buy">
             {result.options.slice(0, 3).map((o, i) => (
               <section key={i} className={`tile on ${CLS[o.verdict]}`}>
@@ -92,7 +103,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
 
       {n && (n.retail_now || n.sold_median || n.ask_median || n.sell || n.asks) && (
         <>
-          <p className="lab stripcap"><span className="h1txt">right now · from the tracker</span><span className="h5h10txt">the long view · from the tracker</span></p>
+          <p className="lab stripcap"><Glyph kind="ledger" /><span className="h1txt">the receipts · what actually changed hands</span><span className="h5h10txt">the long receipts · what has held</span></p>
           <div className="strip">
             {n.sell && (() => { const sl = n.sell; const rate = payoutRate(sl.median_sold); const net = Math.round(sl.median_sold * rate - sl.retail); return (
               <div className={`sell ${net >= 0 ? "up" : "down"}`}><div className="lab">buy at the boutique, resell now</div><div className="v">{net >= 0 ? "+" : "−"}{money(Math.abs(net))}</div><div className="l"><b>Pay {money(sl.retail)}.</b> Pristine ones sold for {money(sl.median_sold)} in the last {sl.window_days} days ({sl.n} sales). After The RealReal&apos;s {Math.round((1 - rate) * 100)}%, you keep about {money(Math.abs(net))} {net >= 0 ? "more" : "less"} than you paid. {/(hermès|hermes|chanel)/i.test(bagName) ? "Getting one is the hard part." : ""}</div></div>
@@ -113,7 +124,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             </span>
           </div>
           {n.path && (
-            <p className="anchor"><span className="lab">the anchor</span> <b>{bagName.split(" · ")[0]} raised it from {money(n.path.from_price)} to {money(n.path.to_price)}</b> ({fmtDate(n.path.from_date)} to {fmtDate(n.path.to_date)}). Last year&apos;s price now looks like a deal.</p>
+            <p className="anchor"><span className="lab"><Glyph kind="anchor" />the price creep</span> <b>{bagName.split(" · ")[0]} raised it from {money(n.path.from_price)} to {money(n.path.to_price)}</b> ({fmtDate(n.path.from_date)} to {fmtDate(n.path.to_date)}). Last year&apos;s price now looks like a deal.</p>
           )}
         </>
       )}
@@ -122,7 +133,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
       {open && (
         <div className="edit">
           <section className="glance">
-            <p className="lab">at a glance</p>
+            <p className="lab">if you read nothing else</p>
             <ol>{(result.takeaways && result.takeaways.length ? result.takeaways : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}>{plain(t)}</li>)}</ol>
           </section>
 
@@ -152,20 +163,20 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             const pick = (t: string, re: RegExp, max = 200) => { const parts = strip(t).split(/(?<=[.;])\s+/); const hit = parts.filter((x) => re.test(x)); const list = hit.length ? hit : parts; let out = list[0] ?? ""; if (list[1] && (out + " " + list[1]).length <= max) out += " " + list[1]; return out; };
             return (
               <section className="buzz2">
-                <header className="bz-head"><div><p className="lab">the culture board · what TikTok and Instagram are saying</p>
-                  <h4>{b ? (over ? <>Is {bagShort} over? <i>The feeds are turning on {house}.</i></> : growth && growth.value > 15 ? <>Still rising. <i>Searches for “{growth.term}” are up {Math.round(growth.value)}% this week.</i></> : <>Steady. <i>Nothing is turning on {house} this week.</i></>) : <>No read on {house} <i>yet</i>.</>}</h4>
+                <header className="bz-head"><div><p className="lab"><Glyph kind="chat" />the group chat · what TikTok and Instagram are saying</p>
+                  <h4>{b ? (over ? <>The feeds have thoughts. <i>Is {bagShort} over?</i></> : growth && growth.value > 15 ? <>Everyone&apos;s suddenly searching “{growth.term}”. <i>Up {Math.round(growth.value)}% this week.</i></> : <>Quiet week. <i>{house} is minding its own business.</i></>) : <>Nobody&apos;s said a word about {house} <i>yet</i>.</>}</h4>
                 </div></header>
                 {b ? (
                   <>
                     <dl className="bz-lines">
                       <div><dt>Is it over?</dt><dd>{over ? pick(over.note, /deinfluenc|moved on|had its moment|backlash|over\b/i) : trendsForHouse.length ? `Not that we can see. ${pick(trendsForHouse[0].note, new RegExp(house.split(" ")[0], "i"))}` : `No one is calling ${house} over this week.`}</dd></div>
-                      <div><dt>Who is carrying it</dt><dd>{carrying && new RegExp(house.split(" ")[0], "i").test(carrying.note) ? `${pick(carrying.note, new RegExp(house.split(" ")[0], "i"), 160)} That is a Gen Z feed; nothing on women over 35 yet.` : "Nothing on women over 35 yet. The Gen Z feeds show Coach and mid-range labels, with luxury as the occasional treat."}</dd></div>
-                      <div><dt>The dupe wave</dt><dd>{dupe ? (new RegExp(house.split(" ")[0], "i").test(pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160)) ? pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160) : `Dupes and deinfluencing are circulating among younger buyers. Nothing aimed at ${house} this week.`) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
-                      <div><dt>Where this bag lives</dt><dd>{bagTags.length ? bagTags.slice(0, 3).map((t) => `#${t.term} (${Math.round(t.value).toLocaleString()} posts)`).join(", ") : houseTags.length ? `No tag of its own yet. The house's: ${houseTags.slice(0, 2).map((t) => `#${t.term} (${Math.round(t.value) >= 1e6 ? (t.value / 1e6).toFixed(1) + "M" : Math.round(t.value / 1000) + "K"})`).join(", ")}.` : `No hashtag of its own yet; ${house}'s tags carry it.`}</dd></div>
+                      <div><dt>Who&apos;s carrying it</dt><dd>{carrying && new RegExp(house.split(" ")[0], "i").test(carrying.note) ? `${pick(carrying.note, new RegExp(house.split(" ")[0], "i"), 160)} That is a Gen Z feed; nothing on women over 35 yet.` : "Nothing on women over 35 yet. The Gen Z feeds show Coach and mid-range labels, with luxury as the occasional treat."}</dd></div>
+                      <div><dt>The dupe situation</dt><dd>{dupe ? (new RegExp(house.split(" ")[0], "i").test(pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160)) ? pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160) : `Dupes and deinfluencing are circulating among younger buyers. Nothing aimed at ${house} this week.`) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
+                      <div><dt>Where it lives online</dt><dd>{bagTags.length ? bagTags.slice(0, 3).map((t) => `#${t.term} (${Math.round(t.value).toLocaleString()} posts)`).join(", ") : houseTags.length ? `No tag of its own yet. The house's: ${houseTags.slice(0, 2).map((t) => `#${t.term} (${Math.round(t.value) >= 1e6 ? (t.value / 1e6).toFixed(1) + "M" : Math.round(t.value / 1000) + "K"})`).join(", ")}.` : `No hashtag of its own yet; ${house}'s tags carry it.`}</dd></div>
                     </dl>
                     {(b.events.length > 0) && (
                       <div className="bz-moments">
-                        <p className="lab">moments</p>
+                        <p className="lab"><Glyph kind="bell" />moments worth knowing</p>
                         <ol>{b.events.filter((e) => !/fashion month on Instagram/i.test(e.note)).slice(0, 2).map((e, i) => <li key={i}><span className="when">{fmt(e.date)}</span><span className="what">{e.note}</span></li>)}</ol>
                       </div>
                     )}
@@ -186,7 +197,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
                   {c.soWhat && <p className="so">{plain(c.headline)}</p>}
                   {(proof || more.length > 0 || c.more) && (
                     <details>
-                      <summary>the proof</summary>
+                      <summary><Glyph kind="proof" />receipts</summary>
                       <ul>{[...(proof ? [proof] : []), ...more].slice(0, 4).map((e, i) => <li key={i}>{e.text} <span className="src">{e.url ? <a href={e.url} target="_blank" rel="noreferrer">{e.source}</a> : e.source}</span></li>)}</ul>
                     </details>
                   )}
@@ -196,10 +207,10 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
           </div>
 
           <div className="watch">
-            {result.spec_guidance?.length > 0 && <section><p className="lab">if you buy</p><ul>{result.spec_guidance.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>}
-            <section><p className="lab">for</p><ul>{result.bull_case.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
-            <section><p className="lab">against</p><ul>{result.bear_case.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
-            <section><p className="lab">what would change this</p><ul>{result.what_would_change_this.slice(0, 1).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
+            {result.spec_guidance?.length > 0 && <section><p className="lab">if you do buy</p><ul>{result.spec_guidance.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>}
+            <section><p className="lab">the case for</p><ul>{result.bull_case.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
+            <section><p className="lab">the case against</p><ul>{result.bear_case.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
+            <section><p className="lab">what would change our mind</p><ul>{result.what_would_change_this.slice(0, 1).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
           </div>
         </div>
       )}

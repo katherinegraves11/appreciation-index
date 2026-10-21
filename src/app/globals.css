@@ -413,3 +413,7 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 .watch ul{font-size:15.5px}
 .ecard details summary{color:var(--ink-3)}
 @media (max-width:600px){.strip .l{max-width:none}}
+
+/* section glyphs */
+.sg{width:16px;height:16px;vertical-align:-3px;margin-right:6px;color:var(--ink-3)}
+.bz-head h4 i{font-weight:400}
