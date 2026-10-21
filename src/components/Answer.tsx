@@ -121,47 +121,43 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
 
           {(() => {
             const b = n?.buzz;
-            const mood = !b || b.direction == null ? "quiet" : b.direction === "rising" ? (b.score != null && b.score >= 70 ? "on fire" : "warming up") : b.direction === "fading" ? "cooling off" : "steady";
-            const plat = (b?.detail ?? "").split(" ").filter(Boolean).map((d) => { const m = d.match(/^([a-z-]+):(\d+)(?:\(([+-]?\d+)%\))?/i); return m ? { key: m[1], score: Number(m[2]), growth: m[3] ? Number(m[3]) : null } : null; }).filter(Boolean) as { key: string; score: number; growth: number | null }[];
-            const name: Record<string, string> = { google: "Google search", instagram: "Instagram", tiktok: "TikTok", "tiktok-cc": "TikTok trends", youtube: "YouTube", reddit: "Reddit", pinterest: "Pinterest", "vogue-runway": "Vogue Runway" };
-            const missing = ["tiktok", "instagram", "google"].filter((k) => !plat.some((p) => p.key === k || (k === "tiktok" && p.key === "tiktok-cc")));
-            const tags = (b?.movers ?? []).filter((m) => (m.platform === "instagram" || m.platform === "tiktok" || m.platform === "tiktok-cc") && (m.metric === "posts_total" || m.metric === "posts_7d" || m.metric === "views_7d" || m.metric === "posts_visible"));
-            const searches = (b?.movers ?? []).filter((m) => m.platform === "google" && m.metric === "growth_pct_7d");
-            const fmt = (v: number) => v >= 1e6 ? `${(v / 1e6).toFixed(1).replace(/\.0$/, "")}M` : v >= 1e3 ? `${Math.round(v / 1e3)}K` : `${Math.round(v)}`;
-            const why = plat.map((p) => `${name[p.key] ?? p.key} ${p.score}${p.growth != null ? ` (${p.growth > 0 ? "+" : ""}${p.growth}% this week)` : ""}`).join(" · ");
+            const house = bagName.split(" · ")[0] ?? "";
+            const bagShort = bagName.split(" · ")[1] ?? "this bag";
+            const name: Record<string, string> = { google: "Google", instagram: "Instagram", tiktok: "TikTok", "tiktok-cc": "TikTok", youtube: "YouTube", reddit: "Reddit", pinterest: "Pinterest", "vogue-runway": "Vogue Runway" };
+            const plat = (b?.detail ?? "").split(" ").map((d) => d.match(/^([a-z-]+):/i)?.[1]).filter(Boolean).map((k) => name[k as string] ?? k) as string[];
+            const readFrom = Array.from(new Set(plat));
+            const tiktokRead = readFrom.includes("TikTok");
+            const growth = (b?.movers ?? []).find((m) => m.platform === "google" && m.metric === "growth_pct_7d");
+            const trendsForHouse = (b?.trends ?? []).filter((t) => new RegExp(house.split(" ")[0], "i").test(t.note));
+            const over = trendsForHouse.find((t) => /deinfluenc|moved on|had its moment|backlash|over\b/i.test(t.note));
+            const carrying = (b?.trends ?? []).find((t) => /whatsinmybag|what's in my bag|carr(y|ied)|rotation|most-shown/i.test(t.note));
+            const dupe = (b?.trends ?? []).find((t) => /dupe|inspired by|boujee on a budget/i.test(t.note));
+            const recentEvent = (b?.events ?? []).find((e) => !/fashion month on Instagram/i.test(e.note));
+            const fmt = (d: string) => new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+            const bagTags = (b?.movers ?? []).filter((m) => (m.platform === "instagram" || m.platform.startsWith("tiktok")) && b?.level === "family" && m.metric.startsWith("posts"));
+            const sentence = (t: string) => { const i = t.indexOf(": "); return (i > 0 && i < 60 ? t.slice(i + 2) : t).replace(/\s+\(.*?logged out.*?\)/i, ""); };
             return (
               <section className="buzz2">
-                <header className="bz-head">
-                  <div><p className="lab">the culture board · what TikTok and Instagram are saying</p><h4>{b ? <>The crowd is <i>{mood}</i>.</> : <>No crowd read <i>yet</i>.</>}</h4></div>
-                  {b && <div className="bz-score"><b>{b.score ?? "—"}</b><span>/100 · {b.direction ?? "no direction"}</span></div>}
-                </header>
+                <header className="bz-head"><div><p className="lab">the culture board · what TikTok and Instagram are saying</p>
+                  <h4>{b ? (over ? <>Is {bagShort} over? <i>The feeds are turning on {house}.</i></> : growth && growth.value > 15 ? <>Still rising. <i>Searches for {house} are up {Math.round(growth.value)}% this week{recentEvent ? ", after " + sentence(recentEvent.note).slice(0, 70).replace(/[.;,]\s*$/, "").toLowerCase() : ""}.</i></> : <>Steady. <i>Nothing is turning on {house} this week.</i></>) : <>No read on {house} <i>yet</i>.</>}</h4>
+                </div></header>
                 {b ? (
                   <>
-                    <p className="bz-why">Where the {b.score} comes from: {why || "one platform"}.{missing.length ? ` ${missing.map((k) => name[k]).join(" and ")} not read yet${missing.includes("tiktok") ? " (needs the TikTok trends sign-in)" : ""}.` : ""}{b.level === "house" ? " Read at house level; no hashtags for this exact bag yet." : ""}</p>
-                    {tags.length > 0 && (<p className="lab bz-lab">hashtags people are posting</p>)}
-                    {tags.length > 0 && (
-                      <div className="bz-tags">
-                        {tags.slice(0, 8).map((t, i) => <span key={i} className="htag"><b>#{t.term}</b><span>{fmt(t.value)} {t.metric === "views_7d" ? "views" : "posts"}</span><em>{name[t.platform] ?? t.platform}</em></span>)}
-                      </div>
-                    )}
-                    {searches.length > 0 && (
-                      <p className="bz-search">{searches.slice(0, 3).map((m, i) => <span key={i} className={`srch ${m.value > 0 ? "up" : "down"}`}>“{m.term}” {m.value > 0 ? "↑" : "↓"} {Math.abs(Math.round(m.value))}% in search this week</span>)}</p>
-                    )}
-                    {b.trends.length > 0 && (
-                      <div className="bz-moments viral">
-                        <p className="lab">going viral · on TikTok and Instagram right now</p>
-                        <ol>{b.trends.slice(0, 4).map((t, i) => <li key={i}><span className="when">{new Date(t.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span><span className="what">{t.note.length > 260 ? t.note.slice(0, 257).replace(/\s+\S*$/, "") + "…" : t.note} <span className="src">{t.source}</span></span></li>)}</ol>
-                      </div>
-                    )}
-                    {b.events.length > 0 && (
+                    <dl className="bz-lines">
+                      <div><dt>Is it over?</dt><dd>{over ? sentence(over.note) : trendsForHouse.length ? `Not that we can see. ${sentence(trendsForHouse[0].note)}` : `No one is calling ${house} over this week.`}</dd></div>
+                      <div><dt>Who is carrying it</dt><dd>{carrying ? `${sentence(carrying.note)} This is a logged-out Gen Z feed; women over 35 rarely appear in it.` : "No sightings logged this week."}</dd></div>
+                      <div><dt>The dupe wave</dt><dd>{dupe ? sentence(dupe.note) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
+                      <div><dt>Where this bag lives</dt><dd>{bagTags.length ? bagTags.slice(0, 3).map((t) => `#${t.term} (${Math.round(t.value).toLocaleString()} ${t.metric === "posts_visible" ? "posts visible" : "posts"})`).join(", ") : `No hashtag of its own yet; ${house}'s tags carry it. The house, not this bag, is what is being talked about.`}</dd></div>
+                    </dl>
+                    {(b.events.length > 0) && (
                       <div className="bz-moments">
-                        <p className="lab">events people are talking about</p>
-                        <ol>{b.events.slice(0, 4).map((e, i) => <li key={i}><span className="when">{new Date(e.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span><span className="what">{e.note}</span></li>)}</ol>
+                        <p className="lab">moments</p>
+                        <ol>{b.events.filter((e) => !/fashion month on Instagram/i.test(e.note)).slice(0, 2).map((e, i) => <li key={i}><span className="when">{fmt(e.date)}</span><span className="what">{e.note}</span></li>)}</ol>
                       </div>
                     )}
-                    <p className="bnote">Score = 50 + week-over-week growth, plus a little for volume, averaged across the platforms we read. Derived counts only; no posts or people are stored.</p>
+                    <p className="bz-read">Read from {readFrom.length ? readFrom.join(" and ") : "the tracker"}{b.read_date ? ` on ${fmt(b.read_date)}` : ""}. {tiktokRead ? "" : "We have not read TikTok for this bag yet."} Counts only; no posts or people are stored.</p>
                   </>
-                ) : <p className="bz-why">The daily run adds this bag&apos;s hashtags and search terms the day after it is first asked about.</p>}
+                ) : <p className="bz-read">We add this bag&apos;s hashtags the day after it is first asked about, and read them daily.</p>}
               </section>
             );
           })()}

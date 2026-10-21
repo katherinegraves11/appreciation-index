@@ -391,3 +391,11 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 
 .strip .longonly{display:none}
 :root.h5 .strip .longonly,:root.h10 .strip .longonly{display:contents}
+
+/* the culture board, rewritten as sentences */
+.bz-lines{margin:14px 0 0;display:grid;gap:10px}
+.bz-lines div{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:baseline}
+.bz-lines dt{font-variant:small-caps;letter-spacing:.12em;font-size:15px;color:var(--ink-3);margin:0}
+.bz-lines dd{margin:0;font-size:17px;line-height:1.5;color:var(--ink)}
+.bz-read{margin:14px 0 0;font-size:14.5px;color:var(--ink-3);font-style:italic}
+@media (max-width:600px){.bz-lines div{grid-template-columns:1fr;gap:2px}}

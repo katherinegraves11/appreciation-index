@@ -393,6 +393,7 @@ export type BuzzNumbers = {
   detail: string | null; movers: { term: string; platform: string; metric: string; value: number; note: string | null }[];
   events: { date: string; type: string; note: string }[];
   trends: { date: string; note: string; source: string }[];
+  read_date: string | null;
 };
 
 function bagFamilyTerm(db: DatabaseSync, hTerms: string[], bag: string): string | null {
@@ -414,7 +415,7 @@ export function buzzNumbers(house: string, bag: string): BuzzNumbers | null {
   const houseScore = q<Row>(`select * from v_buzz_score where ${likeAny("house", hTerms)} and family is null`, likeParams(hTerms))[0];
   const sc = famScore ?? houseScore;
   const movers = q<Row>(
-    `select t.term, t.platform, t.metric, t.latest as value, r.note from v_buzz_trend t
+    `select t.term, t.platform, t.metric, t.latest as value, r.note, t.read_date from v_buzz_trend t
        join buzz_terms b on b.platform=t.platform and b.term=t.term
        left join buzz_reads r on r.platform=t.platform and r.term=t.term and r.metric=t.metric and r.read_date=t.read_date
       where ${likeAny("b.house", hTerms)} ${fam ? "and b.family = ?" : "and b.family is null"} and t.metric in ('growth_pct_7d','interest_0_100','posts_total','views_7d','posts_7d','videos_7d','mentions_7d','most_viewed_rank_ss27','fw_ss27_engagements','posts_visible') and t.latest is not null
@@ -441,6 +442,7 @@ export function buzzNumbers(house: string, bag: string): BuzzNumbers | null {
     movers: movers.map((m) => ({ term: m.term as string, platform: m.platform as string, metric: m.metric as string, value: m.value as number, note: (m.note as string) ?? null })),
     events: events.map((e) => ({ date: e.event_date as string, type: e.event_type as string, note: e.derived_note as string })),
     trends: trends.map((t) => ({ date: t.scan_date as string, note: t.derived_note as string, source: t.source as string })),
+    read_date: (movers[0]?.read_date as string | undefined) ?? (trends[0]?.scan_date as string | undefined) ?? null,
   };
 }
 
