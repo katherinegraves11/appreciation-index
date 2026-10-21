@@ -13,7 +13,7 @@ while IFS= read -r q; do
   case "$q" in \#*) continue;; esac
   echo "=== $(date +%H:%M) $q"
   TMP=$(mktemp)
-  curl -s -N -X POST http://localhost:3000/api/ask -H 'content-type: application/json' --data "$(python3 -c 'import json,sys;print(json.dumps({"question":sys.argv[1]}))' "$q")" > "$TMP" 2>&1
+  curl -s -N -X POST http://localhost:3000/api/ask?stream=1 -H 'content-type: application/json' --data "$(python3 -c 'import json,sys;print(json.dumps({"question":sys.argv[1]}))' "$q")" > "$TMP" 2>&1
   python3 - "$TMP" "$OUT" "$q" <<'PY'
 import json,sys
 tmp,out,q=sys.argv[1:4]; row=None; err=None

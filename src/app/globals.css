@@ -399,3 +399,17 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 .bz-lines dd{margin:0;font-size:17px;line-height:1.5;color:var(--ink)}
 .bz-read{margin:14px 0 0;font-size:14.5px;color:var(--ink-3);font-style:italic}
 @media (max-width:600px){.bz-lines div{grid-template-columns:1fr;gap:2px}}
+
+/* readability pass (Jo): a calm, distinct tint per section so the eye can find its place */
+.strip{background:color-mix(in srgb,#5b6b7a 7%,var(--paper));padding:16px 14px;border-radius:2px}
+.buzz2{background:color-mix(in srgb,#2f7f7a 7%,var(--paper))}
+.ecard{background:color-mix(in srgb,#b08a3c 5%,var(--paper))}
+.watch{background:color-mix(in srgb,#8a5a3a 6%,var(--paper));padding:16px 18px;border-top:0;border-radius:2px}
+.glance{background:transparent}
+.strip .l b,.ecard .h b,.timing b,.anchor b{font-weight:500;color:var(--ink)}
+.strip .l{max-width:30ch;margin-inline:auto}
+.tile .def{order:9;color:var(--ink-3);font-size:14px;margin-top:auto}
+.tile .word{margin-top:4px}
+.watch ul{font-size:15.5px}
+.ecard details summary{color:var(--ink-3)}
+@media (max-width:600px){.strip .l{max-width:none}}

@@ -5,16 +5,30 @@ import { saveBrief } from "@/lib/db";
 import { MODEL } from "@/lib/anthropic";
 import { quickNumbers } from "@/lib/tracker";
 import { listBriefs } from "@/lib/db";
+import { getJob, startJob } from "@/lib/jobs";
 
 export const maxDuration = 300;
 export const runtime = "nodejs";
 
-/** POST /api/ask {question} → NDJSON: {status} … {parsed} … {done, id, result} */
+/** GET /api/ask?job=<id>&since=<n> → { done, events: [...after n] } so the page can leave and come back. */
+export async function GET(req: Request) {
+  const u = new URL(req.url);
+  const job = getJob(u.searchParams.get("job") ?? "");
+  if (!job) return Response.json({ error: "That question is no longer running. If it finished, it is under My bags." }, { status: 404 });
+  const since = Number(u.searchParams.get("since") ?? 0) || 0;
+  return Response.json({ done: job.done, question: job.question, horizon: job.horizon, events: job.events.slice(since), total: job.events.length });
+}
+
+/** POST /api/ask {question} → { job } (the work runs server-side; poll with GET). With ?stream=1: NDJSON stream, for scripts. */
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => null)) as { question?: string; horizon?: number; fresh?: boolean } | null;
   const fresh = !!body?.fresh || /\b(fresh|again|update|latest|re-?run|refresh)\b/i.test(body?.question ?? "");
   const question = (body?.question ?? "").trim();
   if (question.length < 3) return new Response(JSON.stringify({ error: "Ask about a bag." }), { status: 400, headers: { "content-type": "application/json" } });
+  if (new URL(req.url).searchParams.get("stream") !== "1") {
+    const job = startJob(question, Number(body?.horizon ?? 1) || 1, fresh);
+    return Response.json({ job: job.id });
+  }
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {

@@ -34,34 +34,62 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /** Apply one event from the job to the screen. Returns true when the job is finished. */
+  function apply(evt: { status?: string; error?: string; clarification?: string; done?: boolean; id?: string; result?: BriefResult; input?: { house: string; bag: string; spec: string }; numbers?: QuickNumbers | null; cached?: boolean; answered_at?: string }): boolean {
+    if (evt.status) setStatus(evt.status);
+    if (evt.error) { setError(evt.error); return true; }
+    if (evt.clarification) { setError(evt.clarification); return true; }
+    if (evt.done && evt.result && evt.input && evt.id) {
+      setDone({ result: evt.result, id: evt.id, bagName: `${evt.input.house} · ${evt.input.bag}${evt.input.spec ? ` · ${evt.input.spec}` : ""}`, numbers: evt.numbers ?? null, cached: !!evt.cached, answeredAt: evt.answered_at });
+      return true;
+    }
+    return false;
+  }
+
+  /** Poll a server-side job until it finishes; the job keeps running if this page is left. */
+  async function follow(jobId: string) {
+    let since = 0;
+    for (;;) {
+      let res: Response;
+      try { res = await fetch(`/api/ask?job=${encodeURIComponent(jobId)}&since=${since}`, { cache: "no-store" }); }
+      catch { await new Promise((r) => setTimeout(r, 3000)); continue; }
+      if (res.status === 404) { setError("That question finished while you were away. Look under My bags."); break; }
+      const j = (await res.json()) as { done: boolean; events: Parameters<typeof apply>[0][]; total: number };
+      let finished = false;
+      for (const e of j.events) { if (apply(e)) finished = true; }
+      since = j.total;
+      if (finished || j.done) break;
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+    try { localStorage.removeItem("ai-job"); } catch {}
+    setBusy(false); setStatus(null);
+  }
+
   async function ask(question: string, fresh = false) {
     if (!question.trim() || busy) return;
     setBusy(true); setError(null); setDone(null); setStatus("Reading your question…");
     try {
       const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question, horizon: h, fresh }) });
-      if (!res.ok || !res.body) { const j = await res.json().catch(() => ({})); throw new Error(j.error || `Request failed (${res.status}).`); }
-      const reader = res.body.getReader(); const dec = new TextDecoder(); let buf = "";
-      while (true) {
-        const { value, done: end } = await reader.read(); if (end) break;
-        buf += dec.decode(value, { stream: true });
-        const lines = buf.split("\n"); buf = lines.pop() ?? "";
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          const evt = JSON.parse(line) as { status?: string; error?: string; clarification?: string; done?: boolean; id?: string; result?: BriefResult; input?: { house: string; bag: string; spec: string }; numbers?: QuickNumbers | null; cached?: boolean; answered_at?: string };
-          if (evt.status) setStatus(evt.status);
-          if (evt.clarification) { setError(evt.clarification); setBusy(false); setStatus(null); return; }
-          if (evt.error) throw new Error(evt.error);
-          if (evt.done && evt.result && evt.id && evt.input) {
-            setDone({ result: evt.result, id: evt.id, bagName: `${evt.input.house} · ${evt.input.bag}${evt.input.spec ? ` · ${evt.input.spec}` : ""}`, numbers: evt.numbers ?? null, cached: !!evt.cached, answeredAt: evt.answered_at });
-            setStatus(null); setBusy(false); return;
-          }
-        }
-      }
-      throw new Error("The connection closed early. Ask again.");
+      const j = (await res.json().catch(() => ({}))) as { job?: string; error?: string };
+      if (!res.ok || !j.job) throw new Error(j.error || `Request failed (${res.status}).`);
+      try { localStorage.setItem("ai-job", JSON.stringify({ id: j.job, q: question, at: Date.now() })); } catch {}
+      await follow(j.job);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong."); setBusy(false); setStatus(null);
     }
   }
+
+  // Coming back to Ask while a question is still running: pick it up where it is.
+  useEffect(() => {
+    if (initial) return;
+    try {
+      const raw = localStorage.getItem("ai-job"); if (!raw) return;
+      const saved = JSON.parse(raw) as { id: string; q: string; at: number };
+      if (Date.now() - saved.at > 20 * 60 * 1000) { localStorage.removeItem("ai-job"); return; }
+      setQ(saved.q); setBusy(true); setStatus("Still working on it…"); void follow(saved.id);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

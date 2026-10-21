@@ -24,16 +24,17 @@ const money = (v: number | null | undefined) => (v == null ? "—" : `$${Math.ro
 
 /** Words a buyer should never have to decode. The scorer is told the same list; this is the net. */
 const PLAIN: [RegExp, string][] = [
-  [/\barchive codes?\b/gi, "shapes the house has made for decades"],
-  [/\bera premium\b/gi, "the bump a designer's bags get after they leave"],
+  [/\basks? (typically |usually )?eases? after the first season\b/gi, "sellers drop the price after the first season"],
   [/\basks? (typically |usually )?eases?\b/gi, "sellers drop the price after the first season"],
+  [/\ban archive code\b/gi, "a shape the house has made for decades"],
+  [/\barchive codes?\b/gi, "shapes the house has made for decades"],
+  [/\ban era premium\b/gi, "a bump after the designer leaves"],
+  [/\bera premium\b/gi, "the bump a designer's bags get after they leave"],
   [/\bclears? at\b/gi, "sells for about"],
   [/\bsell-through\b/gi, "how fast they sell"],
-  [/\bliquidity default\b/gi, "easiest to resell"],
+  [/\bliquidity default\b/gi, "the easiest to resell"],
   [/\bliquid(ity)?\b/gi, "easy to resell"],
-  [/\bretention\b/gi, "value kept"],
   [/\bcomposite\b/gi, "overall score"],
-  [/\basking prices?\b/gi, "what sellers want"],
   [/\brealised\b/gi, "actual"],
 ];
 export function plain(t: string | undefined | null): string { let x = t ?? ""; for (const [re, to] of PLAIN) x = x.replace(re, to); return x; }
@@ -55,7 +56,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         <p className="lab who">{bagName.split(" · ").slice(0, 2).join(" · ").toLowerCase()}</p>
         {bagName.split(" · ").length > 2 && <p className="spec">{bagName.split(" · ").slice(2).join(" · ")}</p>}
         <h2>{first} {rest.length > 0 && <i>{rest.join(" ")}</i>}</h2>
-        {result.timing && <p className="timing">{plain(result.timing)}</p>}
+        {result.timing && (() => { const t = plain(result.timing); const [a, ...r] = t.split(/(?<=[.;:])\s+/); return <p className="timing"><b>{a}</b>{r.length ? " " + r.join(" ") : ""}</p>; })()}
         <div className="stamps"><span className="stamp">{result.call}</span><span className="stamp">confidence {result.confidence.toLowerCase()}</span></div>
         <p className="seeit"><span className="lab">see it</span>{seeItLinks(bagName.split(" · ")[0] ?? "", bagName.split(" · ")[1] ?? "", n?.links).map((l, i) => <a key={i} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)}</p>
       </section>
@@ -81,32 +82,38 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
           <section key={s.intent} className={`tile ${CLS[s.verdict]}`} data-intent={s.intent}>
             <svg className="frame" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" stroke="currentColor"><rect x="1.5" y="1.5" width="97" height="97" rx="3" strokeWidth=".6" /><rect x="4" y="4" width="92" height="92" rx="2" strokeWidth=".3" /></svg>
             <svg className="glyph" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" aria-hidden="true">{GLYPH[s.intent]}</svg>
-            <p className="lab intent">{(INTENT_LABEL[s.intent]?.title ?? s.intent).toLowerCase()}</p>
-            <p className="def">{DEF[s.intent]}</p>
             <p className="word">{WORD[s.verdict]}</p>
+            <p className="lab intent">{(INTENT_LABEL[s.intent]?.title ?? s.intent).toLowerCase()}</p>
             <p className="why">{plain(s.why)}</p>
+            <p className="def">{DEF[s.intent]}</p>
           </section>
         ))}
       </div>
 
-      {n && (n.retail_now || n.sold_median || n.ask_median) && (
+      {n && (n.retail_now || n.sold_median || n.ask_median || n.sell || n.asks) && (
         <>
           <p className="lab stripcap"><span className="h1txt">right now · from the tracker</span><span className="h5h10txt">the long view · from the tracker</span></p>
           <div className="strip">
             {n.sell && (() => { const sl = n.sell; const rate = payoutRate(sl.median_sold); const net = Math.round(sl.median_sold * rate - sl.retail); return (
-              <div className={`sell ${net >= 0 ? "up" : "down"}`}><div className="lab">buy at the boutique, resell now</div><div className="v">{net >= 0 ? "+" : "−"}{money(Math.abs(net))}</div><div className="l">Pay {money(sl.retail)} at the boutique{sl.retail_spec ? ` (${sl.retail_spec})` : ""}, before sales tax. Resale buyers paid {money(sl.median_sold)} in the last {sl.window_days} days for the same edition in pristine or tagged condition: actual sales, not asking prices. The RealReal keeps about {Math.round((1 - rate) * 100)}% at that price, so that is {net >= 0 ? "profit after fees" : "a loss after fees"}. {sl.n} sale{sl.n === 1 ? "" : "s"} behind it{sl.n < 10 ? ", which is thin" : sl.n < 30 ? ", a fair sample" : ", a solid sample"}. {/(hermès|hermes|chanel)/i.test(bagName) ? "Getting one is the hard part: these are allocated, and selling a new bag can cost you the access that got it." : "Check the boutique will sell you one at that price."}</div></div>
+              <div className={`sell ${net >= 0 ? "up" : "down"}`}><div className="lab">buy at the boutique, resell now</div><div className="v">{net >= 0 ? "+" : "−"}{money(Math.abs(net))}</div><div className="l"><b>Pay {money(sl.retail)}.</b> Pristine ones sold for {money(sl.median_sold)} in the last {sl.window_days} days ({sl.n} sales). After The RealReal&apos;s {Math.round((1 - rate) * 100)}%, you keep about {money(Math.abs(net))} {net >= 0 ? "more" : "less"} than you paid. {/(hermès|hermes|chanel)/i.test(bagName) ? "Getting one is the hard part." : ""}</div></div>
             ); })()}
-            {n.sold_n > 0 && n.sold_median && <div><div className="lab">sold for</div><div className="v">{money(n.sold_median)}</div><div className="l">{n.retail_now ? `against ${money(n.retail_now)} new, so ${Math.round(n.sold_pct_of_retail ?? 0)}% of the store price.` : "actual sales, same size."} {n.sold_n} sale{n.sold_n === 1 ? "" : "s"} we can see.</div></div>}
-            {!n.sold_n && n.trr_sold_90d > 0 && <div><div className="lab">sales seen</div><div className="v">{n.trr_sold_90d}</div><div className="l">sold on The RealReal in 90 days, sizes and finishes mixed. No same-size sale yet.</div></div>}
-            {n.retail_now && <div><div className="lab">new, today</div><div className="v">{money(n.retail_now)}</div><div className="l">{n.retail_launch && n.retail_launch !== n.retail_now ? `Was ${money(n.retail_launch)} at launch.` : "Boutique price."}{n.retail_size ? ` ${n.retail_size}.` : ""}</div></div>}
-            {n.ask_median && n.retail_now && <div><div className="lab">sellers want</div><div className="v">{Math.round((100 * n.ask_median) / n.retail_now)}%</div><div className="l">of new: {money(n.ask_median)} across {n.ask_n} listings. Wanting is not getting.</div></div>}
-            {n.trend_pct != null && <div><div className="lab">asking trend</div><div className="v">{n.trend_pct > 0 ? "+" : ""}{n.trend_pct}%</div><div className="l">where what sellers want moved since the last snapshot.</div></div>}
+            {n.sell ? (
+              <div><div className="lab">sold for</div><div className="v">{money(n.sell.median_sold)}</div><div className="l"><b>Pristine, last {n.sell.window_days} days.</b> {n.sell.n} sales. {n.sold_n > 0 && n.sold_median ? `All conditions, all time: ${money(n.sold_median)} (${n.sold_n}).` : ""}</div></div>
+            ) : n.sold_n > 0 && n.sold_median ? (
+              <div><div className="lab">sold for</div><div className="v">{money(n.sold_median)}</div><div className="l"><b>{n.sold_n} sales, same size, any condition.</b>{n.retail_now ? ` ${Math.round(n.sold_pct_of_retail ?? 0)}% of the store price.` : ""}</div></div>
+            ) : n.asks ? (
+              <div><div className="lab">sellers want</div><div className="v">{money(n.asks.median_ask)}</div><div className="l"><b>{n.asks.n} listing{n.asks.n === 1 ? "" : "s"}, none sold yet.</b> Wanting is not getting.</div></div>
+            ) : n.trr_sold_90d > 0 ? (
+              <div><div className="lab">sales seen</div><div className="v">{n.trr_sold_90d}</div><div className="l"><b>Sizes and finishes mixed.</b> No same-size sale yet.</div></div>
+            ) : null}
+            {n.retail_now && <div><div className="lab">new, today</div><div className="v">{money(n.retail_now)}</div><div className="l"><b>Boutique price.</b>{n.retail_launch && n.retail_launch !== n.retail_now ? ` Was ${money(n.retail_launch)} at launch.` : ""}</div></div>}
+            {n.ask_median && n.retail_now && !n.sell && <div><div className="lab">sellers want</div><div className="v">{Math.round((100 * n.ask_median) / n.retail_now)}%</div><div className="l"><b>of the store price,</b> across {n.ask_n} listings.</div></div>}
             <span className="longonly">
-              <div><div className="lab">made for decades?</div><div className="v">{n.icon ? "Yes" : "Not yet"}</div><div className="l">Shapes the house keeps making hold value; novelties fade.</div></div>
+              <div><div className="lab">made for decades?</div><div className="v">{n.icon ? "Yes" : "Not yet"}</div><div className="l"><b>{n.icon ? "A shape the house keeps making." : "A new shape."}</b> {n.icon ? "These hold." : "Novelties fade."}</div></div>
             </span>
           </div>
           {n.path && (
-            <p className="anchor"><span className="lab">the anchor</span> {bagName.split(" · ")[0]} raised the {bagName.split(" · ")[1] ?? "bag"} from {money(n.path.from_price)} ({fmtDate(n.path.from_date)}) to {money(n.path.to_price)} ({fmtDate(n.path.to_date)}). A bag bought at the old price now looks like a deal{n.sold_pct_of_retail ? `, and resale has followed to ${Math.round(n.sold_pct_of_retail)}% of today's price` : ""}.</p>
+            <p className="anchor"><span className="lab">the anchor</span> <b>{bagName.split(" · ")[0]} raised it from {money(n.path.from_price)} to {money(n.path.to_price)}</b> ({fmtDate(n.path.from_date)} to {fmtDate(n.path.to_date)}). Last year&apos;s price now looks like a deal.</p>
           )}
         </>
       )}
@@ -127,30 +134,34 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             const plat = (b?.detail ?? "").split(" ").map((d) => d.match(/^([a-z-]+):/i)?.[1]).filter(Boolean).map((k) => name[k as string] ?? k) as string[];
             const readFrom = Array.from(new Set(plat));
             const tiktokRead = readFrom.includes("TikTok");
-            const growth = (b?.movers ?? []).find((m) => m.platform === "google" && m.metric === "growth_pct_7d");
+            // a search rise counts only when it is more than a handful of searches (the note carries "last week N")
+            const growth = (b?.movers ?? []).find((m) => m.platform === "google" && m.metric === "growth_pct_7d" && Number((m.note ?? "").match(/last week (\d+)/)?.[1] ?? 0) >= 5);
             const trendsForHouse = (b?.trends ?? []).filter((t) => new RegExp(house.split(" ")[0], "i").test(t.note));
             const over = trendsForHouse.find((t) => /deinfluenc|moved on|had its moment|backlash|over\b/i.test(t.note));
             const carrying = (b?.trends ?? []).find((t) => /whatsinmybag|what's in my bag/i.test(t.note)) ?? (b?.trends ?? []).find((t) => /carr(y|ied)|rotation|most-shown/i.test(t.note));
             const dupe = (b?.trends ?? []).find((t) => /dupe|inspired by|boujee on a budget/i.test(t.note));
             const recentEvent = (b?.events ?? []).find((e) => !/fashion month on Instagram/i.test(e.note));
             const fmt = (d: string) => new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
-            const bagTags = (b?.movers ?? []).filter((m) => (m.platform === "instagram" || m.platform.startsWith("tiktok")) && b?.level === "family" && m.metric.startsWith("posts"));
+            const allTags = (b?.movers ?? []).filter((m) => (m.platform === "instagram" || m.platform.startsWith("tiktok")) && m.metric.startsWith("posts"));
+            const bagTags = b?.level === "family" ? allTags : [];
+            const houseTags = b?.level === "family" ? [] : allTags;
+            const tiktokTrends = (b?.trends ?? []).some((t) => /tiktok|#bagtok|#whatsinmybag/i.test(t.note + t.source));
             const strip = (t: string) => { const i = t.indexOf(": "); return (i > 0 && i < 60 ? t.slice(i + 2) : t).replace(/\s*\(top ~?\d+ visible posts, logged out\)/i, ""); };
             const sentence = (t: string) => strip(t);
             /** The one or two sentences of a note that answer the line, not the whole paragraph. */
-            const pick = (t: string, re: RegExp, max = 230) => { const parts = strip(t).split(/(?<=[.;])\s+/); const hit = parts.filter((x) => re.test(x)); const out = (hit.length ? hit : parts).slice(0, 2).join(" "); return out.length > max ? out.slice(0, max - 1).replace(/\s+\S*$/, "") + "…" : out; };
+            const pick = (t: string, re: RegExp, max = 200) => { const parts = strip(t).split(/(?<=[.;])\s+/); const hit = parts.filter((x) => re.test(x)); const list = hit.length ? hit : parts; let out = list[0] ?? ""; if (list[1] && (out + " " + list[1]).length <= max) out += " " + list[1]; return out; };
             return (
               <section className="buzz2">
                 <header className="bz-head"><div><p className="lab">the culture board · what TikTok and Instagram are saying</p>
-                  <h4>{b ? (over ? <>Is {bagShort} over? <i>The feeds are turning on {house}.</i></> : growth && growth.value > 15 ? <>Still rising. <i>Searches for “{growth.term}” are up {Math.round(growth.value)}% this week{recentEvent ? ", after " + sentence(recentEvent.note).slice(0, 70).replace(/[.;,]\s*$/, "").toLowerCase() : ""}.</i></> : <>Steady. <i>Nothing is turning on {house} this week.</i></>) : <>No read on {house} <i>yet</i>.</>}</h4>
+                  <h4>{b ? (over ? <>Is {bagShort} over? <i>The feeds are turning on {house}.</i></> : growth && growth.value > 15 ? <>Still rising. <i>Searches for “{growth.term}” are up {Math.round(growth.value)}% this week.</i></> : <>Steady. <i>Nothing is turning on {house} this week.</i></>) : <>No read on {house} <i>yet</i>.</>}</h4>
                 </div></header>
                 {b ? (
                   <>
                     <dl className="bz-lines">
                       <div><dt>Is it over?</dt><dd>{over ? pick(over.note, /deinfluenc|moved on|had its moment|backlash|over\b/i) : trendsForHouse.length ? `Not that we can see. ${pick(trendsForHouse[0].note, new RegExp(house.split(" ")[0], "i"))}` : `No one is calling ${house} over this week.`}</dd></div>
-                      <div><dt>Who is carrying it</dt><dd>{carrying ? `${pick(carrying.note, /whatsinmybag|what's in my bag|luxury appears|most-shown|carr(y|ied)|rotation|edit/i)} This is a logged-out Gen Z feed; women over 35 rarely appear in it.` : "No sightings logged this week."}</dd></div>
-                      <div><dt>The dupe wave</dt><dd>{dupe ? pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
-                      <div><dt>Where this bag lives</dt><dd>{bagTags.length ? bagTags.slice(0, 3).map((t) => `#${t.term} (${Math.round(t.value).toLocaleString()} ${t.metric === "posts_visible" ? "posts visible" : "posts"})`).join(", ") : `No hashtag of its own yet; ${house}'s tags carry it. The house, not this bag, is what is being talked about.`}</dd></div>
+                      <div><dt>Who is carrying it</dt><dd>{carrying && new RegExp(house.split(" ")[0], "i").test(carrying.note) ? `${pick(carrying.note, new RegExp(house.split(" ")[0], "i"), 160)} That is a Gen Z feed; nothing on women over 35 yet.` : "Nothing on women over 35 yet. The Gen Z feeds show Coach and mid-range labels, with luxury as the occasional treat."}</dd></div>
+                      <div><dt>The dupe wave</dt><dd>{dupe ? (new RegExp(house.split(" ")[0], "i").test(pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160)) ? pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160) : `Dupes and deinfluencing are circulating among younger buyers. Nothing aimed at ${house} this week.`) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
+                      <div><dt>Where this bag lives</dt><dd>{bagTags.length ? bagTags.slice(0, 3).map((t) => `#${t.term} (${Math.round(t.value).toLocaleString()} posts)`).join(", ") : houseTags.length ? `No tag of its own yet. The house's: ${houseTags.slice(0, 2).map((t) => `#${t.term} (${Math.round(t.value) >= 1e6 ? (t.value / 1e6).toFixed(1) + "M" : Math.round(t.value / 1000) + "K"})`).join(", ")}.` : `No hashtag of its own yet; ${house}'s tags carry it.`}</dd></div>
                     </dl>
                     {(b.events.length > 0) && (
                       <div className="bz-moments">
@@ -158,7 +169,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
                         <ol>{b.events.filter((e) => !/fashion month on Instagram/i.test(e.note)).slice(0, 2).map((e, i) => <li key={i}><span className="when">{fmt(e.date)}</span><span className="what">{e.note}</span></li>)}</ol>
                       </div>
                     )}
-                    <p className="bz-read">Read from {readFrom.length ? readFrom.join(" and ") : "the tracker"}{b.read_date ? ` on ${fmt(b.read_date)}` : ""}. {tiktokRead ? "" : "We have not read TikTok for this bag yet."} Counts only; no posts or people are stored.</p>
+                    <p className="bz-read">Read from {[...readFrom, ...(tiktokTrends && !tiktokRead ? ["TikTok tag pages"] : [])].join(", ") || "the tracker"}{b.read_date ? ` on ${fmt(b.read_date)}` : ""}. Counts only; no posts or people are stored.</p>
                   </>
                 ) : <p className="bz-read">We add this bag&apos;s hashtags the day after it is first asked about, and read them daily.</p>}
               </section>
@@ -171,14 +182,12 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
               return (
                 <article key={c.key} className={`ecard ${c.mood}`}>
                   <header><h4>{c.title}</h4><span className="stamp">{c.mood === "strong" ? "good sign" : c.mood === "weak" ? "weak spot" : "mixed"}</span></header>
-                  <p className="h">{plain(c.headline)}</p>
-                  {c.soWhat && <p className="so">{plain(c.soWhat)}</p>}
-                  {proof && <p className="proof">{proof.text} <span className="src">{proof.url ? <a href={proof.url} target="_blank" rel="noreferrer">{proof.source}</a> : proof.source}</span></p>}
-                  {(more.length > 0 || c.more) && (
+                  <p className="h"><b>{plain(c.soWhat ?? c.headline).replace(/\.$/, "")}.</b></p>
+                  {c.soWhat && <p className="so">{plain(c.headline)}</p>}
+                  {(proof || more.length > 0 || c.more) && (
                     <details>
-                      <summary>more</summary>
-                      {c.more && <p>{c.more}</p>}
-                      <ul>{more.slice(0, 5).map((e, i) => <li key={i}>{e.text} <span className="src">{e.url ? <a href={e.url} target="_blank" rel="noreferrer">{e.source}</a> : e.source}</span></li>)}</ul>
+                      <summary>the proof</summary>
+                      <ul>{[...(proof ? [proof] : []), ...more].slice(0, 4).map((e, i) => <li key={i}>{e.text} <span className="src">{e.url ? <a href={e.url} target="_blank" rel="noreferrer">{e.source}</a> : e.source}</span></li>)}</ul>
                     </details>
                   )}
                 </article>
@@ -187,10 +196,10 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
           </div>
 
           <div className="watch">
-            {result.spec_guidance?.length > 0 && <section><p className="lab">if you buy</p><ul>{result.spec_guidance.slice(0, 3).map((b, i) => <li key={i}>{b}</li>)}</ul></section>}
-            <section><p className="lab">for</p><ul>{result.bull_case.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}</ul></section>
-            <section><p className="lab">against</p><ul>{result.bear_case.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}</ul></section>
-            <section><p className="lab">what would change this</p><ul>{result.what_would_change_this.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}</ul></section>
+            {result.spec_guidance?.length > 0 && <section><p className="lab">if you buy</p><ul>{result.spec_guidance.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>}
+            <section><p className="lab">for</p><ul>{result.bull_case.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
+            <section><p className="lab">against</p><ul>{result.bear_case.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
+            <section><p className="lab">what would change this</p><ul>{result.what_would_change_this.slice(0, 1).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
           </div>
         </div>
       )}
