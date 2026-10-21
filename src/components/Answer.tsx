@@ -147,7 +147,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             const tiktokRead = readFrom.includes("TikTok");
             // a search rise counts only when it is more than a handful of searches (the note carries "last week N")
             const growth = (b?.movers ?? []).find((m) => m.platform === "google" && m.metric === "growth_pct_7d" && Number((m.note ?? "").match(/last week (\d+)/)?.[1] ?? 0) >= 5);
-            const trendsForHouse = (b?.trends ?? []).filter((t) => new RegExp(house.split(" ")[0], "i").test(t.note));
+            const trendsForHouse = (b?.trends ?? []).filter((t) => new RegExp(house.split(" ")[0], "i").test(t.note) && !/engagement, \d+ brands|most-viewed/i.test(t.note));
             const over = trendsForHouse.find((t) => /deinfluenc|moved on|had its moment|backlash|over\b/i.test(t.note));
             const carrying = (b?.trends ?? []).find((t) => /whatsinmybag|what's in my bag/i.test(t.note)) ?? (b?.trends ?? []).find((t) => /carr(y|ied)|rotation|most-shown/i.test(t.note));
             const dupe = (b?.trends ?? []).find((t) => /dupe|inspired by|boujee on a budget/i.test(t.note));
@@ -180,6 +180,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
                         <ol>{b.events.filter((e) => !/fashion month on Instagram/i.test(e.note)).slice(0, 2).map((e, i) => <li key={i}><span className="when">{fmt(e.date)}</span><span className="what">{e.note}</span></li>)}</ol>
                       </div>
                     )}
+                    {(() => { const cult = cards.find((c) => c.key === "culture"); return cult ? <p className="bz-ourread"><span className="lab">our read</span> <b>{plain(cult.soWhat ?? cult.headline).replace(/\.$/, "")}.</b>{cult.soWhat ? ` ${plain(cult.headline)}` : ""}</p> : null; })()}
                     <p className="bz-read">Read from {[...readFrom, ...(tiktokTrends && !tiktokRead ? ["TikTok tag pages"] : [])].join(", ") || "the tracker"}{b.read_date ? ` on ${fmt(b.read_date)}` : ""}. Counts only; no posts or people are stored.</p>
                   </>
                 ) : <p className="bz-read">We add this bag&apos;s hashtags the day after it is first asked about, and read them daily.</p>}
@@ -188,7 +189,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
           })()}
 
           <div className="ecards">
-            {cards.filter((c) => c.key !== "buy").map((c) => {
+            {cards.filter((c) => c.key !== "buy" && c.key !== "culture").map((c) => {
               const [proof, ...more] = c.evidence;
               return (
                 <article key={c.key} className={`ecard ${c.mood}`}>

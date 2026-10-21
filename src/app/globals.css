@@ -417,3 +417,7 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 /* section glyphs */
 .sg{width:16px;height:16px;vertical-align:-3px;margin-right:6px;color:var(--ink-3)}
 .bz-head h4 i{font-weight:400}
+
+.bz-ourread{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line);font-size:17px;line-height:1.5;color:var(--ink)}
+.bz-ourread b{font-weight:500}
+.bz-ourread .lab{margin-right:6px}
