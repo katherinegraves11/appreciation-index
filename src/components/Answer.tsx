@@ -130,12 +130,15 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             const growth = (b?.movers ?? []).find((m) => m.platform === "google" && m.metric === "growth_pct_7d");
             const trendsForHouse = (b?.trends ?? []).filter((t) => new RegExp(house.split(" ")[0], "i").test(t.note));
             const over = trendsForHouse.find((t) => /deinfluenc|moved on|had its moment|backlash|over\b/i.test(t.note));
-            const carrying = (b?.trends ?? []).find((t) => /whatsinmybag|what's in my bag|carr(y|ied)|rotation|most-shown/i.test(t.note));
+            const carrying = (b?.trends ?? []).find((t) => /whatsinmybag|what's in my bag/i.test(t.note)) ?? (b?.trends ?? []).find((t) => /carr(y|ied)|rotation|most-shown/i.test(t.note));
             const dupe = (b?.trends ?? []).find((t) => /dupe|inspired by|boujee on a budget/i.test(t.note));
             const recentEvent = (b?.events ?? []).find((e) => !/fashion month on Instagram/i.test(e.note));
             const fmt = (d: string) => new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
             const bagTags = (b?.movers ?? []).filter((m) => (m.platform === "instagram" || m.platform.startsWith("tiktok")) && b?.level === "family" && m.metric.startsWith("posts"));
-            const sentence = (t: string) => { const i = t.indexOf(": "); return (i > 0 && i < 60 ? t.slice(i + 2) : t).replace(/\s+\(.*?logged out.*?\)/i, ""); };
+            const strip = (t: string) => { const i = t.indexOf(": "); return (i > 0 && i < 60 ? t.slice(i + 2) : t).replace(/\s*\(top ~?\d+ visible posts, logged out\)/i, ""); };
+            const sentence = (t: string) => strip(t);
+            /** The one or two sentences of a note that answer the line, not the whole paragraph. */
+            const pick = (t: string, re: RegExp, max = 230) => { const parts = strip(t).split(/(?<=[.;])\s+/); const hit = parts.filter((x) => re.test(x)); const out = (hit.length ? hit : parts).slice(0, 2).join(" "); return out.length > max ? out.slice(0, max - 1).replace(/\s+\S*$/, "") + "…" : out; };
             return (
               <section className="buzz2">
                 <header className="bz-head"><div><p className="lab">the culture board · what TikTok and Instagram are saying</p>
@@ -144,9 +147,9 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
                 {b ? (
                   <>
                     <dl className="bz-lines">
-                      <div><dt>Is it over?</dt><dd>{over ? sentence(over.note) : trendsForHouse.length ? `Not that we can see. ${sentence(trendsForHouse[0].note)}` : `No one is calling ${house} over this week.`}</dd></div>
-                      <div><dt>Who is carrying it</dt><dd>{carrying ? `${sentence(carrying.note)} This is a logged-out Gen Z feed; women over 35 rarely appear in it.` : "No sightings logged this week."}</dd></div>
-                      <div><dt>The dupe wave</dt><dd>{dupe ? sentence(dupe.note) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
+                      <div><dt>Is it over?</dt><dd>{over ? pick(over.note, /deinfluenc|moved on|had its moment|backlash|over\b/i) : trendsForHouse.length ? `Not that we can see. ${pick(trendsForHouse[0].note, new RegExp(house.split(" ")[0], "i"))}` : `No one is calling ${house} over this week.`}</dd></div>
+                      <div><dt>Who is carrying it</dt><dd>{carrying ? `${pick(carrying.note, /whatsinmybag|what's in my bag|luxury appears|most-shown|carr(y|ied)|rotation|edit/i)} This is a logged-out Gen Z feed; women over 35 rarely appear in it.` : "No sightings logged this week."}</dd></div>
+                      <div><dt>The dupe wave</dt><dd>{dupe ? pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
                       <div><dt>Where this bag lives</dt><dd>{bagTags.length ? bagTags.slice(0, 3).map((t) => `#${t.term} (${Math.round(t.value).toLocaleString()} ${t.metric === "posts_visible" ? "posts visible" : "posts"})`).join(", ") : `No hashtag of its own yet; ${house}'s tags carry it. The house, not this bag, is what is being talked about.`}</dd></div>
                     </dl>
                     {(b.events.length > 0) && (

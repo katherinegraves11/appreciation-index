@@ -423,6 +423,12 @@ export function buzzNumbers(house: string, bag: string): BuzzNumbers | null {
     [...likeParams(hTerms), ...(fam ? [fam] : [])]);
   // If the family has no hashtag counts yet, borrow the house's so the board always shows what people are posting.
   const hasTags = movers.some((m) => (m.platform === "instagram" || m.platform === "tiktok" || m.platform === "tiktok-cc") && String(m.metric).startsWith("posts"));
+  const hasGrowth = movers.some((m) => m.platform === "google" && m.metric === "growth_pct_7d");
+  if (fam && !hasGrowth) {
+    movers.push(...q<Row>(`select t.term, t.platform, t.metric, t.latest as value, r.note, t.read_date from v_buzz_trend t join buzz_terms b on b.platform=t.platform and b.term=t.term
+      left join buzz_reads r on r.platform=t.platform and r.term=t.term and r.metric=t.metric and r.read_date=t.read_date
+      where ${likeAny("b.house", hTerms)} and b.family is null and t.platform='google' and t.metric='growth_pct_7d' and t.latest is not null order by abs(t.latest) desc limit 1`, likeParams(hTerms)));
+  }
   if (fam && !hasTags) {
     const houseTags = q<Row>(
       `select t.term, t.platform, t.metric, t.latest as value, r.note from v_buzz_trend t
