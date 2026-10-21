@@ -132,7 +132,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             return (
               <section className="buzz2">
                 <header className="bz-head">
-                  <div><p className="lab">the buzz · what the internet is saying</p><h4>{b ? <>The crowd is <i>{mood}</i>.</> : <>No crowd read <i>yet</i>.</>}</h4></div>
+                  <div><p className="lab">the culture board · what TikTok and Instagram are saying</p><h4>{b ? <>The crowd is <i>{mood}</i>.</> : <>No crowd read <i>yet</i>.</>}</h4></div>
                   {b && <div className="bz-score"><b>{b.score ?? "—"}</b><span>/100 · {b.direction ?? "no direction"}</span></div>}
                 </header>
                 {b ? (
@@ -149,7 +149,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
                     )}
                     {b.trends.length > 0 && (
                       <div className="bz-moments viral">
-                        <p className="lab">going viral · what the feeds are on about</p>
+                        <p className="lab">going viral · on TikTok and Instagram right now</p>
                         <ol>{b.trends.slice(0, 4).map((t, i) => <li key={i}><span className="when">{new Date(t.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span><span className="what">{t.note.length > 260 ? t.note.slice(0, 257).replace(/\s+\S*$/, "") + "…" : t.note} <span className="src">{t.source}</span></span></li>)}</ol>
                       </div>
                     )}

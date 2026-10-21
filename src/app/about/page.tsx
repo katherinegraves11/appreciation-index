@@ -26,8 +26,9 @@ export default function About() {
           <div className="abox"><h4>House</h4><p>Stable, growing, owns its workshops? Built-in scarcity lasts; marketed scarcity doesn&apos;t.</p></div>
         </div>
         <div className="abox2">
+          <div className="abox"><h4>The culture board</h4><p>What TikTok and Instagram are saying about the bag: the hashtags people post, what is going viral, and the moments people are talking about. Counts only; no posts or people are stored.</p></div>
           <div className="abox"><h4>Ask by photo</h4><p>Drop a photo or a listing screenshot. We name the bag, you confirm, and the answer runs. Photos are read once and not kept.</p></div>
-          <div className="abox"><h4>The race</h4><p>Houses on one board. <b>Up</b> = hot right now. <b>Right</b> = holds its value, from confirmed sales.</p></div>
+          <div className="abox"><h4>The race</h4><p>Houses on one board. <b>Up</b> = sells faster right now. <b>Right</b> = bags sold closer to the store price. Low on the board means resale pays less, not that prices are falling.</p></div>
           <div className="abox"><h4>Where the numbers come from</h4><p>Sales and asks: The RealReal, Fashionphile, Rebag, Madison Avenue Couture, Privé Porter, the auction houses. New prices: the houses and the guides that track them. Runway: Vogue. People and money: Vogue Business. Every number keeps its source.</p></div>
         </div>
         <p className="asub" style={{ marginTop: 30, fontStyle: "italic" }}>Value-retention analysis based on public market data, not investment advice.</p>

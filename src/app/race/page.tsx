@@ -10,7 +10,7 @@ export default function Race() {
       <section className="bookhead">
         <p className="lab">the race · {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }).toLowerCase()}</p>
         <h1 className="vh">Where to put your money <i>this season.</i></h1>
-        <p className="hint">If you buy to resell, this tells you three things: which houses <b>sell fast right now</b>, which <b>hold their value</b>, and which are <b>cooling off</b>.<br /><b>Up</b> = sells fast now (listings clear, many saves). <b>Right</b> = holds value: what it actually sold for, divided by what it costs new. From {rows.length} houses in the tracker, confirmed sales only.</p>
+        <p className="hint">Three things, in plain terms: which houses <b>sell fastest right now</b>, which <b>keep their value</b> (bags sold close to the store price), and which <b>lose the most</b> (bags sold far below it).<br /><b>Up</b> = sells faster. <b>Right</b> = sold closer to the store price. From {rows.length} houses in the tracker, confirmed sales only.</p>
       </section>
       <RaceBoard rows={rows} />
     </main>
