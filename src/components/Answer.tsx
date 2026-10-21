@@ -142,7 +142,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             return (
               <section className="buzz2">
                 <header className="bz-head"><div><p className="lab">the culture board · what TikTok and Instagram are saying</p>
-                  <h4>{b ? (over ? <>Is {bagShort} over? <i>The feeds are turning on {house}.</i></> : growth && growth.value > 15 ? <>Still rising. <i>Searches for {house} are up {Math.round(growth.value)}% this week{recentEvent ? ", after " + sentence(recentEvent.note).slice(0, 70).replace(/[.;,]\s*$/, "").toLowerCase() : ""}.</i></> : <>Steady. <i>Nothing is turning on {house} this week.</i></>) : <>No read on {house} <i>yet</i>.</>}</h4>
+                  <h4>{b ? (over ? <>Is {bagShort} over? <i>The feeds are turning on {house}.</i></> : growth && growth.value > 15 ? <>Still rising. <i>Searches for “{growth.term}” are up {Math.round(growth.value)}% this week{recentEvent ? ", after " + sentence(recentEvent.note).slice(0, 70).replace(/[.;,]\s*$/, "").toLowerCase() : ""}.</i></> : <>Steady. <i>Nothing is turning on {house} this week.</i></>) : <>No read on {house} <i>yet</i>.</>}</h4>
                 </div></header>
                 {b ? (
                   <>
