@@ -388,3 +388,6 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 
 .strip .sell.up .v{color:var(--buy)}.strip .sell.down .v{color:var(--dont)}
 .strip .sell{border:1px solid var(--line);padding:10px 12px;margin:-10px 0}
+
+.strip .longonly{display:none}
+:root.h5 .strip .longonly,:root.h10 .strip .longonly{display:contents}

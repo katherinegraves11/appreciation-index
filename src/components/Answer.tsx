@@ -101,7 +101,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             {n.retail_now && <div><div className="lab">new, today</div><div className="v">{money(n.retail_now)}</div><div className="l">{n.retail_launch && n.retail_launch !== n.retail_now ? `Was ${money(n.retail_launch)} at launch.` : "Boutique price."}{n.retail_size ? ` ${n.retail_size}.` : ""}</div></div>}
             {n.ask_median && n.retail_now && <div><div className="lab">sellers want</div><div className="v">{Math.round((100 * n.ask_median) / n.retail_now)}%</div><div className="l">of new: {money(n.ask_median)} across {n.ask_n} listings. Wanting is not getting.</div></div>}
             {n.trend_pct != null && <div><div className="lab">asking trend</div><div className="v">{n.trend_pct > 0 ? "+" : ""}{n.trend_pct}%</div><div className="l">where what sellers want moved since the last snapshot.</div></div>}
-            <span className="h5h10txt" style={{ display: "contents" }}>
+            <span className="longonly">
               <div><div className="lab">made for decades?</div><div className="v">{n.icon ? "Yes" : "Not yet"}</div><div className="l">Shapes the house keeps making hold value; novelties fade.</div></div>
             </span>
           </div>

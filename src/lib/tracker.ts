@@ -302,6 +302,8 @@ function modelMatch(col: string, bag: string, house?: string): { sql: string; pa
   if (!words.length) return { sql: "0", params: [] };
   return { sql: "(" + words.map(() => `lower(${col}) like ?`).join(" and ") + ")", params: words.map((w) => `%${w}%`) };
 }
+/** Shapes the houses have made for decades: the fallback when the bags table has no launch year. */
+const ICONS = /\b(birkin|kelly|constance|bolide|picotin|evelyne|lindy|garden party|classic flap|2\.55|reissue|boy|lady dior|saddle|baguette|peekaboo|speedy|neverfull|alma|keepall|capucines|jackie|bamboo|horsebit|dionysus|galleria|cabat|luggage|classic box|triomphe|sac de jour|city|puzzle|margaux)\b/;
 export function quickNumbers(house: string, bag: string, spec?: string): QuickNumbers | null {
   const db = open(); if (!db) return null;
   const hTerms = houseTerms(house); const mm = modelMatch("model", bag, house); const mg = modelMatch("model_guess", bag, house); const bagTerm = norm(bag).split(" ").filter((w) => w.length > 2)[0] ?? norm(bag);
@@ -319,7 +321,7 @@ export function quickNumbers(house: string, bag: string, spec?: string): QuickNu
     ask_median: (ask?.m as number) ?? null, ask_n: (ask?.n as number) ?? 0,
     sold_median: (sold?.m as number) ?? null, sold_n: (sold?.n as number) ?? 0, sold_pct_of_retail: (sold?.p as number) ?? null,
     saves_avg: (trr?.saves as number) ?? null, trend_pct: trend?.a0 && trend?.a1 ? Math.round((((trend.a1 as number) - (trend.a0 as number)) / (trend.a0 as number)) * 1000) / 10 : null,
-    trr_sold_90d: (trr?.sold90 as number) ?? 0, icon: !!icon,
+    trr_sold_90d: (trr?.sold90 as number) ?? 0, icon: !!icon || ICONS.test(norm(bag)),
     buzz: buzzNumbers(house, bag),
     links: bagLinks(house, bag),
     path: pricePath(house, bag),
