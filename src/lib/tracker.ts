@@ -338,8 +338,12 @@ export function asksNow(house: string, bag: string, spec?: string): QuickNumbers
   const words = norm(`${bag}`).split(" ").filter((w) => w.length > 2 && !["bag", "bags", "the", "and", "with", "clutch", "flap"].includes(w)).slice(0, 4);
   if (!words.length) { db.close(); return null; }
   const q = <T extends Row>(sql: string, params: (string | number)[] = []): T[] => { try { return db.prepare(sql).all(...params) as T[]; } catch { return []; } };
-  const titleLike = words.map(() => "and lower(title) like ?").join(" ");
-  const wp = words.map((w) => `%${w}%`);
+  // a two-digit size in the name ("Birkin 30") must appear in the title too, so a 30 never borrows a 25's price
+  const houseWords = new Set(norm(house).split(" "));
+  const nameIsHousePlusNumber = !norm(bag).split(" ").some((w) => w.length > 1 && !/^\d+$/.test(w) && !houseWords.has(w));
+  const sizeNum = nameIsHousePlusNumber ? null : (norm(`${bag} ${spec ?? ""}`).match(/\b(1[5-9]|[2-4]\d)\b/)?.[1] ?? null);
+  const titleLike = words.map(() => "and lower(title) like ?").join(" ") + (sizeNum ? " and (title like ? or title like ? or title like ? or title like ?)" : "");
+  const wp = [...words.map((w) => `%${w}%`), ...(sizeNum ? [`% ${sizeNum} %`, `% ${sizeNum}`, `% ${sizeNum},%`, `%${sizeNum}cm%`] : [])];
   const trr = q<Row>(`select price, sold from trr_item_reads where ${likeAny("house", hTerms)} and read_date >= date('now','-45 days') and price is not null ${titleLike} order by price`, [...likeParams(hTerms), ...wp]);
   // FWRD Renew (fwrd.com pre-owned): Katie trusts its pricing for vetted second hand. Weekly page read; asks only, FWRD shows no sold data.
   const fwrd = q<Row>(`select price from v_fwrd_latest where ${likeAny("house", hTerms)} and read_date >= date('now','-45 days') ${titleLike} order by price`, [...likeParams(hTerms), ...wp]);
