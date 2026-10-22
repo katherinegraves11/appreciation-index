@@ -161,35 +161,35 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             const sentence = (t: string) => strip(t);
             /** The one or two sentences of a note that answer the line, not the whole paragraph. */
             const pick = (t: string, re: RegExp, max = 200) => { const parts = strip(t).split(/(?<=[.;])\s+/); const hit = parts.filter((x) => re.test(x)); const list = hit.length ? hit : parts; let out = list[0] ?? ""; if (list[1] && (out + " " + list[1]).length <= max) out += " " + list[1]; return out; };
-            return (
-              <section className="buzz2">
-                <header className="bz-head"><div><p className="lab"><Glyph kind="chat" />the group chat · what TikTok and Instagram are saying</p>
-                  <h4>{b ? (over ? <>The feeds have thoughts. <i>Is {bagShort} over?</i></> : growth && growth.value > 15 ? <>Everyone&apos;s suddenly searching “{growth.term}”. <i>Up {Math.round(growth.value)}% this week.</i></> : <>Quiet week. <i>{house} is minding its own business.</i></>) : <>Nobody&apos;s said a word about {house} <i>yet</i>.</>}</h4>
-                </div></header>
-                {b ? (
-                  <>
+            const cult = cards.find((c) => c.key === "culture");
+            const mood = !b ? "no read yet" : over ? "turning" : growth && growth.value > 15 ? "rising" : "quiet";
+            const cultureCard = (
+              <article className={`ecard culture ${!b ? "mixed" : over ? "weak" : growth && growth.value > 15 ? "strong" : "mixed"}`}>
+                <header><h4><Glyph kind="chat" />The group chat</h4><span className="stamp">{mood}</span></header>
+                <p className="h"><b>{b ? (over ? `The feeds have thoughts. Is ${bagShort} over?` : growth && growth.value > 15 ? `Everyone's suddenly searching “${growth.term}”: up ${Math.round(growth.value)}% this week.` : `Quiet week. ${house} is minding its own business.`) : `Nobody's said a word about ${house} yet.`}</b></p>
+                {cult && <p className="so">{plain(cult.soWhat ?? cult.headline)}</p>}
+                {b && (
+                  <details>
+                    <summary><Glyph kind="chat" />the chat</summary>
                     <dl className="bz-lines">
                       <div><dt>Is it over?</dt><dd>{over ? pick(over.note, /deinfluenc|moved on|had its moment|backlash|over\b/i) : trendsForHouse.length ? `Not that we can see. ${pick(trendsForHouse[0].note, new RegExp(house.split(" ")[0], "i"))}` : `No one is calling ${house} over this week.`}</dd></div>
                       <div><dt>Who&apos;s carrying it</dt><dd>{carrying && new RegExp(house.split(" ")[0], "i").test(carrying.note) ? `${pick(carrying.note, new RegExp(house.split(" ")[0], "i"), 160)} That is a Gen Z feed; nothing on women over 35 yet.` : "Nothing on women over 35 yet. The Gen Z feeds show Coach and mid-range labels, with luxury as the occasional treat."}</dd></div>
                       <div><dt>The dupe situation</dt><dd>{dupe ? (new RegExp(house.split(" ")[0], "i").test(pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160)) ? pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160) : `Dupes and deinfluencing are circulating among younger buyers. Nothing aimed at ${house} this week.`) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
                       <div><dt>Where it lives online</dt><dd>{bagTags.length ? bagTags.slice(0, 3).map((t) => `#${t.term} (${Math.round(t.value).toLocaleString()} posts)`).join(", ") : houseTags.length ? `No tag of its own yet. The house's: ${houseTags.slice(0, 2).map((t) => `#${t.term} (${Math.round(t.value) >= 1e6 ? (t.value / 1e6).toFixed(1) + "M" : Math.round(t.value / 1000) + "K"})`).join(", ")}.` : `No hashtag of its own yet; ${house}'s tags carry it.`}</dd></div>
                     </dl>
-                    {(b.events.length > 0) && (
-                      <div className="bz-moments">
-                        <p className="lab"><Glyph kind="bell" />moments worth knowing</p>
-                        <ol>{b.events.filter((e) => !/fashion month on Instagram/i.test(e.note)).slice(0, 2).map((e, i) => <li key={i}><span className="when">{fmt(e.date)}</span><span className="what">{e.note}</span></li>)}</ol>
-                      </div>
+                    {b.events.filter((e) => !/fashion month on Instagram/i.test(e.note)).length > 0 && (
+                      <div className="bz-moments"><p className="lab"><Glyph kind="bell" />moments worth knowing</p>
+                        <ol>{b.events.filter((e) => !/fashion month on Instagram/i.test(e.note)).slice(0, 2).map((e, i) => <li key={i}><span className="when">{fmt(e.date)}</span><span className="what">{e.note}</span></li>)}</ol></div>
                     )}
-                    {(() => { const cult = cards.find((c) => c.key === "culture"); return cult ? <p className="bz-ourread"><span className="lab">our read</span> <b>{plain(cult.soWhat ?? cult.headline).replace(/\.$/, "")}.</b>{cult.soWhat ? ` ${plain(cult.headline)}` : ""}</p> : null; })()}
                     <p className="bz-read">Read from {[...readFrom, ...(tiktokTrends && !tiktokRead ? ["TikTok tag pages"] : [])].join(", ") || "the tracker"}{b.read_date ? ` on ${fmt(b.read_date)}` : ""}. Counts only; no posts or people are stored.</p>
-                  </>
-                ) : <p className="bz-read">We add this bag&apos;s hashtags the day after it is first asked about, and read them daily.</p>}
-              </section>
+                  </details>
+                )}
+              </article>
             );
-          })()}
-
-          <div className="ecards">
-            {cards.filter((c) => c.key !== "buy" && c.key !== "culture").map((c) => {
+            return (
+              <div className="ecards">
+                {cultureCard}
+                {cards.filter((c) => c.key !== "buy" && c.key !== "culture").map((c) => {
               const [proof, ...more] = c.evidence;
               return (
                 <article key={c.key} className={`ecard ${c.mood}`}>
@@ -205,7 +205,9 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
                 </article>
               );
             })}
-          </div>
+              </div>
+            );
+          })()}
 
           <div className="watch">
             {result.spec_guidance?.length > 0 && <section><p className="lab">if you do buy</p><ul>{result.spec_guidance.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>}

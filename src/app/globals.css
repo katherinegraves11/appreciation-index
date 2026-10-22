@@ -421,3 +421,12 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 .bz-ourread{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line);font-size:17px;line-height:1.5;color:var(--ink)}
 .bz-ourread b{font-weight:500}
 .bz-ourread .lab{margin-right:6px}
+/* the group chat as a card */
+.ecard.culture{background:color-mix(in srgb,#2f7f7a 7%,var(--paper))}
+.ecard.culture .h b{font-weight:500}
+.ecard.culture details .bz-lines{margin-top:10px;gap:8px}
+.ecard.culture details .bz-lines div{grid-template-columns:1fr;gap:1px}
+.ecard.culture details dd{font-size:15px}
+.ecard.culture .bz-moments{margin-top:12px}
+.ecard.culture .bz-read{font-size:13px}
+.buzz2{display:none}
