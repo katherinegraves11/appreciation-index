@@ -289,7 +289,7 @@ export type QuickNumbers = {
   links: { house_url: string | null; runway_url: string | null };
   path: { from_price: number; from_date: string; to_price: number; to_date: string; size: string | null } | null;
   sell: { retail: number; retail_spec: string; median_sold: number; n: number; window_days: number; matched_on: string } | null;
-  asks: { median_ask: number; n: number; sold: number } | null;
+  asks: { median_ask: number; n: number; sold: number; trr_n: number; fwrd_n: number; fwrd_median: number | null } | null;
 };
 /** SQL fragment + params requiring every meaningful word of the bag name to appear in a column (no first-word guessing). */
 function modelMatch(col: string, bag: string, house?: string): { sql: string; params: string[] } {
@@ -337,13 +337,18 @@ export function asksNow(house: string, bag: string, spec?: string): QuickNumbers
   const hTerms = houseTerms(house);
   const words = norm(`${bag}`).split(" ").filter((w) => w.length > 2 && !["bag", "bags", "the", "and", "with", "clutch", "flap"].includes(w)).slice(0, 4);
   if (!words.length) { db.close(); return null; }
-  try {
-    const rows = db.prepare(`select price, sold from trr_item_reads where ${likeAny("house", hTerms)} and read_date >= date('now','-45 days') and price is not null ${words.map(() => "and lower(title) like ?").join(" ")} order by price`).all(...likeParams(hTerms), ...words.map((w) => `%${w}%`)) as Row[];
-    db.close();
-    const asks = rows.filter((r) => !r.sold).map((r) => r.price as number);
-    if (!asks.length) return null;
-    return { median_ask: asks[Math.floor(asks.length / 2)], n: asks.length, sold: rows.filter((r) => !!r.sold).length };
-  } catch { db.close(); return null; }
+  const q = <T extends Row>(sql: string, params: (string | number)[] = []): T[] => { try { return db.prepare(sql).all(...params) as T[]; } catch { return []; } };
+  const titleLike = words.map(() => "and lower(title) like ?").join(" ");
+  const wp = words.map((w) => `%${w}%`);
+  const trr = q<Row>(`select price, sold from trr_item_reads where ${likeAny("house", hTerms)} and read_date >= date('now','-45 days') and price is not null ${titleLike} order by price`, [...likeParams(hTerms), ...wp]);
+  // FWRD Renew (fwrd.com pre-owned): Katie trusts its pricing for vetted second hand. Weekly page read; asks only, FWRD shows no sold data.
+  const fwrd = q<Row>(`select price from v_fwrd_latest where ${likeAny("house", hTerms)} and read_date >= date('now','-45 days') ${titleLike} order by price`, [...likeParams(hTerms), ...wp]);
+  db.close();
+  const trrAsks = trr.filter((r) => !r.sold).map((r) => r.price as number);
+  const fwrdAsks = fwrd.map((r) => r.price as number);
+  const asks = [...trrAsks, ...fwrdAsks].sort((a, b) => a - b);
+  if (!asks.length) return null;
+  return { median_ask: asks[Math.floor(asks.length / 2)], n: asks.length, sold: trr.filter((r) => !!r.sold).length, trr_n: trrAsks.length, fwrd_n: fwrdAsks.length, fwrd_median: fwrdAsks.length ? fwrdAsks[Math.floor(fwrdAsks.length / 2)] : null };
 }
 
 /** One block of headline numbers the scorer must use, so the words and the tiles never disagree. */
@@ -351,10 +356,11 @@ export function headlineNumbers(house: string, bag: string, spec?: string): stri
   const n = quickNumbers(house, bag, spec); if (!n) return "";
   const lines: string[] = [];
   if (n.retail_now) lines.push(`Boutique price today: $${n.retail_now}${n.retail_size ? ` (${n.retail_size})` : ""}${n.retail_launch && n.retail_launch !== n.retail_now ? `; was $${n.retail_launch} at launch` : ""}.`);
-  if (n.sell) lines.push(`SOLD PRICE TO QUOTE: $${n.sell.median_sold} median, ${n.sell.n} pristine/excellent same-edition sales in the last ${n.sell.window_days} days, against $${n.sell.retail} retail. Use this as "sold for". Never quote a single outlier sale as the sold price.`);
+  if (n.sell) lines.push(`SOLD PRICE TO QUOTE: $${n.sell.median_sold} median, ${n.sell.n} pristine/excellent same-edition sold listings seen on The RealReal in the last ${n.sell.window_days} days (sale dates unknown; say "sold listings seen", never "sales since <date>"), against $${n.sell.retail} retail. Use this as "sold for". Never quote a single outlier sale as the sold price.`);
   else if (n.sold_n) lines.push(`SOLD PRICE TO QUOTE: $${n.sold_median} median, ${n.sold_n} same-size sales (any condition), ${n.sold_pct_of_retail}% of today's retail.`);
   else if (n.asks) lines.push(`No sold price yet. Sellers want $${n.asks.median_ask} across ${n.asks.n} listings; ${n.asks.sold} sold.`);
   if (n.ask_median) lines.push(`Asking median: $${n.ask_median} across ${n.ask_n} listings (asks, not sales).`);
+  if (n.asks?.fwrd_n && n.asks.fwrd_median) lines.push(`FWRD Renew (vetted pre-owned, a trusted price reference; asks, not sales): $${n.asks.fwrd_median} median across ${n.asks.fwrd_n} listings this week.`);
   if (n.path) lines.push(`Retail path: $${n.path.from_price} (${n.path.from_date}) → $${n.path.to_price} (${n.path.to_date}).`);
   return lines.length ? section("HEADLINE NUMBERS (the page shows exactly these; your takeaways, plain_answer and signals must use the same figures)", lines) : "";
 }

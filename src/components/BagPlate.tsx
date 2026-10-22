@@ -137,6 +137,8 @@ export function seeItLinks(house: string, bag: string, extra?: { house_url?: str
     { label: "The RealReal · sold", href: `https://www.therealreal.com/products?keywords=${q}&taxons[]=493&sort=sold` },
     { label: "The RealReal · for sale", href: `https://www.therealreal.com/products?keywords=${q}&taxons[]=493` },
     { label: "Fashionphile", href: `https://www.fashionphile.com/shop?search=${q}` },
+    // FWRD's site search does not index Renew stock, so the link goes to the Renew shelf itself.
+    { label: "FWRD Renew", href: "https://www.fwrd.com/brand-fwrd-renew/e90c01/?sr=true" },
   ];
   if (extra?.house_url) links.push({ label: `${house}.com`, href: extra.house_url });
   if (extra?.runway_url) links.push({ label: "Runway look · Vogue", href: extra.runway_url });
