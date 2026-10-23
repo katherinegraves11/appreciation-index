@@ -30,8 +30,9 @@ export default function About() {
           <div className="abox"><h4>Ask by photo</h4><p>Drop a photo or a listing screenshot. We name the bag, you confirm, and the answer runs. Photos are read once and not kept.</p></div>
           <div className="abox"><h4>The race</h4><p>Houses on one board. <b>Up</b> = sells faster right now. <b>Right</b> = bags sold closer to the store price. Low on the board means resale pays less, not that prices are falling.</p></div>
           <div className="abox"><h4>Where the numbers come from</h4><p>Sales and asks: The RealReal, Fashionphile, Rebag, Madison Avenue Couture, Privé Porter, the auction houses. New prices: the houses and the guides that track them. Runway: Vogue. People and money: Vogue Business. Every number keeps its source.</p></div>
+          <div className="abox"><h4>Which market</h4><p>The United States, in dollars. New prices are what the US boutiques charge; sales and asks come from the US resale platforms. A bag bought in Paris or Tokyo costs a different sum, and the answer is for the buyer paying in dollars.</p></div>
         </div>
-        <p className="asub" style={{ marginTop: 30, fontStyle: "italic" }}>Value-retention analysis based on public market data, not investment advice.</p>
+        <p className="asub" style={{ marginTop: 30, fontStyle: "italic" }}>Value-retention analysis of the US market, in dollars, based on public market data, not investment advice.</p>
       </div>
     </main>
   );

@@ -55,7 +55,7 @@ export const CALLS = ["Core Hold", "Selective", "Watch", "Wear, Don't Bank"] as 
 export type Call = (typeof CALLS)[number];
 
 export const DISCLAIMER =
-  "This is value-retention analysis based on public market data, not investment advice. Past resale performance does not guarantee future results.";
+  "This is value-retention analysis of the US market, in dollars, based on public market data, not investment advice. Past resale performance does not guarantee future results.";
 
 const layerTable = LAYERS.map(
   (l) => `- ${l.name} (weight ${l.weight}): ${l.measures}\n  Sources: ${l.sources}`,
