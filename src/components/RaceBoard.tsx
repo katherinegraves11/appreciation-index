@@ -35,7 +35,7 @@ export default function RaceBoard({ rows }: { rows: RaceRow[] }) {
   const x = (r: RaceRow) => pos.get(r.house)!.x;
   const y = (r: RaceRow) => pos.get(r.house)!.y;
   const hot = rows.filter((r) => (r.heat ?? 0) >= 70 && (r.sold_pct ?? 0) >= 60).map((r) => r.house);
-  const sortedHold = [...rows].filter((r) => r.sold_pct != null).sort((a, b) => (b.sold_pct ?? 0) - (a.sold_pct ?? 0));
+  const sortedHold = [...rows].filter((r) => r.sold_pct != null && !r.thin).sort((a, b) => (b.sold_pct ?? 0) - (a.sold_pct ?? 0));
   const sortedHeat = [...rows].filter((r) => r.heat != null).sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
   return (
     <>
@@ -53,11 +53,11 @@ export default function RaceBoard({ rows }: { rows: RaceRow[] }) {
         ))}
       </div>
       <div className="podium">
-        <div className="pod-now"><p className="lab">selling fastest right now</p><ol>{sortedHeat.slice(0, 3).map((r) => <li key={r.house}><b>{r.house}</b> {r.saves ?? "?"} saves per listing{r.delist_pct != null ? `, ${r.delist_pct}% clear in a month` : ""}.</li>)}</ol></div>
+        <div className="pod-now"><p className="lab">selling fastest right now</p><ol>{sortedHeat.slice(0, 3).map((r) => <li key={r.house}><b>{r.house}</b> {r.saves ?? "?"} saves per listing{r.delist_pct != null ? `, ${r.delist_pct}% of listings gone within a month, sold or withdrawn` : ""}.</li>)}</ol></div>
         <div className="pod-fore"><p className="lab">keeps its value · sold closest to the store price</p><ol>{sortedHold.slice(0, 3).map((r) => <li key={r.house}><b>{r.house}</b> Sold at {r.sold_pct}% of new across {r.models} model{r.models === 1 ? "" : "s"}.</li>)}</ol></div>
         <div className="pod-cool"><p className="lab">loses the most · sold furthest below the store price</p><ol>{sortedHold.slice(-3).reverse().map((r) => <li key={r.house}><b>{r.house}</b> Sold at {r.sold_pct}% of new.</li>)}</ol></div>
       </div>
-      <p className="hint center">Left to right: what bags actually sold for, as a share of today&apos;s store price. Bottom to top: how fast they sell (saves and listings clearing). The board is scaled to the houses shown, so the middle line is the middle of the pack. Asking prices are not used. A house low on the board loses value on resale; that is not the same as a house whose prices are falling, which we will show once there are enough snapshots to see a drop.</p>
+      <p className="hint center">Left to right: what bags actually sold for, as a share of today&apos;s store price. Bottom to top: how fast they sell (saves and listings clearing). The board is scaled to the houses shown, so the middle line is the middle of the pack. Asking prices are not used. A house is ranked only with at least two models and 30 sales; {rows.filter((r) => r.thin).map((r) => r.house).join(", ") || "none"} {rows.filter((r) => r.thin).length === 1 ? "has" : "have"} too few to rank yet. A house low on the board loses value on resale; that is not the same as a house whose prices are falling, which we will show once there are enough snapshots to see a drop.</p>
     </>
   );
 }

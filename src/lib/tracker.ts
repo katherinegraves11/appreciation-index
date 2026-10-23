@@ -29,6 +29,14 @@ function norm(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
+/** True median: the mean of the middle two when the count is even (two asks never report the higher one). */
+function median(xs: number[]): number {
+  if (!xs.length) return 0;
+  const a = [...xs].sort((x, y) => x - y); const m = Math.floor(a.length / 2);
+  return a.length % 2 ? a[m] : Math.round((a[m - 1] + a[m]) / 2);
+}
+const EXOTIC_TITLE_SQL = "and lower(title) not like '%ostrich%' and lower(title) not like '%croc%' and lower(title) not like '%alligator%' and lower(title) not like '%lizard%' and lower(title) not like '%porosus%' and lower(title) not like '%niloticus%'";
+
 // House aliases so "Dior" finds "Christian Dior" rows and vice versa.
 function houseTerms(house: string): string[] {
   const h = norm(house);
@@ -246,6 +254,32 @@ export function buildTrackerDossier(house: string, bag: string, spec?: string): 
     ]),
   );
 
+  // 6b. Dealer listings in the same material (resale_listings: Privé Porter, Madison Avenue Couture, Fashionphile, Rebag, dealers read one page at a time).
+  // Asks unless marked sold; private-sourcer-offer rows are Katie's own quotes and never appear here.
+  {
+    const MATERIALS = ["doblis", "suede", "crocodile", "croc", "alligator", "ostrich", "lizard", "shearling", "grizzly", "barenia", "box calf", "chevre", "swift", "epsom", "togo", "clemence", "evercolor", "tadelakt"];
+    const specN = norm(`${bag} ${spec ?? ""}`);
+    const mats = MATERIALS.filter((m) => specN.includes(m));
+    const bagWords = norm(bag).split(" ").filter((w) => w.length > 2 && !["bag", "bags", "the", "and", "with", "clutch"].includes(w)).slice(0, 3);
+    const sizeN = specN.match(/\b(1[5-9]|[2-4]\d)\b/)?.[1] ?? null;
+    if (mats.length && bagWords.length) {
+      const rows = q<Row>(
+        `select source, title, price, available, last_seen, handle_url from resale_listings
+         where ${likeAny("brand", hTerms)} and source <> 'private-sourcer-offer'
+         ${bagWords.map(() => "and lower(title) like ?").join(" ")}
+         and (${mats.map(() => "(lower(title) like ? or lower(coalesce(material_guess,'')) like ?)").join(" or ")})
+         order by price desc limit 40`,
+        [...likeParams(hTerms), ...bagWords.map((w) => `%${w}%`), ...mats.flatMap((m) => [`%${m}%`, `%${m}%`])],
+      );
+      const sized = sizeN ? rows.filter((r) => new RegExp(`(^|[^0-9$])${sizeN}(\\s*cm)?([^0-9%,]|$)`).test(String(r.title).toLowerCase().replace(/\$\s*[0-9][0-9,.]*/g, " "))) : rows;
+      const use = (sized.length ? sized : rows).slice(0, 12);
+      if (use.length) {
+        out.push(section(`Dealer listings in the same material (${mats.join(", ")}${sizeN && sized.length ? `, size ${sizeN}` : ""}; ASKS unless marked SOLD; use these, not plain-leather sales, for any counter on a ${mats.join("/")} quote)`,
+          use.map((r) => `${r.available === 0 ? "SOLD" : "ask"} $${r.price} · ${r.source} · ${r.title} · seen ${r.last_seen}${String(r.handle_url ?? "").startsWith("http") ? ` (${r.handle_url})` : ""}`)));
+      }
+    }
+  }
+
   // 7. WGSN forecasts (forward-looking; cite as forecast)
   const wgsn = q<Row>(
     `select report_title, published, signal, derived_note, relevance_bucket, underlying_source from wgsn_signals
@@ -288,12 +322,12 @@ export type QuickNumbers = {
   buzz: BuzzNumbers | null;
   links: { house_url: string | null; runway_url: string | null };
   path: { from_price: number; from_date: string; to_price: number; to_date: string; size: string | null } | null;
-  sell: { retail: number; retail_spec: string; median_sold: number; n: number; window_days: number; matched_on: string } | null;
+  sell: { retail: number; retail_spec: string; median_sold: number; n: number; window_days: number; matched_on: string; lo: number; hi: number; read_from: string; read_to: string; pristine: number; plain: boolean } | null;
   asks: { median_ask: number; n: number; sold: number; trr_n: number; fwrd_n: number; fwrd_median: number | null; venue: string; link: string | null; link_label: string } | null;
 };
 /** SQL fragment + params requiring every meaningful word of the bag name to appear in a column (no first-word guessing). */
 function modelMatch(col: string, bag: string, house?: string): { sql: string; params: string[] } {
-  const stop = new Set(["bag", "bags", "the", "and", "with", "flap", "runway", "pieces", "collection", "mini", "small", "medium", "large", "maxi", "jumbo"]);
+  const stop = new Set(["bag", "bags", "the", "and", "with", "flap", "runway", "pieces", "collection", "mini", "small", "medium", "large", "maxi", "jumbo", "clutch"]);
   const toks = norm(bag).split(" ").filter((w) => w.length > 1 && !stop.has(w) && !/^\d{4}$/.test(w));
   const houseWords = new Set(norm(house ?? "").split(" "));
   const alpha = toks.filter((w) => !/^\d+$/.test(w));
@@ -301,7 +335,9 @@ function modelMatch(col: string, bag: string, house?: string): { sql: string; pa
   // Sizes ride in another column ("Birkin 30" → model "Birkin"), so numbers are optional, unless the name is only the house plus a number ("Chanel 25").
   const words = alpha.some((w) => !houseWords.has(w)) ? alpha : [...alpha, ...nums];
   if (!words.length) return { sql: "0", params: [] };
-  return { sql: "(" + words.map(() => `lower(${col}) like ?`).join(" and ") + ")", params: words.map((w) => `%${w}%`) };
+  // Hermès sub-models are different bags: a "Kelly" must never borrow a Kelly Cut's or Kelly Pochette's price, and vice versa.
+  const sub = toks.some((w) => w === "kelly" || w === "birkin") ? ["cut", "pochette", "danse", "elan", "moove", "depeches", "longue", "doll", "shoulder", "shopper"].filter((w) => !toks.includes(w)) : [];
+  return { sql: "(" + [...words.map(() => `lower(${col}) like ?`), ...sub.map(() => `lower(${col}) not like ?`)].join(" and ") + ")", params: [...words.map((w) => `%${w}%`), ...sub.map((w) => `%${w}%`)] };
 }
 /** Shapes the houses have made for decades: the fallback when the bags table has no launch year. */
 const ICONS = /\b(birkin|kelly|constance|bolide|picotin|evelyne|lindy|garden party|classic flap|2\.55|reissue|boy|lady dior|saddle|baguette|peekaboo|speedy|neverfull|alma|keepall|capucines|jackie|bamboo|horsebit|dionysus|galleria|cabat|luggage|classic box|triomphe|sac de jour|city|puzzle|margaux)\b/;
@@ -344,7 +380,8 @@ export function asksNow(house: string, bag: string, spec?: string): QuickNumbers
   const sizeNum = nameIsHousePlusNumber ? null : (norm(`${bag} ${spec ?? ""}`).match(/\b(1[5-9]|[2-4]\d)\b/)?.[1] ?? null);
   const titleLike = words.map(() => "and lower(title) like ?").join(" ") + (sizeNum ? " and (title like ? or title like ? or title like ? or title like ?)" : "");
   const wp = [...words.map((w) => `%${w}%`), ...(sizeNum ? [`% ${sizeNum} %`, `% ${sizeNum}`, `% ${sizeNum},%`, `%${sizeNum}cm%`] : [])];
-  const trr = q<Row>(`select price, sold, slug from trr_item_reads where ${likeAny("house", hTerms)} and read_date >= date('now','-45 days') and price is not null ${titleLike} order by price`, [...likeParams(hTerms), ...wp]);
+  const exoticOk = /(ostrich|croc|alligator|lizard|porosus|niloticus)/i.test(spec ?? "");
+  const trr = q<Row>(`select price, sold, slug from trr_item_reads where ${likeAny("house", hTerms)} and read_date >= date('now','-45 days') and price is not null ${titleLike} ${exoticOk ? "" : EXOTIC_TITLE_SQL} order by price`, [...likeParams(hTerms), ...wp]);
   // FWRD Renew (fwrd.com pre-owned): Katie trusts its pricing for vetted second hand. Weekly page read; asks only, FWRD shows no sold data.
   const fwrd = q<Row>(`select price from v_fwrd_latest where ${likeAny("house", hTerms)} and read_date >= date('now','-45 days') ${titleLike} order by price`, [...likeParams(hTerms), ...wp]);
   db.close();
@@ -359,7 +396,7 @@ export function asksNow(house: string, bag: string, spec?: string): QuickNumbers
   const slug = trrAskRows.length === 1 && trrAskRows[0].slug ? String(trrAskRows[0].slug) : null;
   const link = slug ? `https://www.therealreal.com/products/${slug}` : trrAsks.length ? `https://www.therealreal.com/products?keywords=${encodeURIComponent(`${house} ${bag}`)}&taxons[]=493` : "https://www.fwrd.com/brand-fwrd-renew/e90c01/?sr=true";
   const link_label = slug ? "see the listing on The RealReal" : trrAsks.length ? "see it on The RealReal" : "see the FWRD Renew shelf";
-  return { median_ask: asks[Math.floor(asks.length / 2)], n: asks.length, sold: trr.filter((r) => !!r.sold).length, trr_n: trrAsks.length, fwrd_n: fwrdAsks.length, fwrd_median: fwrdAsks.length ? fwrdAsks[Math.floor(fwrdAsks.length / 2)] : null, venue, link, link_label };
+  return { median_ask: median(asks), n: asks.length, sold: trr.filter((r) => !!r.sold).length, trr_n: trrAsks.length, fwrd_n: fwrdAsks.length, fwrd_median: fwrdAsks.length ? median(fwrdAsks) : null, venue, link, link_label };
 }
 
 /** One block of headline numbers the scorer must use, so the words and the tiles never disagree. */
@@ -367,9 +404,9 @@ export function headlineNumbers(house: string, bag: string, spec?: string): stri
   const n = quickNumbers(house, bag, spec); if (!n) return "";
   const lines: string[] = [];
   if (n.retail_now) lines.push(`Boutique price today: $${n.retail_now}${n.retail_size ? ` (${n.retail_size})` : ""}${n.retail_launch && n.retail_launch !== n.retail_now ? `; was $${n.retail_launch} at launch` : ""}.`);
-  if (n.sell) lines.push(`SOLD PRICE TO QUOTE: $${n.sell.median_sold} median, ${n.sell.n} pristine/excellent same-edition sold listings seen on The RealReal in the last ${n.sell.window_days} days (sale dates unknown; say "sold listings seen", never "sales since <date>"), against $${n.sell.retail} retail. Use this as "sold for". Never quote a single outlier sale as the sold price.`);
+  if (n.sell) lines.push(`SOLD PRICE TO QUOTE: $${n.sell.median_sold} median (range $${n.sell.lo}-$${n.sell.hi}), ${n.sell.n} sold listings in excellent condition or better (${n.sell.pristine} graded pristine), seen on The RealReal in reads from ${n.sell.read_from} to ${n.sell.read_to}; sale dates are unknown, so say "sold listings seen", never "sales in the last N days". Matched on: ${n.sell.matched_on}. ${n.sell.plain ? `IMPORTANT: these are PLAIN ${bag} sales, NOT the leather/colour/finish asked about. Say exactly that ("plain ${bag}s, not this leather") and never call them the same edition or name a leather they were not.` : ""} Against $${n.sell.retail} retail (${n.sell.retail_spec}). Never call these pristine. Never quote a single outlier sale as the sold price.`);
   else if (n.sold_n) lines.push(`SOLD PRICE TO QUOTE: $${n.sold_median} median, ${n.sold_n} same-size sales (any condition), ${n.sold_pct_of_retail}% of today's retail.`);
-  else if (n.asks) lines.push(`No pristine same-edition sold price to quote. The model itself does sell: ${n.asks.sold} sold listings of this model seen on The RealReal in the last 45 days (all colours and sizes)${n.trr_sold_90d ? `, ${n.trr_sold_90d} in 90 days` : ""}. Sellers want $${n.asks.median_ask}: ${n.asks.n} listing${n.asks.n === 1 ? "" : "s"} on ${n.asks.venue}, an ask, not a sale. RULES: never write "no confirmed sale" on its own; in the same sentence say how many of the model have sold (e.g. "Fourteen Sardines sold; none yet in this turquoise mini"). Whenever you quote this asking price, name the venue, call it an ask, and put the token [[ask-link]] immediately after the dollar figure (the page turns it into a link to the listing).`);
+  else if (n.asks) lines.push(`No sold price to quote in this exact edition. The model itself does sell: ${n.asks.sold} sold listings of this model seen in recent reads of The RealReal (all colours, sizes and leathers; sale dates unknown)${n.trr_sold_90d ? `, ${n.trr_sold_90d} in 90 days` : ""}. Sellers want $${n.asks.median_ask}: ${n.asks.n} listing${n.asks.n === 1 ? "" : "s"} on ${n.asks.venue}, an ask, not a sale. RULES: never write "no confirmed sale" on its own; in the same sentence say how many of the model have sold (e.g. "Fourteen Sardines sold; none yet in this turquoise mini"). Whenever you quote this asking price, name the venue, call it an ask, and put the token [[ask-link]] immediately after the dollar figure (the page turns it into a link to the listing).`);
   if (n.ask_median) lines.push(`Asking median: $${n.ask_median} across ${n.ask_n} listings (asks, not sales).`);
   if (n.asks?.fwrd_n && n.asks.fwrd_median) lines.push(`FWRD Renew (vetted pre-owned, a trusted price reference; asks, not sales): $${n.asks.fwrd_median} median across ${n.asks.fwrd_n} listings this week.`);
   if (n.path) lines.push(`Retail path: $${n.path.from_price} (${n.path.from_date}) → $${n.path.to_price} (${n.path.to_date}).`);
@@ -405,14 +442,23 @@ export function sellNow(house: string, bag: string, spec?: string): QuickNumbers
       [...likeParams(hTerms), ...mm.params, ...words.map((w) => `%${w}%`), ...(sizeWord ? [`%${sizeWord}%`] : [])]);
     if (!retailRows.length) return null;
     const mg = modelMatch("model_guess", bag, house);
-    const sold = q<Row>(`select price from trr_item_reads where ${likeAny("house", hTerms)} and ${mg.sql} and sold=1 and price is not null and read_date >= date('now','-45 days')
+    const numericSize = !!sizeWord && /^\d+$/.test(sizeWord);
+    const soldRaw = q<Row>(`select price, title, read_date, condition from trr_item_reads where ${likeAny("house", hTerms)} and ${mg.sql} and sold=1 and price is not null and read_date >= date('now','-45 days')
         and (coalesce(condition,'') in ('Pristine','Excellent') or title like '%w/Tags%' or title like '%w/ Tags%')
         ${wantsExotic ? "" : "and lower(title) not like '%ostrich%' and lower(title) not like '%croc%' and lower(title) not like '%alligator%' and lower(title) not like '%lizard%' and lower(title) not like '%porosus%'"}
-        ${anyOf("title")} ${sizeWord ? "and lower(title) like ?" : ""} order by price`,
-      [...likeParams(hTerms), ...mg.params, ...words.map((w) => `%${w}%`), ...(sizeWord ? [`%${sizeWord}%`] : [])]);
+        ${anyOf("title")} ${sizeWord && !numericSize ? "and lower(title) like ?" : ""} order by price`,
+      [...likeParams(hTerms), ...mg.params, ...words.map((w) => `%${w}%`), ...(sizeWord && !numericSize ? [`%${sizeWord}%`] : [])]);
+    // A numeric size ("30") must be a whole size token in the title, never part of a price or a discount ("$30,000", "30% off").
+    const sizeRe = numericSize ? new RegExp(`(^|[^0-9])${sizeWord}(\\s*cm)?($|[^0-9%,.])`) : null;
+    const sized = sizeRe ? soldRaw.filter((r) => sizeRe.test(String(r.title ?? "").toLowerCase().replace(/\$\s*[0-9][0-9,.]*/g, " ").replace(/[0-9]+(\.[0-9]+)?\s*%/g, " "))) : soldRaw;
+    // the same sold tile can appear in several reads: count it once (title without the bracketed status, plus price)
+    const seen = new Set<string>();
+    const sold = sized.filter((r) => { const k = `${String(r.title ?? "").replace(/\[.*$/, "").trim().toLowerCase()}|${r.price}`; if (seen.has(k)) return false; seen.add(k); return true; });
     if (sold.length < 3) return null;
-    const prices = sold.map((r) => r.price as number); const median = prices[Math.floor(prices.length / 2)];
-    return { retail: retailRows[0].price as number, retail_spec: (retailRows[0].size_or_spec as string) ?? "", median_sold: median, n: prices.length, window_days: 45, matched_on: label };
+    const prices = sold.map((r) => r.price as number).sort((a, b) => a - b);
+    const dates = sold.map((r) => String(r.read_date)).sort();
+    return { retail: retailRows[0].price as number, retail_spec: (retailRows[0].size_or_spec as string) ?? "", median_sold: median(prices), n: prices.length, window_days: 45, matched_on: label,
+      lo: prices[0], hi: prices[prices.length - 1], read_from: dates[0], read_to: dates[dates.length - 1], pristine: sold.filter((r) => r.condition === "Pristine").length, plain: label.endsWith(", plain") && !!(spec ?? "").trim() };
   };
   const out = (specWords.length ? tryMatch(specWords, `${bag} ${specWords.join(" ")}${sizeWord ? ` ${sizeWord}` : ""}`) : null) ?? tryMatch([], `${bag}${sizeWord ? ` ${sizeWord}` : ""}, plain`);
   db.close();
@@ -544,18 +590,18 @@ export function collectionDossier(house: string, season?: string): string {
 }
 
 /** The race board: one row per house, from sold prices (holds value) and sell-through/saves (heat). */
-export type RaceRow = { house: string; models: number; sold_pct: number | null; heat: number | null; delist_pct: number | null; saves: number | null; sold_90d: number };
+export type RaceRow = { house: string; models: number; sales: number; sold_pct: number | null; heat: number | null; delist_pct: number | null; saves: number | null; sold_90d: number; thin: boolean };
 export function raceBoard(): RaceRow[] {
   const db = open(); if (!db) return [];
   try {
     const rows = db.prepare(`
-      with hold as (select house, count(*) models, round(avg(sold_pct_of_retail)) sold_pct from v_sold_vs_retail group by house),
+      with hold as (select house, count(*) models, sum(n_sold_same_size) sales, round(avg(sold_pct_of_retail)) sold_pct from v_sold_vs_retail group by house),
       heat as (select house, round(avg(cast(nullif(rtrim(substr(substr(title, instr(title,'saves=')+6), 1, 6), ';] abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,'),'') as real))) saves, sum(sold) sold90 from trr_item_reads where read_date >= date('now','-90 days') group by house),
       dl as (select brand house, round(100.0*sum(gone)/sum(listed_before),1) delist from v_disappearance group by brand)
-      select h.house, h.models, h.sold_pct, t.saves, t.sold90, d.delist
+      select h.house, h.models, h.sales, h.sold_pct, t.saves, t.sold90, d.delist
       from hold h left join heat t on t.house=h.house left join dl d on d.house=h.house order by h.sold_pct desc`).all() as Row[];
     db.close();
-    return rows.map((r) => ({ house: String(r.house), models: Number(r.models), sold_pct: (r.sold_pct as number) ?? null, saves: (r.saves as number) ?? null, sold_90d: Number(r.sold90 ?? 0), delist_pct: (r.delist as number) ?? null,
+    return rows.map((r) => ({ house: String(r.house), models: Number(r.models), sales: Number(r.sales ?? 0), thin: Number(r.models) < 2 || Number(r.sales ?? 0) < 30, sold_pct: (r.sold_pct as number) ?? null, saves: (r.saves as number) ?? null, sold_90d: Number(r.sold90 ?? 0), delist_pct: (r.delist as number) ?? null,
       heat: r.saves != null ? Math.round(Math.min(100, (r.saves as number) * 1.2 + ((r.delist as number) ?? 0))) : null }));
   } catch { db.close(); return []; }
 }
@@ -618,8 +664,8 @@ export function tickerLines(): string[] {
   const db = open(); if (!db) return [];
   const g = <T extends Row>(sql: string): T | undefined => { try { return db.prepare(sql).get() as T | undefined; } catch { return undefined; } };
   const out: string[] = [];
-  const sold = g<Row>(`select count(*) n from trr_item_reads where sold=1 and read_date >= date('now','-7 days')`);
-  if (sold?.n) out.push(`${Number(sold.n).toLocaleString()} sold listings seen on The RealReal this week`);
+  const sold = g<Row>(`select count(distinct lower(substr(title,1,instr(title||'[','[')-1))||price) n from trr_item_reads where sold=1 and read_date >= date('now','-7 days')`);
+  if (sold?.n) out.push(`${Number(sold.n).toLocaleString()} sold listings visible on The RealReal in this week's reads`);
   const asks = g<Row>(`select count(*) n from trr_item_reads where sold=0 and read_date >= date('now','-7 days')`);
   if (asks?.n) out.push(`${Number(asks.n).toLocaleString()} bags asking right now`);
   const fwrd = g<Row>(`select count(*) n, max(read_date) d from v_fwrd_latest`);

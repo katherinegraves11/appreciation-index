@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         send({ parsed: { house: input.house, bag: input.bag, spec: input.spec || "" }, interpretation: parsed.interpretation, status: parsed.interpretation ? `${parsed.interpretation} Looking it up…` : `Looking up the ${input.house} ${input.bag}…` });
         if (!fresh) {
           const norm = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-          const recent = (await listBriefs(80)).find((b) => norm(b.house) === norm(input.house) && norm(b.bag) === norm(input.bag) && Date.now() - new Date(b.created_at).getTime() < 7 * 86400000);
+          const recent = (await listBriefs(80)).find((b) => norm(b.house) === norm(input.house) && norm(b.bag) === norm(input.bag) && norm(b.spec || "") === norm(input.spec || "") && Date.now() - new Date(b.created_at).getTime() < 7 * 86400000);
           if (recent) {
             send({ status: "We answered this recently. Showing that read…" });
             send({ done: true, id: recent.id, result: recent.result, input: { house: recent.house, bag: recent.bag, spec: recent.spec || "" }, numbers: quickNumbers(recent.house, recent.bag, recent.spec || undefined), cached: true, answered_at: recent.created_at });
