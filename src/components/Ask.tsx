@@ -6,8 +6,6 @@ import type { QuickNumbers } from "@/lib/tracker";
 import Answer from "./Answer";
 import { Dial, useHorizon } from "./Horizon";
 import PhotoDrop from "./PhotoDrop";
-import Board from "./Board";
-import type { BoardPiece } from "@/lib/tracker";
 
 const EXAMPLES = [
   "Is the pony hair Chanel bag everyone's talking about worth buying right now?",
@@ -18,7 +16,7 @@ const EXAMPLES = [
 
 export type Done = { result: BriefResult; id: string; bagName: string; numbers: QuickNumbers | null; cached?: boolean; answeredAt?: string };
 
-export default function Ask({ initial = null, board = [] }: { initial?: Done | null; board?: BoardPiece[] }) {
+export default function Ask({ initial = null }: { initial?: Done | null }) {
   const { h } = useHorizon();
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
@@ -96,7 +94,6 @@ export default function Ask({ initial = null, board = [] }: { initial?: Done | n
   return (
     <>
       <section className={`askpanel ${done || busy ? "asked" : ""}`}>
-        {!done && !busy && board.length > 0 && <Board pieces={board} />}
         <p className="lab">ask about a bag</p>
         <h1 className="ask-h">
           <span className="h1txt">Is it worth buying <i>right now?</i></span>

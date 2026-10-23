@@ -18,3 +18,6 @@ What we take (craft), what we keep (identity), what we refuse (cloning):
 
 Order of work (biggest effect, least risk): ticker + motion layer → /browse catalogue → hero ephemera board → gate + look rounds (inspect at 1440/768/390, critique, fix, three rounds max).
 Gate allowances to declare: eyebrow (small-caps section labels are the house style), hairline (engraved rules), numbering (the receipts count 01·02·03 on purpose), mixed-font-headline (the italic clause is the house's voice).
+
+## Katie's call, 2026-10-23
+The hero board (plate, receipt, tag, ticket, clipping around the question) was removed at Katie's request: "get rid of these pop ups. I like the scroll up top though." The ticker stays. Do not reintroduce floating pieces around the hero; the first screen is the question alone.
