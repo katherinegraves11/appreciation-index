@@ -10,7 +10,7 @@ import type { BoardPiece } from "@/lib/tracker";
  */
 export default function Board({ pieces }: { pieces: BoardPiece[] }) {
   return (
-    <div className="board">
+    <div className="ephemera">
       {pieces.map((p) => {
         if (p.kind === "plate") return (
           <Link key={p.kind} href={p.href} className="piece plate-p">
