@@ -36,8 +36,22 @@ const PLAIN: [RegExp, string][] = [
   [/\bliquid(ity)?\b/gi, "easy to resell"],
   [/\bcomposite\b/gi, "overall score"],
   [/\brealised\b/gi, "actual"],
+  [/\s*\[\[ask-link\]\]/g, ""],
 ];
 export function plain(t: string | undefined | null): string { let x = t ?? ""; for (const [re, to] of PLAIN) x = x.replace(re, to); return x; }
+/** Bold the lead: the words up to the first comma, colon or semicolon (five at most), so a scanning eye gets the verdict before the fact. */
+function Lead({ text }: { text: string }) {
+  const m = text.match(/^([^,:;.]{1,60}?)([,:;])\s*([\s\S]*)$/);
+  if (m && m[1].split(/\s+/).length <= 5) return <><b>{m[1]}{m[2]}</b> {m[3]}</>;
+  const w = text.split(" ");
+  if (w.length <= 4) return <b>{text}</b>;
+  return <><b>{w.slice(0, 3).join(" ")}</b> {w.slice(3).join(" ")}</>;
+}
+/** Client-facing text with the [[ask-link]] token turned into a quiet link to the listing the asking price came from. */
+function Rich({ text, link, lead }: { text: string; link?: { href: string; label: string } | null; lead?: boolean }) {
+  const parts = (text ?? "").split("[[ask-link]]");
+  return <>{parts.map((p, i) => <span key={i}>{i === 0 && lead ? <Lead text={plain(p).trim()} /> : plain(p)}{i < parts.length - 1 && link ? <> <a className="asklink" href={link.href} target="_blank" rel="noreferrer">{link.label}</a></> : null}</span>)}</>;
+}
 /** Small engraved glyphs that give each section a face: a speech bubble for the culture board, a ledger for the numbers, a bell for moments. */
 const Glyph = ({ kind }: { kind: "chat" | "ledger" | "bell" | "anchor" | "proof" }) => (
   <svg className="sg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -58,6 +72,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
   const signals = toSignals(result);
   const cards = toCards(result);
   const n = numbers;
+  const askLink = n?.asks?.link ? { href: n.asks.link, label: n.asks.link_label } : null;
   const plainAnswer = plain(result.plain_answer || result.one_line);
   const [first, ...rest] = plainAnswer.split(/(?<=\.)\s+/);
   return (
@@ -113,7 +128,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             ) : n.sold_n > 0 && n.sold_median ? (
               <div><div className="lab">sold for</div><div className="v">{money(n.sold_median)}</div><div className="l"><b>{n.sold_n} sales, same size, any condition.</b>{n.retail_now ? ` ${Math.round(n.sold_pct_of_retail ?? 0)}% of the store price.` : ""}</div></div>
             ) : n.asks ? (
-              <div><div className="lab">sellers want</div><div className="v">{money(n.asks.median_ask)}</div><div className="l"><b>{n.asks.n} listing{n.asks.n === 1 ? "" : "s"}{n.asks.fwrd_n ? " across The RealReal and FWRD Renew" : ""}, none sold yet.</b> Wanting is not getting.</div></div>
+              <div><div className="lab">sellers want</div><div className="v">{money(n.asks.median_ask)}</div><div className="l"><b>{n.asks.n} listing{n.asks.n === 1 ? "" : "s"} on {n.asks.venue}.</b> An ask, not a sale. {n.asks.sold > 0 ? `${n.asks.sold} of this model sold in the last 45 days; none pristine in this exact edition.` : "None of this model has sold in the last 45 days."}{n.asks.link ? <> <a className="asklink" href={n.asks.link} target="_blank" rel="noreferrer">{n.asks.link_label}</a></> : null}</div></div>
             ) : n.trr_sold_90d > 0 ? (
               <div><div className="lab">sales seen</div><div className="v">{n.trr_sold_90d}</div><div className="l"><b>Sizes and finishes mixed.</b> No same-size sale yet.</div></div>
             ) : null}
@@ -135,7 +150,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         <div className="edit">
           <section className="glance">
             <p className="lab">if you read nothing else</p>
-            <ol>{(result.takeaways && result.takeaways.length ? result.takeaways : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}>{plain(t)}</li>)}</ol>
+            <ol>{(result.takeaways && result.takeaways.length ? result.takeaways : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}><Rich text={t} link={askLink} /></li>)}</ol>
           </section>
 
           {(() => {
@@ -210,11 +225,14 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             );
           })()}
 
+          {/* The close, the way a buying committee ends: the instruction first and largest, against before for, and the turn-our-mind line as one quiet italic. Lead words bold; no sentiment colours. */}
           <div className="watch">
-            {result.spec_guidance?.length > 0 && <section><p className="lab">if you do buy</p><ul>{result.spec_guidance.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>}
-            <section><p className="lab">the case for</p><ul>{result.bull_case.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
-            <section><p className="lab">the case against</p><ul>{result.bear_case.slice(0, 2).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
-            <section><p className="lab">what would change our mind</p><ul>{result.what_would_change_this.slice(0, 1).map((b, i) => <li key={i}>{plain(b)}</li>)}</ul></section>
+            {result.spec_guidance?.length > 0 && <section className="do"><p className="lab">if you do buy</p><ul>{result.spec_guidance.slice(0, 2).map((b, i) => <li key={i}><Rich text={b} link={askLink} lead /></li>)}</ul></section>}
+            <div className="forag">
+              <section><p className="lab">the case against</p><ul>{result.bear_case.slice(0, 2).map((b, i) => <li key={i}><Rich text={b} link={askLink} lead /></li>)}</ul></section>
+              <section><p className="lab">the case for</p><ul>{result.bull_case.slice(0, 2).map((b, i) => <li key={i}><Rich text={b} link={askLink} lead /></li>)}</ul></section>
+            </div>
+            {result.what_would_change_this?.length > 0 && <section className="turn"><p className="lab">what would change our mind</p><p className="one"><Rich text={result.what_would_change_this[0]} link={askLink} lead /></p></section>}
           </div>
         </div>
       )}
