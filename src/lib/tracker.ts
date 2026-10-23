@@ -613,15 +613,62 @@ export function bagLinks(house: string, bag: string): { house_url: string | null
 
 
 /** Every bag with a current boutique price, for the Browse page. */
-export type CatalogueRow = { house: string; model: string; retail_now: number | null; sold_pct: number | null; sold_n: number };
+/** "What moved today": a handful of short lines from the tracker for the masthead ticker. Counts and dates, never a promise. */
+export function tickerLines(): string[] {
+  const db = open(); if (!db) return [];
+  const g = <T extends Row>(sql: string): T | undefined => { try { return db.prepare(sql).get() as T | undefined; } catch { return undefined; } };
+  const out: string[] = [];
+  const sold = g<Row>(`select count(*) n from trr_item_reads where sold=1 and read_date >= date('now','-7 days')`);
+  if (sold?.n) out.push(`${Number(sold.n).toLocaleString()} sold listings seen on The RealReal this week`);
+  const asks = g<Row>(`select count(*) n from trr_item_reads where sold=0 and read_date >= date('now','-7 days')`);
+  if (asks?.n) out.push(`${Number(asks.n).toLocaleString()} bags asking right now`);
+  const fwrd = g<Row>(`select count(*) n, max(read_date) d from v_fwrd_latest`);
+  if (fwrd?.n) out.push(`FWRD Renew shelf: ${fwrd.n} vetted pre-owned listings, read ${fwrd.d}`);
+  const lead = g<Row>(`select house, model, sold_pct_of_retail p, n_sold_same_size n from v_sold_vs_retail where n_sold_same_size >= 5 order by sold_pct_of_retail desc limit 1`);
+  if (lead?.p) out.push(`Holding best: ${lead.house} ${lead.model} sold at ${Math.round(lead.p as number)}% of new (${lead.n} sales)`);
+  const drop = g<Row>(`select a.house, a.model, round(100.0*(b.median_ask-a.median_ask)/a.median_ask) pct from resale_aggregates a join resale_aggregates b on a.source=b.source and a.house=b.house and a.model=b.model and a.snapshot_date<b.snapshot_date where a.median_ask>0 order by b.snapshot_date desc, pct asc limit 1`);
+  if (drop?.pct != null && Number(drop.pct) !== 0) out.push(`Sellers ${Number(drop.pct) < 0 ? "dropped" : "raised"} the ${drop.house} ${drop.model} ask ${Math.abs(Number(drop.pct))}% since the last read`);
+  const move = g<Row>(`select headline from people_moves order by id desc limit 1`);
+  if (move?.headline) out.push(`People moves: ${String(move.headline).slice(0, 90)}`);
+  const ev = g<Row>(`select house, family, event_type from buzz_events order by id desc limit 1`);
+  if (ev?.house) out.push(`Buzz: ${ev.house}${ev.family ? ` ${ev.family}` : ""}, ${String(ev.event_type).replace(/_/g, " ")}`);
+  db.close();
+  return out;
+}
+
+/** The hero board: the bag trade's printed things, drawn from today's tracker rows. A plate, a receipt, a window tag, a runway ticket, a clipping. */
+export type BoardPiece = { kind: "plate" | "receipt" | "tag" | "ticket" | "clip"; title: string; lines: string[]; href: string; name?: string };
+export function boardData(): BoardPiece[] {
+  const db = open(); if (!db) return [];
+  const q = <T extends Row>(sql: string): T[] => { try { return db.prepare(sql).all() as T[]; } catch { return []; } };
+  const g = <T extends Row>(sql: string): T | undefined => { try { return db.prepare(sql).get() as T | undefined; } catch { return undefined; } };
+  const ask = (house: string, model: string) => `/?q=${encodeURIComponent(`Is the ${house} ${model} worth buying right now?`)}`;
+  const out: BoardPiece[] = [];
+  const best = g<Row>(`select house, model, matched_size, n_sold_same_size n, sold_pct_of_retail p from v_sold_vs_retail where n_sold_same_size >= 20 order by sold_pct_of_retail desc limit 1`);
+  if (best) out.push({ kind: "plate", name: `${best.house} ${best.model}`, title: `${best.house} ${best.model}${best.matched_size ? ` ${best.matched_size}` : ""}`, lines: [`sold at ${Math.round(Number(best.p))}% of new`, `${best.n} sold listings seen`], href: ask(String(best.house), String(best.model)) });
+  const sold = q<Row>(`select house, model, matched_size, median_sold, n_sold_same_size n from v_sold_vs_retail where n_sold_same_size >= 20 order by n_sold_same_size desc limit 3`);
+  if (sold.length) out.push({ kind: "receipt", title: "the receipts", lines: sold.map((r) => `${r.model}${r.matched_size ? ` ${r.matched_size}` : ""}|$${Math.round(Number(r.median_sold)).toLocaleString()} · ${r.n} seen`), href: "/browse" });
+  const tag = g<Row>(`select house, model, price, source_name from retail_reference where source_name like 'private%' and price_type='current' order by effective_date desc limit 1`)
+    ?? g<Row>(`select house, model, retail_now price, 'boutique' source_name from v_retail_current order by retail_now desc limit 1`);
+  if (tag) out.push({ kind: "tag", title: String(tag.house), lines: [String(tag.model), `$${Math.round(Number(tag.price)).toLocaleString()}`, String(tag.source_name).startsWith("private") ? "boutique window, converted to dollars" : "boutique price today"], href: ask(String(tag.house), String(tag.model)) });
+  const show = g<Row>(`select house, season, look_number, model_guess, show_date from runway_pipeline where look_number is not null order by show_date desc, id desc limit 1`);
+  if (show) out.push({ kind: "ticket", title: String(show.house), lines: [String(show.season).replace(/-/g, " ").replace("ready to wear", "ready-to-wear"), `look ${show.look_number}`, `${show.model_guess ? `${show.model_guess} · ` : ""}shown ${show.show_date}`], href: "/race" });
+  const move = g<Row>(`select tracker_month, headline from people_moves order by id desc limit 1`);
+  if (move) out.push({ kind: "clip", title: "people moves", lines: [String(move.headline), `Vogue Business, ${move.tracker_month}`], href: "/briefs" });
+  db.close();
+  return out;
+}
+
+export type CatalogueRow = { house: string; model: string; retail_now: number | null; sold_pct: number | null; sold_n: number; launch_year: number | null };
 export function catalogue(): CatalogueRow[] {
   const db = open(); if (!db) return [];
   const q = <T extends Row>(sql: string): T[] => { try { return db.prepare(sql).all() as T[]; } catch { return []; } };
   const rows = q<Row>(`select c.house, c.model, min(c.retail_now) retail_now,
        (select sold_pct_of_retail from v_sold_vs_retail s where s.house=c.house and s.model=c.model limit 1) sold_pct,
-       (select n_sold_same_size from v_sold_vs_retail s where s.house=c.house and s.model=c.model limit 1) sold_n
+       (select n_sold_same_size from v_sold_vs_retail s where s.house=c.house and s.model=c.model limit 1) sold_n,
+       (select launch_year from bags b where b.house=c.house and lower(b.model)=lower(c.model) and b.launch_year is not null limit 1) launch_year
      from v_retail_current c group by c.house, c.model
      order by case c.house when 'Hermès' then 0 when 'Chanel' then 1 when 'Louis Vuitton' then 2 when 'Dior' then 3 when 'Bottega Veneta' then 4 when 'The Row' then 5 when 'Loewe' then 6 when 'Celine' then 7 else 9 end, c.house, c.model`);
   db.close();
-  return rows.map((r) => ({ house: r.house as string, model: r.model as string, retail_now: (r.retail_now as number) ?? null, sold_pct: (r.sold_pct as number) ?? null, sold_n: (r.sold_n as number) ?? 0 }));
+  return rows.map((r) => ({ house: r.house as string, model: r.model as string, retail_now: (r.retail_now as number) ?? null, sold_pct: (r.sold_pct as number) ?? null, sold_n: (r.sold_n as number) ?? 0, launch_year: (r.launch_year as number) ?? null }));
 }

@@ -441,3 +441,74 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 .ecard.culture .bz-moments{margin-top:12px}
 .ecard.culture .bz-read{font-size:13px}
 .buzz2{display:none}
+
+/* ===== 2026-10-22 · the studio pass: ticker, catalogue, motion. Craft taken from the reference, identity kept. ===== */
+/* the ticker: what moved today, under the masthead rule */
+.ticker{display:flex;align-items:center;gap:14px;margin-top:8px;overflow:hidden;white-space:nowrap;font-size:15px;color:var(--ink-2)}
+.ticker .tlab{flex:none;font-size:13px;color:var(--ink-3)}
+.ticker .track{flex:1;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.ticker .reel{display:inline-flex;animation:reel 70s linear infinite;will-change:transform}
+.ticker:hover .reel{animation-play-state:paused}
+.ticker .reel i{font-style:normal;margin:0 18px;color:var(--ink-3)}
+@keyframes reel{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* the catalogue (browse): ruled cells, one geometry repeated */
+.filter{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:baseline;justify-content:center;margin:10px auto 18px;max-width:1100px}
+.filter button{background:none;border:0;padding:2px 0;font:inherit;font-size:16px;color:var(--ink-2);border-bottom:1px solid transparent;cursor:pointer}
+.filter button:hover{color:var(--ink)}
+.filter button.on{color:var(--ink);border-bottom-color:var(--ink)}
+.catalogue{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));grid-auto-rows:1fr;max-width:1100px;margin:0 auto;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.cell{position:relative;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 16px 12px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto auto;gap:4px 8px;min-height:310px;text-decoration:none;color:var(--ink);transition:background .3s ease}
+.cell:hover{background:var(--paper-2)}
+.cell .chouse{font-family:var(--serif);font-size:19px;letter-spacing:.02em;line-height:1.1}
+.cell .cfam{text-align:right;align-self:start;font-size:13px;white-space:nowrap}
+.cell .cplate{grid-column:1/-1;justify-self:center;align-self:center;padding:10px 0 6px}
+.cell .cplate .plate{color:var(--ink-2);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+.cell:hover .cplate .plate{transform:scale(1.05)}
+.cell .cmodel{grid-column:1/-1;font-family:var(--serif);font-size:25px;line-height:1.05;margin-bottom:4px}
+.cell .ctags{display:flex;gap:6px;flex-wrap:wrap;align-self:end}
+.cell .ctags em{font-style:normal;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--ink-2);white-space:nowrap}
+.cell .ctags em.good{color:var(--buy);border-color:var(--buy)}
+.cell .ctags em.weak{color:var(--dont);border-color:var(--dont)}
+.cell .cyear{align-self:end;text-align:right;font-size:13px;color:var(--ink-3)}
+@media (max-width:560px){.ticker .tlab{display:none}.catalogue{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.cell{min-height:250px;padding:14px}.cell .chouse{font-size:16px}.cell .cfam{font-size:11px}.cell .cmodel{font-size:20px}.cell .cplate .plate{width:110px;height:auto}}
+
+/* the motion layer: entrances staggered by position (the independent translate property, so the tiles' scale survives), lifts on hover, all still under reduced motion */
+@keyframes rise{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+.answer > *{animation:rise .6s ease both}
+.answer > :nth-child(2){animation-delay:70ms}.answer > :nth-child(3){animation-delay:140ms}.answer > :nth-child(4){animation-delay:210ms}.answer > :nth-child(5){animation-delay:280ms}.answer > :nth-child(6){animation-delay:350ms}.answer > :nth-child(7){animation-delay:420ms}.answer > :nth-child(8){animation-delay:490ms}.answer > :nth-child(n+9){animation-delay:560ms}
+.tiles .tile{animation:rise .5s ease both}.tiles .tile:nth-child(2){animation-delay:80ms}.tiles .tile:nth-child(3){animation-delay:160ms}.tiles .tile:nth-child(4){animation-delay:240ms}
+.catalogue .cell{animation:rise .5s ease both}.catalogue .cell:nth-child(2n){animation-delay:60ms}.catalogue .cell:nth-child(3n){animation-delay:120ms}.catalogue .cell:nth-child(4n){animation-delay:180ms}
+.askpanel{animation:rise .7s ease both}
+.chip,.ecard,.bag,.hbtn,.dial button,.shelfitem{transition:translate .25s ease,background .25s ease,border-color .25s ease,color .25s ease}
+.chip:hover,.ecard:hover,.bag:hover{translate:0 -2px}
+.chip:active,.bag:active{translate:0 0}
+.mast nav a,.mast .right a{background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/0 1px;transition:background-size .3s ease;text-decoration:none}
+.mast nav a:hover,.mast .right a:hover{text-decoration:none;background-size:100% 1px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important}.ticker .reel{animation:none;white-space:normal;flex-wrap:wrap}.ticker .reel span[aria-hidden="true"]{display:none}}
+
+/* the hero board: the bag trade's paper, drawn from today's rows, around the question. Wide screens only. */
+.askpanel{position:relative}
+.askpanel > :not(.board){position:relative;z-index:1}
+.board{position:absolute;top:0;bottom:0;left:calc(50% - 50vw + 28px);right:calc(50% - 50vw + 28px);pointer-events:none;display:none;z-index:0}
+@media (min-width:1300px){.board{display:block}}
+.piece{position:absolute;pointer-events:auto;width:200px;padding:14px 14px 12px;background:var(--paper-2);color:var(--ink);text-decoration:none;outline:1px solid var(--line);outline-offset:-5px;display:flex;flex-direction:column;gap:3px;text-align:left;transition:rotate .4s ease,scale .4s ease,background .4s ease;animation:drift 7s ease-in-out infinite alternate}
+.piece:hover{rotate:0deg;scale:1.03;background:var(--paper)}
+.piece .ptitle{font-family:var(--serif);font-size:17px;line-height:1.1}
+.piece .pline{font-size:13.5px;color:var(--ink-2);line-height:1.3}
+.piece .pbig{font-family:var(--serif);font-size:30px;line-height:1;margin:4px 0 2px}
+.piece .pmid{font-family:var(--serif);font-size:19px;line-height:1.15;margin:2px 0}
+.piece .pfoot{font-size:12px;color:var(--ink-3);font-style:italic;margin-top:4px;line-height:1.3}
+.piece .plate{align-self:center;color:var(--ink-2);margin:2px 0}
+.piece.plate-p{left:0;top:24px;rotate:-5deg}
+.piece.receipt{left:30px;bottom:30px;rotate:3deg;width:220px;background:var(--paper);border-bottom:1px dashed var(--line)}
+.piece.receipt .row{display:flex;justify-content:space-between;gap:10px;font-variant-numeric:tabular-nums}
+.piece.tag{right:36px;top:20px;rotate:6deg;width:172px;padding-top:28px}
+.piece.tag .hole{position:absolute;top:9px;left:50%;width:9px;height:9px;margin-left:-5px;border-radius:50%;border:1px solid var(--line);background:var(--paper)}
+.piece.ticket{right:0;bottom:44px;rotate:-3deg;width:230px}
+.piece.ticket::before{content:"";position:absolute;left:10px;right:10px;top:42px;border-top:1px dashed var(--line)}
+.piece.clip{right:150px;bottom:-14px;rotate:2deg;width:230px;display:none}
+@media (min-width:1500px){.piece.clip{display:flex}}
+@keyframes drift{from{translate:0 0}to{translate:0 -5px}}
+.piece:nth-child(2){animation-delay:-2s}.piece:nth-child(3){animation-delay:-4s}.piece:nth-child(4){animation-delay:-1s}.piece:nth-child(5){animation-delay:-3s}
+:root.forever .piece{background:var(--paper-2)}

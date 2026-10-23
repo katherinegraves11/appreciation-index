@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { HorizonProvider, ModeCorners } from "@/components/Horizon";
+import Ticker from "@/components/Ticker";
 
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="right"><Link href="/briefs">Journal</Link><Link href="/classic">Analyst</Link></div>
             </header>
             <div className="rule" />
+            <Ticker />
             <svg className="orn" viewBox="0 0 150 14" fill="none" stroke="currentColor" strokeWidth="1" aria-hidden="true"><path d="M2 7h50M98 7h50" /><path d="M60 7c4-6 10-6 15 0c5 6 11 6 15 0" /><circle cx="75" cy="7" r="1.6" fill="currentColor" /><circle cx="55" cy="7" r="1" fill="currentColor" /><circle cx="95" cy="7" r="1" fill="currentColor" /></svg>
             {children}
           </div>

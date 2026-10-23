@@ -1,6 +1,6 @@
 import Ask, { type Done } from "@/components/Ask";
 import { getBrief } from "@/lib/db";
-import { quickNumbers } from "@/lib/tracker";
+import { quickNumbers, boardData } from "@/lib/tracker";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ b
   }
   return (
     <main>
-      <Ask initial={initial} />
+      <Ask initial={initial} board={initial ? [] : boardData()} />
     </main>
   );
 }
