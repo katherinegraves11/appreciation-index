@@ -59,7 +59,7 @@ export function dataFlow(today = new Date()): FlowRow[] {
   const d30 = iso(new Date(today.getTime() - 30 * 864e5)), d7 = iso(new Date(today.getTime() - 7 * 864e5)), d3 = iso(new Date(today.getTime() - 3 * 864e5));
   const feeds: [DatabaseSync | null, string, string, string][] = [
     [db, "The RealReal tiles (asks, saves, sold)", "trr_item_reads", "read_date"],
-    [db, "Dealer listings (asks)", "resale_listings", "substr(last_seen,1,10)"],
+    [db, "Secondhand sourcer listings (asks)", "resale_listings", "substr(last_seen,1,10)"],
     [db, "Resale ask snapshots", "resale_aggregates", "snapshot_date"],
     [db, "FWRD Renew shelf (asks)", "fwrd_renew_reads", "read_date"],
     [db, "Search and social reads", "buzz_reads", "read_date"],

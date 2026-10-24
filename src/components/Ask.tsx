@@ -128,7 +128,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
         <div className="thinking" aria-live="polite">
           <div className="dots"><span /><span /><span /></div>
           <p>{status}</p>
-          <p className="k">about three minutes · it reads the tracker first, then searches only for what is missing</p>
+          <p className="k">about three minutes · checking what this bag sells for, what sellers are asking, and where it is heading</p>
         </div>
       )}
       {error && <div className="status error" role="alert">{error}</div>}

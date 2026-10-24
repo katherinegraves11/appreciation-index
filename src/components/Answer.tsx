@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { BriefResult } from "@/lib/schema";
 import type { QuickNumbers } from "@/lib/tracker";
-import { toCards, toSignals, INTENT_LABEL } from "@/lib/cards";
+import { toCards, toSignals, INTENT_LABEL, SECTION_SOURCES } from "@/lib/cards";
 import BagPlate, { seeItLinks } from "./BagPlate";
 
 const WORD: Record<string, string> = { yes: "Yes", no: "No", wait: "Not yet" };
@@ -131,11 +131,12 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             ) : n.sold_n > 0 && n.sold_median ? (
               <div><div className="lab">sold for</div><div className="v">{money(n.sold_median)}</div><div className="l"><b>{n.sold_n} sales, same size, any condition.</b>{n.retail_now ? ` ${Math.round(n.sold_pct_of_retail ?? 0)}% of the store price.` : ""}</div></div>
             ) : n.asks && !n.tiers?.sites_asks ? (
-              <div><div className="lab">sellers want</div><div className="v">{money(n.asks.median_ask)}</div><div className="l"><b>{n.asks.n} listing{n.asks.n === 1 ? "" : "s"} on {n.asks.venue}.</b> An ask, not a sale. {n.asks.sold > 0 ? `${n.asks.sold} of this model sold, all colours and sizes; none we can see in this exact colour and finish.` : "None of this model sold in our recent reads."}{n.asks.link ? <> <a className="asklink" href={n.asks.link} target="_blank" rel="noreferrer">{n.asks.link_label}</a></> : null}</div></div>
+              <div><div className="lab">sellers want</div><div className="v">{money(n.asks.median_ask)}</div><div className="l"><b>{n.asks.n} listing{n.asks.n === 1 ? "" : "s"} on {n.asks.venue}.</b> An ask, not a sale. {n.asks.sold > 0 ? `${n.asks.sold} of this model sold, all colours and sizes.` : "Priced from asking prices."}{n.asks.link ? <> <a className="asklink" href={n.asks.link} target="_blank" rel="noreferrer">{n.asks.link_label}</a></> : null}</div></div>
             ) : n.trr_sold_90d > 0 ? (
               <div><div className="lab">sales seen</div><div className="v">{n.trr_sold_90d}</div><div className="l"><b>Sizes and finishes mixed.</b> No same-size sale yet.</div></div>
             ) : null}
             {n.tiers?.sites_asks && (() => { const t = n.tiers.sites_asks; return <div><div className="lab">websites ask, on average</div><div className="v">{money(t.mean)}</div><div className="l"><b>{t.n} listing{t.n === 1 ? "" : "s"}, {t.matched}.</b> Asks, not sales, from {t.sources.join(", ")}. {t.n > 1 ? `${money(t.lo)} to ${money(t.hi)}.` : ""}{n.asks?.link && t.sources.includes("The RealReal") ? <> <a className="asklink" href={n.asks.link} target="_blank" rel="noreferrer">{n.asks.link_label}</a></> : null}</div></div>; })()}
+            {n.tiers?.sourcer_sold && (() => { const t = n.tiers.sourcer_sold; return <div><div className="lab">sourcers sold, on average</div><div className="v">{money(t.mean)}</div><div className="l"><b>{t.n} sold through secondhand sourcers.</b> At their listed price, from {t.sources.join(", ")}. {t.n > 1 ? `${money(t.lo)} to ${money(t.hi)}.` : ""}</div></div>; })()}
             {n.tiers?.private_quotes && (() => { const p = n.tiers.private_quotes; return <div><div className="lab">private sourcers, on average</div><div className="v">{money(p.mean)}</div><div className="l"><b>{p.n} quote{p.n === 1 ? "" : "s"} logged{p.n < 3 ? ", too few to call an average" : ""}.</b> Sourcers set their own price, so buyers pay more here.</div></div>; })()}
             {n.retail_now && <div><div className="lab">new, from the boutique</div><div className="v">{money(n.retail_now)}</div><div className="l"><b>The one fixed price{n.retail_size ? `, ${n.retail_size}` : ""}.</b>{n.retail_launch && n.retail_launch !== n.retail_now ? ` Was ${money(n.retail_launch)} at launch.` : ""}</div></div>}
             {!n.tiers?.sites_asks && n.asks?.fwrd_n && n.asks.fwrd_median ? <div><div className="lab">the FWRD Renew shelf</div><div className="v">{money(n.asks.fwrd_median)}</div><div className="l"><b>{n.asks.fwrd_n} vetted pre-owned listing{n.asks.fwrd_n === 1 ? "" : "s"} this week.</b> An asking price, not a sale, from a seller whose pricing we trust.</div></div> : null}
@@ -186,19 +187,20 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             /** The one or two sentences of a note that answer the line, not the whole paragraph. */
             const pick = (t: string, re: RegExp, max = 200) => { const parts = strip(t).split(/(?<=[.;])\s+/); const hit = parts.filter((x) => re.test(x)); const list = hit.length ? hit : parts; let out = list[0] ?? ""; if (list[1] && (out + " " + list[1]).length <= max) out += " " + list[1]; return out; };
             const cult = cards.find((c) => c.key === "culture");
-            const mood = !b ? "no read yet" : over ? "turning" : growth && growth.value > 15 ? "rising" : "quiet";
+            const mood = !b ? "no gossip yet" : over ? "cooling off" : growth && growth.value > 15 ? "buzzing" : "quiet";
             const cultureCard = (
               <article className={`ecard culture ${!b ? "mixed" : over ? "weak" : growth && growth.value > 15 ? "strong" : "mixed"}`}>
-                <header><h4><Glyph kind="chat" />What people are saying</h4><span className="stamp">{mood}</span></header>
-                <p className="h"><b>{b ? (over ? `Some posts say ${bagShort} has peaked.` : growth && growth.value > 15 ? `Searches for “${growth.term}” up ${Math.round(growth.value)}% this week, against the month before.` : `A quiet week for ${house}.`) : `Nobody's said a word about ${house} yet.`}</b></p>
+                <header><h4><Glyph kind="chat" />The group chat</h4><span className="stamp">{mood}</span></header>
+                <p className="from"><b>{SECTION_SOURCES.culture.about}</b> From {SECTION_SOURCES.culture.from.replace(/^./, (x) => x.toLowerCase())}</p>
+                <p className="h"><b>{b ? (over ? `The chat says ${bagShort} might be having its moment, then moving on.` : growth && growth.value > 15 ? `Searches for “${growth.term}” up ${Math.round(growth.value)}% this week, against the month before.` : `Quiet week in the chat for ${house}.`) : `The chat hasn't found ${house} yet.`}</b></p>
                 {cult && <p className="so">{plain(cult.soWhat ?? cult.headline)}</p>}
                 {b && (
                   <details>
-                    <summary><Glyph kind="chat" />the chat</summary>
+                    <summary><Glyph kind="chat" />read the chat</summary>
                     <dl className="bz-lines">
-                      <div><dt>Fading?</dt><dd>{over ? pick(over.note, /deinfluenc|moved on|had its moment|backlash|over\b/i) : trendsForHouse.length ? `Not that we can see. ${pick(trendsForHouse[0].note, new RegExp(house.split(" ")[0], "i"))}` : `No one is calling ${house} over this week.`}</dd></div>
+                      <div><dt>Is it over?</dt><dd>{over ? pick(over.note, /deinfluenc|moved on|had its moment|backlash|over\b/i) : trendsForHouse.length ? `Not that we can see. ${pick(trendsForHouse[0].note, new RegExp(house.split(" ")[0], "i"))}` : `No one is calling ${house} over this week.`}</dd></div>
                       <div><dt>Who&apos;s carrying it</dt><dd>{carrying && new RegExp(house.split(" ")[0], "i").test(carrying.note) ? `${pick(carrying.note, new RegExp(house.split(" ")[0], "i"), 160)} One feed, not a survey.` : "We don't track who is carrying this bag yet."}</dd></div>
-                      <div><dt>Dupes</dt><dd>{dupe ? (new RegExp(house.split(" ")[0], "i").test(pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160)) ? pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160) : `Dupes and deinfluencing are circulating among younger buyers. Nothing aimed at ${house} this week.`) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
+                      <div><dt>The dupe situation</dt><dd>{dupe ? (new RegExp(house.split(" ")[0], "i").test(pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160)) ? pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160) : `Dupes and deinfluencing are circulating among younger buyers. Nothing aimed at ${house} this week.`) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
                       <div><dt>Where it lives online</dt><dd>{bagTags.length ? bagTags.slice(0, 3).map((t) => `#${t.term} (${Math.round(t.value).toLocaleString()} posts)`).join(", ") : houseTags.length ? `No tag of its own yet. The house's: ${houseTags.slice(0, 2).map((t) => `#${t.term} (${Math.round(t.value) >= 1e6 ? (t.value / 1e6).toFixed(1) + "M" : Math.round(t.value / 1000) + "K"})`).join(", ")}.` : `No hashtag of its own yet; ${house}'s tags carry it.`}</dd></div>
                     </dl>
                     {b.events.filter((e) => !/fashion month on Instagram/i.test(e.note)).length > 0 && (
@@ -215,6 +217,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             const headingCard = f && f.signals.length > 0 ? (
               <article className={`ecard ${f.lean === "rising" ? "strong" : f.lean === "cooling" ? "weak" : "mixed"}`}>
                 <header><h4><Glyph kind="anchor" />Where it&apos;s heading</h4><span className="stamp">{LEANW[f.lean]}</span></header>
+                <p className="from"><b>Which way this bag&apos;s numbers are moving.</b> From five years of weekly Google searches, the boutique price history, resale asking-price snapshots, and auction results from Bonhams and Artcurial.</p>
                 <p className="h"><b>{f.lean === "rising" ? "Trends point up" : f.lean === "cooling" ? "Trends point down" : f.lean === "mixed" ? "Trends pull both ways" : "Trends are flat"}{f.confidence === "low" ? ", an early read" : ""}.</b></p>
                 {f.nextBoutique && <p className="so">On its current pace the boutique price reaches about {money(f.nextBoutique.price)} by {f.nextBoutique.date}.</p>}
                 <details>
@@ -239,6 +242,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
               return (
                 <article key={c.key} className={`ecard ${c.mood}`}>
                   <header><h4>{c.title}</h4><span className="stamp">{c.mood === "strong" ? "good sign" : c.mood === "weak" ? "weak spot" : "mixed"}</span></header>
+                  {c.about && <p className="from"><b>{c.about}</b> From {c.from?.replace(/^./, (x) => x.toLowerCase())}{c.evidence.length ? ` Cited in this answer: ${[...new Set(c.evidence.map((e) => e.source).filter(Boolean))].slice(0, 5).join(", ")}.` : ""}</p>}
                   <p className="h"><b>{plain(c.soWhat ?? c.headline).replace(/\.$/, "")}.</b></p>
                   {c.soWhat && <p className="so">{plain(c.headline)}</p>}
                   {(proof || more.length > 0 || c.more) && (

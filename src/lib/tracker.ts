@@ -256,7 +256,7 @@ export function buildTrackerDossier(house: string, bag: string, spec?: string): 
     ]),
   );
 
-  // 6b. Dealer listings in the same material (resale_listings: Privé Porter, Madison Avenue Couture, Fashionphile, Rebag, dealers read one page at a time).
+  // 6b. Secondhand sourcer listings in the same material (resale_listings: Privé Porter, Madison Avenue Couture, Fashionphile, Rebag, dealers read one page at a time).
   // Asks unless marked sold; private-sourcer-offer rows are Katie's own quotes and never appear here.
   {
     const MATERIALS = ["doblis", "suede", "crocodile", "croc", "alligator", "ostrich", "lizard", "shearling", "grizzly", "barenia", "box calf", "chevre", "swift", "epsom", "togo", "clemence", "evercolor", "tadelakt"];
@@ -284,8 +284,8 @@ export function buildTrackerDossier(house: string, bag: string, spec?: string): 
         return notes.length ? ` [${notes.join("; ")}]` : "";
       };
       if (use.length) {
-        out.push(section(`Dealer listings in the same material (${mats.join(", ")}${sizeN ? `; size ${sizeN} first, then other sizes for context` : ""}). These are ASKS. "gone" means the dealer marked it sold or sold out: the price paid and the date are unknown. Use these, not plain-leather sales, for any counter on a ${mats.join("/")} quote, and state the size, hardware and condition of each comp you cite.`,
-          use.map((r) => `${r.available === 0 ? "gone at last ask" : "ask"} $${r.price} · ${r.source} · ${r.title}${tag(r)} · seen ${r.last_seen}${String(r.handle_url ?? "").startsWith("http") ? ` (${r.handle_url})` : ""}`)));
+        out.push(section(`Secondhand sourcer listings in the same material (${mats.join(", ")}${sizeN ? `; size ${sizeN} first, then other sizes for context` : ""}). These are ASKS unless marked SOLD; SOLD means the secondhand sourcer marked it placed or sold out at that listed price (count it as a sale). Use these, not plain-leather sales, for any counter on a ${mats.join("/")} quote, and state the size, hardware and condition of each comp you cite.`,
+          use.map((r) => `${r.available === 0 ? "SOLD by the sourcer, at listed" : "ask"} $${r.price} · ${r.source} · ${r.title}${tag(r)} · seen ${r.last_seen}${String(r.handle_url ?? "").startsWith("http") ? ` (${r.handle_url})` : ""}`)));
       }
     }
   }
@@ -347,7 +347,7 @@ export type QuickNumbers = {
 /** Katie's rule: the boutique price is the only absolute price; every secondhand figure is an average.
  *  Secondhand websites (sold and asked) and the private sourcer market (where the sourcer sets the price) are kept apart. */
 export type Avg = { mean: number; median: number; n: number; lo: number; hi: number };
-export type PriceTiers = { material: string | null; size: string | null; sites_asks: (Avg & { sources: string[]; matched: string }) | null; private_quotes: (Avg & { prices: number[] }) | null } | null;
+export type PriceTiers = { material: string | null; size: string | null; sites_asks: (Avg & { sources: string[]; matched: string }) | null; sourcer_sold: (Avg & { sources: string[] }) | null; private_quotes: (Avg & { prices: number[] }) | null } | null;
 /** SQL fragment + params requiring every meaningful word of the bag name to appear in a column (no first-word guessing). */
 /** TRR model column for a bag: model_guess, plus the title when the bag is a Hermès sub-model (TRR tags a Kelly Cut as "Kelly"). */
 function trrModelCol(bag: string): string {
@@ -466,6 +466,7 @@ export function priceTiers(house: string, bag: string, spec?: string): PriceTier
   const dealer = q<Row>(`select source, title, price from resale_listings where ${likeAny("brand", hTerms)} ${like} and available=1 and price > 0 and source <> 'private-sourcer-offer' and last_seen >= date('now','-60 days')`, [...likeParams(hTerms), ...lp]);
   const trr = q<Row>(`select slug, title, price from trr_item_reads where ${likeAny("house", hTerms)} ${like} and sold=0 and price > 0 and read_date >= date('now','-45 days')`, [...likeParams(hTerms), ...lp]);
   const fwrd = q<Row>(`select title, price from v_fwrd_latest where ${likeAny("house", hTerms)} ${like} and price > 0`, [...likeParams(hTerms), ...lp]);
+  const placed = q<Row>(`select source, title, price from resale_listings where ${likeAny("brand", hTerms)} ${like} and available=0 and price > 0 and source <> 'private-sourcer-offer'`, [...likeParams(hTerms), ...lp]);
   const priv = q<Row>(`select title, price from resale_listings where source='private-sourcer-offer' and ${likeAny("brand", hTerms)} ${like} and price > 0`, [...likeParams(hTerms), ...lp]);
   db.close();
   const keep = (t: string) => sizeOk(t) && matOk(t) && exoticOk(t) && subOk(t);
@@ -480,6 +481,7 @@ export function priceTiers(house: string, bag: string, spec?: string): PriceTier
   return {
     material, size,
     sites_asks: a ? { ...a, sources: [...new Set(asks.map((x) => NAME[x.src] ?? x.src))], matched: [size ? `size ${size}` : "", material ? material : "any leather"].filter(Boolean).join(", ") } : null,
+    sourcer_sold: (() => { const k = placed.filter((r) => keep(String(r.title))); const a2 = avg(k.map((r) => Number(r.price))); return a2 ? { ...a2, sources: [...new Set(k.map((r) => NAME[String(r.source)] ?? String(r.source)))] } : null; })(),
     private_quotes: pq ? { ...pq, prices: priv.filter((r) => keep(String(r.title))).map((r) => Number(r.price)) } : null,
   };
 }
@@ -490,14 +492,14 @@ export function headlineNumbers(house: string, bag: string, spec?: string): stri
   if (n.retail_now) lines.push(`Boutique price today: $${n.retail_now}${n.retail_size ? ` (${n.retail_size})` : ""}${n.retail_launch && n.retail_launch !== n.retail_now ? `; was $${n.retail_launch} at launch` : ""}.`);
   if (n.sell) lines.push(`SOLD PRICE TO QUOTE: $${n.sell.median_sold} median (range $${n.sell.lo}-$${n.sell.hi}), ${n.sell.n} sold listings in excellent condition or better (${n.sell.pristine} graded pristine), seen on The RealReal in reads from ${n.sell.read_from} to ${n.sell.read_to}; sale dates are unknown, so say "sold listings seen", never "sales in the last N days". Matched on: ${n.sell.matched_on}. ${n.sell.plain ? `IMPORTANT: these are PLAIN ${bag} sales, NOT the leather/colour/finish asked about. Say exactly that ("plain ${bag}s, not this leather") and never call them the same edition or name a leather they were not.` : ""} Against $${n.sell.retail} retail (${n.sell.retail_spec}). Never call these pristine. Never quote a single outlier sale as the sold price.`);
   else if (n.sold_n) lines.push(`SOLD PRICE TO QUOTE: $${n.sold_median} median, ${n.sold_n} same-size sales (any condition), ${n.sold_pct_of_retail}% of today's retail.`);
-  else if (n.asks) lines.push(`No sold price to quote in this exact edition. The model itself does sell: ${n.asks.sold} sold listings of this model seen in recent reads of The RealReal (all colours, sizes and leathers; sale dates unknown)${n.trr_sold_90d ? `, ${n.trr_sold_90d} in 90 days` : ""}. Sellers want $${n.asks.median_ask}: ${n.asks.n} listing${n.asks.n === 1 ? "" : "s"} on ${n.asks.venue}, an ask, not a sale. RULES: never write "no confirmed sale" on its own; in the same sentence say how many of the model have sold (e.g. "Fourteen Sardines sold; none yet in this turquoise mini"). Whenever you quote this asking price, name the venue, call it an ask, and put the token [[ask-link]] immediately after the dollar figure (the page turns it into a link to the listing).`);
+  else if (n.asks) lines.push(`This exact edition is priced from asks here. The model itself sells: ${n.asks.sold} sold listings of this model seen in recent reads of The RealReal (all colours, sizes and leathers; sale dates unknown)${n.trr_sold_90d ? `, ${n.trr_sold_90d} in 90 days` : ""}. Sellers want $${n.asks.median_ask}: ${n.asks.n} listing${n.asks.n === 1 ? "" : "s"} on ${n.asks.venue}, an ask, not a sale. RULES: say what the price rests on and how many of the model sold (e.g. "Fourteen Sardines sold; this turquoise mini is priced from two asks"); never claim this edition has not sold. Whenever you quote this asking price, name the venue, call it an ask, and put the token [[ask-link]] immediately after the dollar figure (the page turns it into a link to the listing).`);
   if (n.ask_median) lines.push(`Asking median: $${n.ask_median} across ${n.ask_n} listings (asks, not sales).`);
   if (n.asks?.fwrd_n && n.asks.fwrd_median) lines.push(`FWRD Renew (vetted pre-owned, a trusted price reference; asks, not sales): $${n.asks.fwrd_median} median across ${n.asks.fwrd_n} listings this week.`);
   if (n.path) lines.push(`Retail path: $${n.path.from_price} (${n.path.from_date}) → $${n.path.to_price} (${n.path.to_date}).`);
   {
     const t = n.tiers; const parts: string[] = [];
     parts.push(`(1) Boutique price, the only absolute price: ${n.retail_now ? `$${n.retail_now}${n.retail_size ? ` (${n.retail_size})` : ""}` : "not in our records"}.`);
-    parts.push(`(2) Secondhand websites, averages: ${n.sell ? `sold, average $${n.sell.mean_sold} (median $${n.sell.median_sold}) across ${n.sell.n} sold listings${n.sell.plain ? ", plain leather, not the one asked about" : ""}` : "no matching sold listings"}; ${t?.sites_asks ? `asking, average $${t.sites_asks.mean} (median $${t.sites_asks.median}, $${t.sites_asks.lo} to $${t.sites_asks.hi}) across ${t.sites_asks.n} listings matched on ${t.sites_asks.matched}, from ${t.sites_asks.sources.join(", ")}` : "no matching asks"}.`);
+    parts.push(`(2) Secondhand websites, averages: ${n.sell ? `sold, average $${n.sell.mean_sold} (median $${n.sell.median_sold}) across ${n.sell.n} sold listings${n.sell.plain ? ", plain leather, not the one asked about" : ""}` : "no matching sold listings"}; ${t?.sites_asks ? `${t?.sourcer_sold ? `sold through secondhand sourcers (marked placed or sold out, at their listed price), average $${t.sourcer_sold.mean} across ${t.sourcer_sold.n}, from ${t.sourcer_sold.sources.join(", ")}; ` : ""}asking, average $${t.sites_asks.mean} (median $${t.sites_asks.median}, $${t.sites_asks.lo} to $${t.sites_asks.hi}) across ${t.sites_asks.n} listings matched on ${t.sites_asks.matched}, from ${t.sites_asks.sources.join(", ")}` : "no matching asks"}.`);
     parts.push(`(3) Private sourcer market (the sourcer sets the price; willingness to pay runs higher): ${t?.private_quotes ? `average $${t.private_quotes.mean} across ${t.private_quotes.n} logged quote${t.private_quotes.n === 1 ? "" : "s"}${t.private_quotes.n < 3 ? ", too few to call an average" : ""}` : "no logged quotes for this bag"}.`);
     lines.push(`THREE PRICES: ${parts.join(" ")} Say every secondhand figure as an average with its count ("averages $21,300 across 25 sold listings"); never call a secondhand figure "the price".`);
   }
