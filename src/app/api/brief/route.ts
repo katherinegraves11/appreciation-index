@@ -1,3 +1,4 @@
+import { checkSpend } from "@/lib/limits";
 import { BriefInput } from "@/lib/schema";
 import { runResearch } from "@/lib/research";
 import { runScoring } from "@/lib/score";
@@ -23,6 +24,8 @@ export async function POST(req: Request) {
     });
   }
   const input = parsed.data;
+  const refused = checkSpend(req, "ask");
+  if (refused) return Response.json({ error: refused }, { status: 429 });
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream<Uint8Array>({

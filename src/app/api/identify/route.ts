@@ -1,3 +1,4 @@
+import { checkSpend } from "@/lib/limits";
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { anthropic } from "@/lib/anthropic";
@@ -24,6 +25,8 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => null)) as { image?: string } | null;
   const m = body?.image?.match(/^data:(image\/(?:jpeg|png|webp|gif));base64,(.+)$/);
   if (!m) return Response.json({ error: "Send a JPEG, PNG or WebP photo." }, { status: 400 });
+  const refused = checkSpend(req, "identify");
+  if (refused) return Response.json({ error: refused }, { status: 429 });
   const [, mediaType, data] = m;
   if (data.length > 6_000_000) return Response.json({ error: "That photo is too large. Try a smaller one." }, { status: 413 });
   try {

@@ -6,9 +6,9 @@ export default function About() {
         <h3 className="ah">The four signals</h3>
         <p className="asub">Every answer gives one of these for each: <b className="b">Buy</b> do it · <b className="w">Wait</b> not yet · <b className="d">Don&apos;t</b> not for this.</p>
         <div className="abox4">
-          <div className="abox"><h4>Sell within a year</h4><p>Buy now, resell by next year.</p><p className="when"><b>Buy when</b> real sales beat the new price and bags sell fast.</p></div>
-          <div className="abox"><h4>Hold five years</h4><p>Buy now, sell around 2031.</p><p className="when"><b>Buy when</b> resale keeps 85%+ of the new price and demand has lasted.</p></div>
-          <div className="abox"><h4>Keep ten years</h4><p>Buy and keep.</p><p className="when"><b>Buy when</b> it&apos;s a true icon with a price history to prove it.</p></div>
+          <div className="abox"><h4>Sell within a year</h4><p>If you sold it within a year.</p><p className="when"><b>Buy when</b> real sales beat the new price and bags sell fast.</p></div>
+          <div className="abox"><h4>Hold five years</h4><p>If you kept it about five years.</p><p className="when"><b>Buy when</b> resale keeps 85%+ of the new price and demand has lasted.</p></div>
+          <div className="abox"><h4>Keep ten years</h4><p>If you kept it ten years or more.</p><p className="when"><b>Buy when</b> it&apos;s a true icon with a price history to prove it.</p></div>
           <div className="abox"><h4>Just to wear</h4><p>Buy to use. Value second.</p><p className="when"><b>Buy</b> almost always. <b>Wait</b> if a price rise is near.</p></div>
         </div>
         <h3 className="ah">The dial <span className="dim">(1 · 5 · 10 years)</span></h3>
@@ -26,7 +26,7 @@ export default function About() {
           <div className="abox"><h4>House</h4><p>Stable, growing, owns its workshops? Built-in scarcity lasts; marketed scarcity doesn&apos;t.</p></div>
         </div>
         <div className="abox2">
-          <div className="abox"><h4>The culture board</h4><p>What TikTok and Instagram are saying about the bag: the hashtags people post, what is going viral, and the moments people are talking about. Counts only; no posts or people are stored.</p></div>
+          <div className="abox"><h4>The culture board</h4><p>What TikTok and Instagram are saying about the bag: the hashtags people post, how searches for the bag are moving, and the moments people are talking about. Counts only; no posts or people are stored. The Trends page shows how much of this we have read so far.</p></div>
           <div className="abox"><h4>Ask by photo</h4><p>Drop a photo or a listing screenshot. We name the bag, you confirm, and the answer runs. Photos are read once and not kept.</p></div>
           <div className="abox"><h4>The race</h4><p>Houses on one board. <b>Up</b> = sells faster right now. <b>Right</b> = bags sold closer to the store price. Low on the board means resale pays less, not that prices are falling.</p></div>
           <div className="abox"><h4>Where the numbers come from</h4><p>Sales and asks: The RealReal, Fashionphile, Rebag, Madison Avenue Couture, Privé Porter, the auction houses. New prices: the houses and the guides that track them. Runway: Vogue. People and money: Vogue Business. Every number keeps its source.</p></div>

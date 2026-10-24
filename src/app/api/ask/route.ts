@@ -1,3 +1,4 @@
+import { checkSpend } from "@/lib/limits";
 import { parseQuestion } from "@/lib/parse";
 import { runResearch } from "@/lib/research";
 import { runScoring } from "@/lib/score";
@@ -25,6 +26,9 @@ export async function POST(req: Request) {
   const fresh = !!body?.fresh || /\b(fresh|again|update|latest|re-?run|refresh)\b/i.test(body?.question ?? "");
   const question = (body?.question ?? "").trim();
   if (question.length < 3) return new Response(JSON.stringify({ error: "Ask about a bag." }), { status: 400, headers: { "content-type": "application/json" } });
+  if (question.length > 1200) return Response.json({ error: "That's a long question. Ask it in a few sentences." }, { status: 413 });
+  const refused = checkSpend(req, "ask");
+  if (refused) return Response.json({ error: refused }, { status: 429 });
   if (new URL(req.url).searchParams.get("stream") !== "1") {
     const job = startJob(question, Number(body?.horizon ?? 1) || 1, fresh);
     return Response.json({ job: job.id });

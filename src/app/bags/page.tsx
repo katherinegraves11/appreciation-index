@@ -36,11 +36,11 @@ export default async function Bags() {
                 <div><p className="lab">{new Date(b.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p><h3>{b.house} <i>{shortName(b.bag)}</i></h3>{shortName(b.bag) !== b.bag && <p className="spec">{b.bag}</p>}</div>
                 <span className="tag">{b.result.call}</span><BagPlate name={`${b.house} ${b.bag}`} size={72} className="cplate" />
               </div>
-              <p className="line">{b.result.plain_answer || b.result.one_line}</p>
+              <p className="line">{(b.result.plain_answer || b.result.one_line || "").replace(/\s*\[\[ask-link\]\]/g, "")}</p>
               <ul className="mini">
                 {sig.map((s) => <li key={s.intent} className={s.verdict}><b>{W[s.verdict]}</b><span>{s.intent === "flip_1y" ? "sell in a year" : s.intent === "hold_5y" ? "hold 5" : s.intent === "hold_10y" ? "keep 10" : "wear"}</span></li>)}
               </ul>
-              {b.result.timing && <p className="meta">{b.result.timing}</p>}
+              {b.result.timing && <p className="meta">{b.result.timing.replace(/\s*\[\[ask-link\]\]/g, "")}</p>}
             </Link>
           );
         })}

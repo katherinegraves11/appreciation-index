@@ -30,7 +30,6 @@ export default function BriefView({ brief }: { brief: BriefRecord }) {
 
       <div className="callbar">
         <span className="call">{r.call}</span>
-        <span className="composite">{r.composite}<span className="k"> / 100</span></span>
         <span className={`tag ${r.confidence}`}>Confidence {r.confidence}</span>
       </div>
       <p className="lede" style={{ marginTop: 18 }}>{r.one_line}</p>
@@ -116,10 +115,6 @@ export default function BriefView({ brief }: { brief: BriefRecord }) {
         </>
       )}
 
-      <details>
-        <summary>Research dossier (raw notes the score was built from)</summary>
-        <pre className="dossier">{brief.dossier}</pre>
-      </details>
 
       <p className="disclaimer">{r.disclaimer}</p>
     </article>

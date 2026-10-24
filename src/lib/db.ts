@@ -28,7 +28,7 @@ const supabase = url && key ? createClient(url, key, { auth: { persistSession: f
 
 // Local-file fallback for dev without Supabase. Durable on a laptop; NOT durable on serverless hosts.
 // (A plain in-memory Map does not work in `next dev`: the API route and the page are separate module instances.)
-const DATA_DIR = path.join(process.cwd(), ".data", "briefs");
+const DATA_DIR = process.env.BRIEFS_DIR ? path.resolve(process.env.BRIEFS_DIR) : path.join(process.cwd(), ".data", "briefs");
 function ensureDir() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }

@@ -9,10 +9,10 @@ import BagPlate, { seeItLinks } from "./BagPlate";
 const WORD: Record<string, string> = { yes: "Buy", no: "Don't", wait: "Wait" };
 const CLS: Record<string, string> = { yes: "buy", no: "dont", wait: "wait" };
 const DEF: Record<string, string> = {
-  flip_1y: "Buy now, sell by this time next year.",
-  hold_5y: "Buy now, sell around 2031.",
-  hold_10y: "Buy now and keep. Only shapes the house has made for decades earn this.",
-  wear: "Buy to use. Value comes second.",
+  flip_1y: "If you sold it within a year.",
+  hold_5y: "If you kept it about five years.",
+  hold_10y: "If you kept it ten years or more.",
+  wear: "If you bought it to use.",
 };
 const GLYPH: Record<string, React.ReactNode> = {
   flip_1y: <><path d="M8 20h32l-3 20H11z" /><path d="M16 20c0-8 16-8 16 0" /><path d="M36 10l4 4-4 4" /><path d="M8 14h32" /></>,
@@ -120,11 +120,11 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         <>
           <p className="lab stripcap"><Glyph kind="ledger" /><span className="h1txt">the receipts · what actually changed hands</span><span className="h5h10txt">the long receipts · what has held</span></p>
           <div className="strip">
-            {n.sell && (() => { const sl = n.sell; const rate = payoutRate(sl.median_sold); const net = Math.round(sl.median_sold * rate - sl.retail); return (
+            {n.sell && (() => { const sl = n.sell; const rate = payoutRate(sl.median_sold); const net = Math.round(sl.median_sold * rate - sl.retail); return sl.plain ? null : (
               <div className={`sell ${net >= 0 ? "up" : "down"}`}><div className="lab">buy at the boutique, resell now</div><div className="v">{net >= 0 ? "+" : "−"}{money(Math.abs(net))}</div><div className="l"><b>Pay {money(sl.retail)}.</b> {sl.plain ? "Plain ones, not this leather," : "Ones in excellent condition or better"} sold for {money(sl.median_sold)} ({sl.n} sold listings seen on The RealReal, {money(sl.lo)} to {money(sl.hi)}). After The RealReal&apos;s {Math.round((1 - rate) * 100)}%, you keep about {money(Math.abs(net))} {net >= 0 ? "more" : "less"} than you paid. {/(hermès|hermes|chanel)/i.test(bagName) ? "Getting one is the hard part." : ""}</div></div>
             ); })()}
             {n.sell ? (
-              <div><div className="lab">sold for</div><div className="v">{money(n.sell.median_sold)}</div><div className="l"><b>{n.sell.plain ? "Plain, not this leather. " : ""}Excellent or better. {n.sell.n} sold listings seen, {money(n.sell.lo)} to {money(n.sell.hi)}.</b> The RealReal shows no sale dates. {n.sold_n > 0 && n.sold_median ? `All conditions, all time: ${money(n.sold_median)} (${n.sold_n}).` : ""}</div></div>
+              <div><div className="lab">sold for</div><div className="v">{money(n.sell.median_sold)}</div><div className="l"><b>{n.sell.plain ? "Plain, not this leather. " : ""}Excellent or better. {n.sell.n} sold listings seen, {money(n.sell.lo)} to {money(n.sell.hi)}.</b> The RealReal shows no sale dates. {n.sold_n > 0 && n.sold_median ? `All conditions and colours: ${money(n.sold_median)} across ${n.sold_n} sold listings seen.` : ""}</div></div>
             ) : n.sold_n > 0 && n.sold_median ? (
               <div><div className="lab">sold for</div><div className="v">{money(n.sold_median)}</div><div className="l"><b>{n.sold_n} sales, same size, any condition.</b>{n.retail_now ? ` ${Math.round(n.sold_pct_of_retail ?? 0)}% of the store price.` : ""}</div></div>
             ) : n.asks ? (
@@ -140,7 +140,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             </span>
           </div>
           {n.path && (
-            <p className="anchor"><span className="lab"><Glyph kind="anchor" />the price creep</span> <b>{bagName.split(" · ")[0]} raised it from {money(n.path.from_price)} to {money(n.path.to_price)}</b> ({fmtDate(n.path.from_date)} to {fmtDate(n.path.to_date)}). Last year&apos;s price now looks like a deal.</p>
+            <p className="anchor"><span className="lab"><Glyph kind="anchor" />the price creep</span> <b>{bagName.split(" · ")[0]} raised it from {money(n.path.from_price)} to {money(n.path.to_price)}</b> ({fmtDate(n.path.from_date)} to {fmtDate(n.path.to_date)}), up {Math.round(((n.path.to_price - n.path.from_price) / n.path.from_price) * 100)}% over that time{n.path.steps && n.path.steps > 1 ? `, in ${n.path.steps} rises` : ""}.</p>
           )}
         </>
       )}
@@ -182,14 +182,14 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             const cultureCard = (
               <article className={`ecard culture ${!b ? "mixed" : over ? "weak" : growth && growth.value > 15 ? "strong" : "mixed"}`}>
                 <header><h4><Glyph kind="chat" />What people are saying</h4><span className="stamp">{mood}</span></header>
-                <p className="h"><b>{b ? (over ? `Some posts say ${bagShort} has peaked.` : growth && growth.value > 15 ? `Everyone's suddenly searching “${growth.term}”: up ${Math.round(growth.value)}% this week.` : `A quiet week for ${house}.`) : `Nobody's said a word about ${house} yet.`}</b></p>
+                <p className="h"><b>{b ? (over ? `Some posts say ${bagShort} has peaked.` : growth && growth.value > 15 ? `Searches for “${growth.term}” up ${Math.round(growth.value)}% this week, against the month before.` : `A quiet week for ${house}.`) : `Nobody's said a word about ${house} yet.`}</b></p>
                 {cult && <p className="so">{plain(cult.soWhat ?? cult.headline)}</p>}
                 {b && (
                   <details>
                     <summary><Glyph kind="chat" />the chat</summary>
                     <dl className="bz-lines">
                       <div><dt>Fading?</dt><dd>{over ? pick(over.note, /deinfluenc|moved on|had its moment|backlash|over\b/i) : trendsForHouse.length ? `Not that we can see. ${pick(trendsForHouse[0].note, new RegExp(house.split(" ")[0], "i"))}` : `No one is calling ${house} over this week.`}</dd></div>
-                      <div><dt>Who&apos;s carrying it</dt><dd>{carrying && new RegExp(house.split(" ")[0], "i").test(carrying.note) ? `${pick(carrying.note, new RegExp(house.split(" ")[0], "i"), 160)} That is a Gen Z feed; nothing on women over 35 yet.` : "Nothing on women over 35 yet. The Gen Z feeds show Coach and mid-range labels, with luxury as the occasional treat."}</dd></div>
+                      <div><dt>Who&apos;s carrying it</dt><dd>{carrying && new RegExp(house.split(" ")[0], "i").test(carrying.note) ? `${pick(carrying.note, new RegExp(house.split(" ")[0], "i"), 160)} One feed, not a survey.` : "We don't track who is carrying this bag yet."}</dd></div>
                       <div><dt>Dupes</dt><dd>{dupe ? (new RegExp(house.split(" ")[0], "i").test(pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160)) ? pick(dupe.note, /dupe|inspired by|boujee|deinfluenc/i, 160) : `Dupes and deinfluencing are circulating among younger buyers. Nothing aimed at ${house} this week.`) : "No dupe or deinfluencing wave touching this house this week."}</dd></div>
                       <div><dt>Where it lives online</dt><dd>{bagTags.length ? bagTags.slice(0, 3).map((t) => `#${t.term} (${Math.round(t.value).toLocaleString()} posts)`).join(", ") : houseTags.length ? `No tag of its own yet. The house's: ${houseTags.slice(0, 2).map((t) => `#${t.term} (${Math.round(t.value) >= 1e6 ? (t.value / 1e6).toFixed(1) + "M" : Math.round(t.value / 1000) + "K"})`).join(", ")}.` : `No hashtag of its own yet; ${house}'s tags carry it.`}</dd></div>
                     </dl>

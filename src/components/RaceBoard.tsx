@@ -36,7 +36,7 @@ export default function RaceBoard({ rows }: { rows: RaceRow[] }) {
   const y = (r: RaceRow) => pos.get(r.house)!.y;
   const hot = rows.filter((r) => (r.heat ?? 0) >= 70 && (r.sold_pct ?? 0) >= 60).map((r) => r.house);
   const sortedHold = [...rows].filter((r) => r.sold_pct != null && !r.thin).sort((a, b) => (b.sold_pct ?? 0) - (a.sold_pct ?? 0));
-  const sortedHeat = [...rows].filter((r) => r.heat != null).sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
+  const sortedHeat = [...rows].filter((r) => r.heat != null && !r.thin).sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
   return (
     <>
       <div className="houses" aria-label="Houses in the race">

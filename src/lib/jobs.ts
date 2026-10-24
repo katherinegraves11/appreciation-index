@@ -1,3 +1,4 @@
+import { track } from "@/lib/limits";
 import { parseQuestion } from "./parse";
 import { runResearch } from "./research";
 import { runScoring } from "./score";
@@ -29,7 +30,7 @@ export function startJob(question: string, horizon: number, fresh: boolean): Job
   store.set(id, job);
   // tidy: drop finished jobs older than a day
   for (const [k, j] of store) if (j.done && Date.now() - j.created > 86400000) store.delete(k);
-  void run(job, fresh);
+  void track(() => run(job, fresh));
   return job;
 }
 
