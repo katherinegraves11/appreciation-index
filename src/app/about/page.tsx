@@ -18,7 +18,7 @@ export default function About() {
         <h3 className="ah">How are you buying it?</h3>
         <p className="asub">Pick how you are buying, and the answer under it changes.</p>
         <div className="abox2">
-          <div className="abox"><h4>New, at the boutique</h4><p><b>Yes</b> means secondhand buyers pay more than the boutique charges, so it is worth more than you pay the day you leave. <b>No</b> means secondhand pays less.</p></div>
+          <div className="abox"><h4>New, at the boutique</h4><p><b>Yes</b> means you would keep at least 10% more than the boutique price by reselling, after fees. When you would keep 50% or more, it says <b>consider selling it right away</b>: a big payday. <b>No</b> means it is not worth more secondhand, so buy it to wear.</p></div>
           <div className="abox"><h4>Secondhand, at a price</h4><p>Your quote, or the typical asking price. <b>Likely</b> means it should be worth more in five years after selling fees. <b>Maybe</b> means about what you paid. <b>Unlikely</b> means less.</p></div>
         </div>
 
@@ -57,7 +57,7 @@ export default function About() {
           <div className="abox"><h4>Sunrise</h4><p>Hold. It is still climbing.</p><p className="when"><b>When</b> its trends point up.</p></div>
           <div className="abox"><h4>Midday</h4><p>Steady. Keep wearing it.</p><p className="when"><b>When</b> trends are flat or mixed, and you are less than 20% up after fees.</p></div>
           <div className="abox"><h4>Golden hour</h4><p>Worth watching.</p><p className="when"><b>When</b> you would keep 20% or more than you paid after fees, and trends are no longer rising.</p></div>
-          <div className="abox"><h4>Sunset</h4><p>Time to consider selling.</p><p className="when"><b>When</b> trends point down and you would at least break even, or you would keep 50% or more than you paid and trends are no longer rising.</p></div>
+          <div className="abox"><h4>Sunset</h4><p>Time to consider selling.</p><p className="when"><b>When</b> you would keep double what you paid after fees, whatever the trends; or you would keep 50% more and trends are no longer rising; or trends point down and you would at least break even.</p></div>
         </div>
         <p className="asub">A read on today&apos;s numbers, not a promise. Condition matters most: a bag kept as new, with its box and receipt, sells for more.</p>
 

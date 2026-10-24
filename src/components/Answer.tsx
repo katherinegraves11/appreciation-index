@@ -112,9 +112,9 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             <button type="button" role="radio" aria-checked={way === "used"} onClick={() => setWay("used")}>secondhand<small>{p.buy.isQuote ? `at ${money(p.buy.price)}, your quote` : `typical ask ${money(p.buy.price)}`}</small></button>
           </div>
           {way === "new" && p.boutique ? (
-            <div className={`waypanel ${keepNow >= 0 ? "buy" : "dont"}`}>
-              <p className="word">{keepNow >= 0 ? "Yes" : "No"}</p>
-              <p className="why"><b>{keepNow >= 0 ? "Worth more than you pay, the day you leave." : "Worth less than you pay once it is secondhand."}</b> {p.basis === "same-material asks" ? "Sellers ask about" : "Secondhand buyers pay about"} {range(p.band.lo, p.band.hi)}; after a typical resale fee you would keep about {money(Math.abs(keepNow))} {keepNow >= 0 ? "more" : "less"} than {money(p.boutique.price)}.{isHard && keepNow >= 0 ? " Getting one is the hard part." : ""}</p>
+            <div className={`waypanel ${keepNow >= p.boutique.price * 0.1 ? "buy" : "dont"}`}>
+              <p className="word">{keepNow >= p.boutique.price * 0.1 ? "Yes" : "No"}</p>
+              <p className="why"><b>{keepNow >= p.boutique.price * 0.5 ? "A big payday. Consider selling it right away." : keepNow >= p.boutique.price * 0.1 ? "Worth more than you pay, the day you leave." : "Not worth more secondhand. Buy it to wear."}</b> {p.basis === "same-material asks" ? "Sellers ask about" : "Secondhand buyers pay about"} {range(p.band.lo, p.band.hi)}; after a typical resale fee you would keep about {money(Math.abs(keepNow))} {keepNow >= 0 ? "more" : "less"} than {money(p.boutique.price)}.{isHard && keepNow >= 0 ? " Getting one is the hard part." : ""}</p>
             </div>
           ) : (
             <div className={`waypanel ${usedWord === "Likely" ? "buy" : usedWord === "Maybe" ? "wait" : "dont"}`}>

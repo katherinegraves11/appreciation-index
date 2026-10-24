@@ -9,6 +9,8 @@ export const SUN: Record<SunPhase, { word: string; line: string; c1: string; c2:
 };
 
 export function sunPhase(gainPct: number | null, lean: string | null): SunPhase {
+  // a huge payday: if you would keep double what you paid after fees, consider selling, whatever the trends say (Katie, 2026-10-23)
+  if (gainPct != null && gainPct >= 100) return "sunset";
   if (lean === "cooling" && (gainPct ?? 0) >= 0) return "sunset";
   if (gainPct != null && gainPct >= 50 && lean !== "rising") return "sunset";
   if (gainPct != null && gainPct >= 20 && lean !== "rising") return "golden";
