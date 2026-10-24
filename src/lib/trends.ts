@@ -216,6 +216,24 @@ export function scenario(retailPath: { y: string; price: number }[], soldPrices:
     at: [1, 5, 10].map((y) => { const r = retailNow * Math.pow(1 + g, y); return { y, lo: Math.round(r * lo), mid: Math.round(r * mid), hi: Math.round(r * hi) }; }) };
 }
 
+// ---------- moments: what searches did around each logged cultural moment for this bag ----------
+export type Moment = { date: string; what: string; type: string; before: number | null; after: number | null; changePct: number | null };
+export function moments(house: string, model: string): Moment[] {
+  const words = modelWords(model); const db = trackerDb(); if (!db || !words.length) { db?.close(); return []; }
+  let rows: Row[] = [];
+  try {
+    rows = db.prepare(`select event_date, event_type, derived_note from buzz_events where lower(house) like ? and (${words.map(() => "lower(coalesce(family,'') || ' ' || coalesce(derived_note,'')) like ?").join(" and ")}) and event_date is not null order by event_date desc limit 4`)
+      .all(`%${norm(house).split(" ")[0].slice(0, 4)}%`, ...words.map((w) => `%${w}%`)) as Row[];
+  } catch { rows = []; } finally { db.close(); }
+  const term = termFor(house, model); const s = term ? searchSeries(term) : [];
+  return rows.map((r) => {
+    const d = String(r.event_date).slice(0, 10); const i = s.findIndex((w) => w.week >= d);
+    const before = i >= 8 ? Math.round(mean(s.slice(i - 8, i).map((w) => w.v))) : null;
+    const after = i >= 0 && s.length - i >= 8 ? Math.round(mean(s.slice(i, i + 8).map((w) => w.v))) : null;
+    return { date: d, type: String(r.event_type ?? "").replace(/_/g, " "), what: String(r.derived_note ?? "").split(/(?<=[.;])\s/)[0].slice(0, 180), before, after, changePct: before && after != null ? Math.round(((after - before) / before) * 100) : null };
+  });
+}
+
 // ---------- the dossier block ----------
 /** Lines for the answer's evidence dossier. Every line says its n and whether it is a link or still collecting. */
 export function connectiveLines(house: string, model: string): string[] {
@@ -227,6 +245,7 @@ export function connectiveLines(house: string, model: string): string[] {
   } else out.push("Search trend: no weekly search history for this bag yet.");
   for (const l of [auctionLink(house, model), resaleLink(house, model)]) if (l) out.push(`${l.label}. Culture: ${l.culture}. Money: ${l.money}. ${l.read} Span ${l.span}. Source: ${l.source}.`);
   const rv = retailVsSearch(house, model); if (rv) out.push(rv);
+  for (const m of moments(house, model)) out.push(`Moment ${m.date} (${m.type}): ${m.what} Searches for this bag ${m.changePct == null ? "around it: not enough weeks on both sides yet" : `averaged ${m.before}/100 in the 8 weeks before and ${m.after}/100 in the 8 weeks after (${m.changePct >= 0 ? "+" : ""}${m.changePct}%)`}. A pattern, not proof the moment caused it.`);
   return out;
 }
 

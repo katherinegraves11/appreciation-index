@@ -47,7 +47,7 @@ async function run(job: Job, fresh: boolean) {
       const recent = (await listBriefs(80)).find((b) => norm(b.house) === norm(input.house) && norm(b.bag) === norm(input.bag) && norm(b.spec || "") === norm(input.spec || "") && Date.now() - new Date(b.created_at).getTime() < 7 * 86400000);
       if (recent) {
         send({ status: "We answered this recently. Showing that read…" });
-        send({ done: true, id: recent.id, result: recent.result, input: { house: recent.house, bag: recent.bag, spec: recent.spec || "" }, numbers: quickNumbers(recent.house, recent.bag, recent.spec || undefined), cached: true, answered_at: recent.created_at });
+        send({ done: true, id: recent.id, result: recent.result, input: { house: recent.house, bag: recent.bag, spec: recent.spec || "" }, numbers: quickNumbers(recent.house, recent.bag, recent.spec || undefined, job.question), cached: true, answered_at: recent.created_at });
         return;
       }
     }
@@ -61,7 +61,7 @@ async function run(job: Job, fresh: boolean) {
       input, dossier: research.dossier, sources: research.sources, result: scored.result, model: MODEL,
       usage: { input_tokens: research.usage.input_tokens + scored.usage.input_tokens, output_tokens: research.usage.output_tokens + scored.usage.output_tokens },
     });
-    send({ done: true, id, result: scored.result, input: { house: input.house, bag: input.bag, spec: input.spec || "" }, numbers: quickNumbers(input.house, input.bag, input.spec || undefined) });
+    send({ done: true, id, result: scored.result, input: { house: input.house, bag: input.bag, spec: input.spec || "" }, numbers: quickNumbers(input.house, input.bag, input.spec || undefined, job.question) });
   } catch (err) {
     const raw = err instanceof Error ? err.message : "";
     console.error("[ask]", raw);

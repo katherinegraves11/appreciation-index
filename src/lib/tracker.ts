@@ -7,7 +7,7 @@
  * to skip (the analyst then researches from the web only and says so).
  */
 import { DatabaseSync } from "node:sqlite";
-import { connectiveLines, forwardRead, forwardLines, bagTrend, type Forward } from "./trends";
+import { connectiveLines, forwardRead, forwardLines, bagTrend, moments, type Forward, type Moment } from "./trends";
 import fs from "fs";
 import path from "path";
 
@@ -342,11 +342,30 @@ export type QuickNumbers = {
   asks: { median_ask: number; n: number; sold: number; trr_n: number; fwrd_n: number; fwrd_median: number | null; venue: string; link: string | null; link_label: string } | null;
   tiers: PriceTiers;
   forward: Forward;
-  trend: { term: string | null; years: { year: string; avg: number }[]; auction: string | null; resale: string | null } | null;
+  paths: Paths;
+  trend: { term: string | null; years: { year: string; avg: number }[]; auction: string | null; resale: string | null; moments: Moment[] } | null;
 };
 /** Katie's rule: the boutique price is the only absolute price; every secondhand figure is an average.
  *  Secondhand websites (sold and asked) and the private sourcer market (where the sourcer sets the price) are kept apart. */
 export type Avg = { mean: number; median: number; n: number; lo: number; hi: number };
+/** Two ways in (Katie, 2026-10-23): buy at the boutique and what it is worth secondhand the moment you leave, vs buy secondhand at a price
+ *  and what it is likely worth in 6 months, 1 year and 5 years if prices keep the boutique's own pace. Arithmetic on stated evidence, not a model. */
+export type Paths = {
+  basis: "same-material sales" | "same-material asks" | "other-leather sales"; basisNote: string;
+  band: { lo: number; mid: number; hi: number }; growthPct: number | null;
+  boutique: { price: number; label: string } | null;
+  buy: { price: number; label: string; isQuote: boolean };
+  horizons: { label: string; years: number; lo: number; mid: number; hi: number }[];
+} | null;
+/** A price someone was quoted or offered, from the question's own words ("quoted me $98,000", "$48k"). */
+export function parseQuote(text?: string | null): number | null {
+  if (!text || !/(quot|offer|asking|sourcer|seller|for sale|selling|wants)/i.test(text)) return null;
+  for (const m of text.matchAll(/\$\s?([0-9][0-9,]*(?:\.[0-9]+)?)\s*(k\b|K\b)?|\b([0-9]{2,3}(?:\.[0-9])?)\s?k\b/g)) {
+    const v = m[1] ? Number(m[1].replace(/,/g, "")) * (m[2] ? 1000 : 1) : Number(m[3]) * 1000;
+    if (v >= 1000) return Math.round(v);
+  }
+  return null;
+}
 export type PriceTiers = { material: string | null; size: string | null; sites_asks: (Avg & { sources: string[]; matched: string }) | null; sourcer_sold: (Avg & { sources: string[]; ranges: string[] }) | null; private_quotes: (Avg & { prices: number[] }) | null } | null;
 /** SQL fragment + params requiring every meaningful word of the bag name to appear in a column (no first-word guessing). */
 /** TRR model column for a bag: model_guess, plus the title when the bag is a Hermès sub-model (TRR tags a Kelly Cut as "Kelly"). */
@@ -369,7 +388,7 @@ function modelMatch(col: string, bag: string, house?: string): { sql: string; pa
 }
 /** Shapes the houses have made for decades: the fallback when the bags table has no launch year. */
 const ICONS = /\b(birkin|kelly|constance|bolide|picotin|evelyne|lindy|garden party|classic flap|2\.55|reissue|boy|lady dior|saddle|baguette|peekaboo|speedy|neverfull|alma|keepall|capucines|jackie|bamboo|horsebit|dionysus|galleria|cabat|luggage|classic box|triomphe|sac de jour|city|puzzle|margaux)\b/;
-export function quickNumbers(house: string, bag: string, spec?: string): QuickNumbers | null {
+export function quickNumbers(house: string, bag: string, spec?: string, notes?: string | null): QuickNumbers | null {
   const db = open(); if (!db) return null;
   const hTerms = houseTerms(house); const mm = modelMatch("model", bag, house); const mg = modelMatch(trrModelCol(bag), bag, house); const bagTerm = norm(bag).split(" ").filter((w) => w.length > 2)[0] ?? norm(bag);
   const g = <T extends Row>(sql: string, params: (string | number)[] = []): T | undefined => { try { return db.prepare(sql).get(...params) as T | undefined; } catch { return undefined; } };
@@ -382,6 +401,9 @@ export function quickNumbers(house: string, bag: string, spec?: string): QuickNu
   const icon = g<Row>(`select launch_year from bags where ${likeAny("house", hTerms)} and ${mm.sql} and launch_year <= 2010 limit 1`, [...likeParams(hTerms), ...mm.params]);
   db.close();
   const sell = sellNow(house, bag, spec);
+  const tiers = priceTiers(house, bag, spec);
+  const forward = (() => { try { return forwardRead(house, bag, sell ? { prices: sell.prices, retailNow: sell.retail, plain: sell.plain } : null); } catch { return null; } })();
+  const retailNow = (rc?.retail_now as number) ?? null, retailSize = (rc?.size_or_spec as string) ?? null;
   return {
     retail_now: (rc?.retail_now as number) ?? null, retail_launch: (launch?.price as number) ?? null, retail_size: (rc?.size_or_spec as string) ?? null,
     ask_median: (ask?.m as number) ?? null, ask_n: (ask?.n as number) ?? 0,
@@ -392,9 +414,10 @@ export function quickNumbers(house: string, bag: string, spec?: string): QuickNu
     links: bagLinks(house, bag),
     path: pricePath(house, bag),
     sell,
-    trend: (() => { try { const t = bagTrend(house, bag); return { term: t.term, years: t.search?.byYear ?? [], auction: t.auction?.plain ?? (t.auction ? `Too early to say: ${t.auction.n} of ${t.auction.need} auction sales.` : null), resale: t.resale ? (t.resale.plain ?? `Too early to say: ${t.resale.n} of ${t.resale.need} daily reads.`) : null }; } catch { return null; } })(),
-    forward: (() => { try { return forwardRead(house, bag, sell ? { prices: sell.prices, retailNow: sell.retail, plain: sell.plain } : null); } catch { return null; } })(),
-    tiers: priceTiers(house, bag, spec),
+    trend: (() => { try { const t = bagTrend(house, bag); return { term: t.term, years: t.search?.byYear ?? [], auction: t.auction?.plain ?? (t.auction ? `Too early to say: ${t.auction.n} of ${t.auction.need} auction sales.` : null), resale: t.resale ? (t.resale.plain ?? `Too early to say: ${t.resale.n} of ${t.resale.need} daily reads.`) : null, moments: moments(house, bag) }; } catch { return null; } })(),
+    forward,
+    tiers,
+    paths: twoWaysIn(sell, tiers, forward, retailNow, retailSize, parseQuote(notes)),
     asks: asksNow(house, bag, spec),
   };
 }
@@ -486,8 +509,27 @@ export function priceTiers(house: string, bag: string, spec?: string): PriceTier
   };
 }
 
-export function headlineNumbers(house: string, bag: string, spec?: string): string {
-  const n = quickNumbers(house, bag, spec); if (!n) return "";
+function q(xs: number[], p: number): number { const a = [...xs].sort((x, y) => x - y); const i = (a.length - 1) * p; const lo = Math.floor(i), hi = Math.ceil(i); return Math.round(a[lo] + (a[hi] - a[lo]) * (i - lo)); }
+function twoWaysIn(sell: QuickNumbers["sell"], tiers: PriceTiers, forward: Forward, retailNow: number | null, retailSize: string | null, quote: number | null): Paths {
+  // the evidence for "what it is worth secondhand today", best first
+  let basis: NonNullable<Paths>["basis"] | null = null; let pts: number[] = []; let note = "";
+  const ss = tiers?.sourcer_sold;
+  const sameSold = [...(sell && !sell.plain ? sell.prices : [])];
+  if (ss) { for (const r of ss.ranges) { const m = r.match(/\$([0-9,]+)\s*[–-]\s*\$([0-9,]+)/); if (m) sameSold.push(Number(m[1].replace(/,/g, "")), Number(m[2].replace(/,/g, ""))); } if (!ss.ranges.length) { sameSold.push(ss.lo); if (ss.hi !== ss.lo) sameSold.push(ss.hi); } }
+  if (sameSold.length) { basis = "same-material sales"; pts = sameSold; note = `${(sell && !sell.plain ? sell.n : 0) + (ss?.n ?? 0)} sale${((sell && !sell.plain ? sell.n : 0) + (ss?.n ?? 0)) === 1 ? "" : "s"} in this leather${ss?.ranges.length ? ", one stated as a range" : ""}`; }
+  else if (tiers?.sites_asks) { basis = "same-material asks"; pts = [tiers.sites_asks.lo, tiers.sites_asks.median, tiers.sites_asks.hi]; note = `${tiers.sites_asks.n} asking price${tiers.sites_asks.n === 1 ? "" : "s"} in this leather, not sales`; }
+  else if (sell) { basis = "other-leather sales"; pts = sell.prices; note = `${sell.n} sold listings of the plain version, not this leather`; }
+  if (!basis || !pts.length) return null;
+  const band = pts.length >= 4 ? { lo: q(pts, 0.25), mid: q(pts, 0.5), hi: q(pts, 0.75) } : { lo: Math.min(...pts), mid: q(pts, 0.5), hi: Math.max(...pts) };
+  const g = forward?.nextBoutique ? forward.nextBoutique.ratePct / 100 : null;
+  const grow = (v: number, t: number) => Math.round(v * Math.pow(1 + (g ?? 0), t));
+  const horizons = [{ label: "6 months", years: 0.5 }, { label: "1 year", years: 1 }, { label: "5 years", years: 5 }].map((h) => ({ ...h, lo: grow(band.lo, h.years), mid: grow(band.mid, h.years), hi: grow(band.hi, h.years) }));
+  const buy = quote ? { price: quote, label: "the price you were quoted", isQuote: true } : { price: tiers?.sites_asks?.median ?? band.mid, label: tiers?.sites_asks ? "the middle asking price on secondhand sites" : "today's middle secondhand price", isQuote: false };
+  return { basis, basisNote: note, band, growthPct: g == null ? null : Math.round(g * 1000) / 10, boutique: retailNow ? { price: retailNow, label: retailSize ?? "" } : null, buy, horizons };
+}
+
+export function headlineNumbers(house: string, bag: string, spec?: string, notes?: string | null): string {
+  const n = quickNumbers(house, bag, spec, notes); if (!n) return "";
   const lines: string[] = [];
   if (n.retail_now) lines.push(`Boutique price today: $${n.retail_now}${n.retail_size ? ` (${n.retail_size})` : ""}${n.retail_launch && n.retail_launch !== n.retail_now ? `; was $${n.retail_launch} at launch` : ""}.`);
   if (n.sell) lines.push(`SOLD PRICE TO QUOTE: $${n.sell.median_sold} median (range $${n.sell.lo}-$${n.sell.hi}), ${n.sell.n} sold listings in excellent condition or better (${n.sell.pristine} graded pristine), seen on The RealReal in reads from ${n.sell.read_from} to ${n.sell.read_to}; sale dates are unknown, so say "sold listings seen", never "sales in the last N days". Matched on: ${n.sell.matched_on}. ${n.sell.plain ? `IMPORTANT: these are PLAIN ${bag} sales, NOT the leather/colour/finish asked about. Say exactly that ("plain ${bag}s, not this leather") and never call them the same edition or name a leather they were not.` : ""} Against $${n.sell.retail} retail (${n.sell.retail_spec}). Never call these pristine. Never quote a single outlier sale as the sold price.`);
@@ -503,6 +545,8 @@ export function headlineNumbers(house: string, bag: string, spec?: string): stri
     parts.push(`(3) Private sourcer market (the sourcer sets the price; willingness to pay runs higher): ${t?.private_quotes ? `average $${t.private_quotes.mean} across ${t.private_quotes.n} logged quote${t.private_quotes.n === 1 ? "" : "s"}${t.private_quotes.n < 3 ? ", too few to call an average" : ""}` : "no logged quotes for this bag"}.`);
     lines.push(`THREE PRICES: ${parts.join(" ")} Say every secondhand figure as an average with its count ("averages $21,300 across 25 sold listings"); never call a secondhand figure "the price".`);
   }
+  if (n.paths) { const p = n.paths; const h5 = p.horizons[2];
+    lines.push(`TWO WAYS IN (state both in timing or plain_answer; arithmetic, not a forecast): worth secondhand today $${p.band.lo} to $${p.band.hi} (middle $${p.band.mid}), from ${p.basisNote}. (A) From the boutique${p.boutique ? ` at $${p.boutique.price}${p.boutique.label ? ` (${p.boutique.label})` : ""}` : ""}: ${p.boutique ? `that is ${Math.round((p.band.mid / p.boutique.price) * 10) / 10} times the boutique price, so a boutique buyer could resell at once for more than they paid, before fees` : "no boutique price on record"}. (B) Secondhand at $${p.buy.price} (${p.buy.label}): ${p.growthPct != null ? `if secondhand prices keep the boutique's pace of ${p.growthPct}% a year, about $${h5.lo} to $${h5.hi} in five years` : "no boutique pace to project with; if prices hold it stays at today's range"}. Compare that with $${p.buy.price} plainly.`); }
   const fwd = forwardLines(n.forward);
   if (fwd.length) lines.push(`FORWARD READ (lead the five- and ten-year signals with this; it is a forecast, say so): ${fwd.join(" ")}`);
   return lines.length ? section("HEADLINE NUMBERS (the page shows exactly these; your takeaways, plain_answer and signals must use the same figures)", lines) : "";

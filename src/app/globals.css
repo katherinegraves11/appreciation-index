@@ -490,3 +490,11 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 /* each section says what it measures and where its numbers come from (Katie: nothing opaque) */
 .ecard .from{font-size:15px;line-height:1.45;color:var(--ink-2);margin:2px 0 8px}
 .ecard .from b{color:var(--ink);font-weight:500}
+
+/* two ways in: boutique vs secondhand, side by side */
+.ways{margin-top:22px}
+.ways2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:8px}
+.way{border:1px solid var(--line);padding:14px 16px;background:color-mix(in srgb,#8a6d3b 8%,var(--paper))}
+.way .big{font-family:var(--serif);font-size:21px;line-height:1.3;margin:6px 0}
+.way .l{font-size:16px;line-height:1.45;color:var(--ink-2);margin:0}
+.waysnote{font-size:15px;color:var(--ink-3);font-style:italic;text-align:center;margin:10px 0 0}

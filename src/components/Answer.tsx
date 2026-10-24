@@ -119,6 +119,23 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         <p className="anchor ahead"><span className="lab"><Glyph kind="anchor" />looking ahead</span> <b>{LEAN[f.lean]}{f.confidence === "low" ? ", an early read" : ""}.</b> {f.signals.map((s) => `${s.name} ${s.dir}`).join(" · ")}.{f.nextBoutique ? ` On its current pace the boutique price reaches about ${money(f.nextBoutique.price)} by ${f.nextBoutique.date}.` : ""}{b5 ? ` In five years, resale on current trends: ${money(b5.lo)} to ${money(b5.hi)}${n.sell?.plain ? ", any leather" : ""}.` : ""} A forecast, not a promise.</p>
       ); })()}
 
+      {n?.paths && (() => { const p = n.paths; const keep = (v: number) => Math.round(v * payoutRate(v)); const h = p.horizons; const h5 = h[2];
+        const net5 = keep(h5.mid) - p.buy.price;
+        return (
+        <section className="ways" aria-label="Two ways in">
+          <p className="lab stripcap"><Glyph kind="ledger" />two ways in</p>
+          <div className="ways2">
+            {p.boutique && <div className="way"><p className="lab">from the boutique, at {money(p.boutique.price)}</p>
+              <p className="big">{p.band.mid > p.boutique.price ? <>Worth about <b>{money(p.band.lo)} to {money(p.band.hi)}</b> secondhand the day you leave.</> : <>Secondhand pays <b>{money(p.band.lo)} to {money(p.band.hi)}</b>, less than the boutique.</>}</p>
+              <p className="l">Sell at once and keep about {money(keep(p.band.mid) - p.boutique.price >= 0 ? keep(p.band.mid) - p.boutique.price : p.boutique.price - keep(p.band.mid))} {keep(p.band.mid) >= p.boutique.price ? "more" : "less"} than you paid, after a typical resale fee.{p.boutique.label ? ` Boutique price for ${p.boutique.label}${n.tiers?.material && !p.boutique.label.toLowerCase().includes(n.tiers.material) ? `; the house publishes no ${n.tiers.material} price, so this is the closest` : ""}.` : ""}</p></div>}
+            <div className="way"><p className="lab">secondhand, at {money(p.buy.price)}</p>
+              <p className="big">{p.growthPct != null ? <>On current trends, about <b>{money(h5.lo)} to {money(h5.hi)}</b> in five years.</> : <>If prices hold, about <b>{money(p.band.lo)} to {money(p.band.hi)}</b>.</>}</p>
+              <p className="l">{p.growthPct != null ? `6 months ${money(h[0].lo)} to ${money(h[0].hi)} · 1 year ${money(h[1].lo)} to ${money(h[1].hi)}. ` : ""}Sell in five years and you would keep about {money(Math.abs(net5))} {net5 >= 0 ? "more" : "less"} than {p.buy.isQuote ? "your quote" : "you paid"}, after fees, at the middle of that range.</p></div>
+          </div>
+          <p className="waysnote">Based on {p.basisNote}{p.growthPct != null ? `, grown at the boutique's own pace of ${p.growthPct}% a year` : ""}. Arithmetic on today&apos;s prices, not a promise.</p>
+        </section>
+      ); })()}
+
       {n && (n.retail_now || n.sold_median || n.ask_median || n.sell || n.asks) && (
         <>
           <p className="lab stripcap"><Glyph kind="ledger" /><span className="h1txt">the three prices · boutique, websites, sourcers</span><span className="h5h10txt">the long receipts · what has held</span></p>
@@ -227,6 +244,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
                     {tr?.years && tr.years.length > 1 && <li><b>Searches by year.</b> {tr.years.map((y) => `${y.year}: ${y.avg}`).join(" · ")} (US Google, each bag scaled to its own peak of 100).</li>}
                     {tr?.auction && <li><b>Searches and auction prices.</b> {tr.auction}</li>}
                     {tr?.resale && <li><b>Searches and resale.</b> {tr.resale}</li>}
+                    {tr?.moments?.map((m) => <li key={m.date + m.type}><b>Moment, {fmtDate(m.date)}.</b> {m.what} {m.changePct == null ? "" : `Searches ${m.changePct >= 0 ? "up" : "down"} ${Math.abs(m.changePct)}% in the eight weeks after.`}</li>)}
                     {f.bands && <li><b>Resale on current trends.</b> {f.bands.map((b) => `${b.y} year${b.y === 1 ? "" : "s"}: ${money(b.lo)} to ${money(b.hi)}`).join(" · ")}{n?.sell?.plain ? ", any leather" : ""}.</li>}
                   </ul>
                   <p className="bz-read">A forecast from today&apos;s trends, not a promise. Confidence rises when three or more signals agree.</p>

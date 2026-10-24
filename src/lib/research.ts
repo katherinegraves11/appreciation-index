@@ -24,7 +24,7 @@ export async function runResearch(
   const base = buildTrackerDossier(input.house, input.bag, input.spec || undefined);
   const isCollection = input.questionType === "collection" || /runway|pre-?order|collection|fashion week|just walked|spring 2027|ss27|resort 27/i.test(`${input.bag} ${input.spec ?? ""} ${input.notes ?? ""}`);
   const extras = [buzzDossier(input.house, input.bag), isCollection ? collectionDossier(input.house, input.season || undefined) : "", pestelDossier(input.house), ownershipDossier(input.house)].filter(Boolean).join("\n\n");
-  const head = headlineNumbers(input.house, input.bag, input.spec || undefined);
+  const head = headlineNumbers(input.house, input.bag, input.spec || undefined, input.notes || null);
   const tracker = { ...base, text: [head, base.text, extras].filter(Boolean).join("\n\n"), available: base.available || !!extras || !!head };
   onProgress?.(tracker.available ? `Read ${tracker.rowCount} rows from the tracker…` : "Tracker not available; researching from the web…");
   const basePrompt = researchPrompt({
