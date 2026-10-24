@@ -69,6 +69,20 @@ const fmtDate = (d: string) => { const [y, m] = d.split("-"); const M = ["Jan", 
 
 export default function Answer({ result, bagName, briefId, numbers, photo }: { result: BriefResult; bagName: string; briefId?: string; numbers: QuickNumbers | null; photo?: string | null }) {
   const [open, setOpen] = useState(false);
+  const [buying, setBuying] = useState(false);
+  const [paid, setPaid] = useState("");
+  const [saved, setSaved] = useState(false);
+  /** "I'm buying it": the bag and what you paid go to My bags (kept on this device until there is sign-in). */
+  function saveBought() {
+    const price = Math.round(Number(paid.replace(/[^0-9.]/g, "")));
+    if (!briefId || !price) return;
+    try {
+      const cur = (document.cookie.match(/(?:^|; )bought=([^;]*)/)?.[1] ?? "").split(",").filter(Boolean).filter((e) => !e.startsWith(`${briefId}:`));
+      const today = new Date().toLocaleDateString("en-CA");
+      document.cookie = `bought=${[`${briefId}:${price}:${today}`, ...cur].slice(0, 60).join(",")}; path=/; max-age=31536000; samesite=lax`;
+      setSaved(true); setBuying(false);
+    } catch { /* cookies blocked */ }
+  }
   const [way, setWay] = useState<"new" | "used">(numbers?.paths?.buy.isQuote || !numbers?.paths?.boutique ? "used" : "new");
   const signals = toSignals(result);
   const cards = toCards(result);
@@ -78,6 +92,11 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
   const [first, ...rest] = plainAnswer.split(/(?<=\.)\s+/);
   return (
     <div className="answer">
+      <section className="verdict ident">
+        {photo ? <img src={photo} alt="" className="vphoto" /> : <BagPlate name={bagName} size={132} className="vplate" />}
+        <p className="lab who">{bagName.split(" · ").slice(0, 2).join(" · ").toLowerCase()}</p>
+        {bagName.split(" · ").length > 2 && <p className="spec">{bagName.split(" · ").slice(2).join(" · ")}</p>}
+      </section>
       {n?.paths && (() => { const p = n.paths; const keepOf = (v: number) => Math.round(v * payoutRate(v));
         const isHard = /(hermès|hermes|chanel)/i.test(bagName);
         const keepNow = p.boutique ? keepOf(p.band.mid) - p.boutique.price : 0;
@@ -90,12 +109,12 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
           <p className="lab">how are you buying it?</p>
           <div className="dial waypick" role="radiogroup" aria-label="How you are buying it">
             {p.boutique && <button type="button" role="radio" aria-checked={way === "new"} onClick={() => setWay("new")}>new<small>at the boutique, {money(p.boutique.price)}</small></button>}
-            <button type="button" role="radio" aria-checked={way === "used"} onClick={() => setWay("used")}>secondhand<small>at {money(p.buy.price)}{p.buy.isQuote ? ", your quote" : ""}</small></button>
+            <button type="button" role="radio" aria-checked={way === "used"} onClick={() => setWay("used")}>secondhand<small>{p.buy.isQuote ? `at ${money(p.buy.price)}, your quote` : `typical ask ${money(p.buy.price)}`}</small></button>
           </div>
           {way === "new" && p.boutique ? (
             <div className={`waypanel ${keepNow >= 0 ? "buy" : "dont"}`}>
               <p className="word">{keepNow >= 0 ? "Yes" : "No"}</p>
-              <p className="why"><b>{keepNow >= 0 ? "Worth more than you pay, the day you leave." : "Worth less than you pay once it is secondhand."}</b> Secondhand buyers pay about {range(p.band.lo, p.band.hi)}; after a typical resale fee you would keep about {money(Math.abs(keepNow))} {keepNow >= 0 ? "more" : "less"} than {money(p.boutique.price)}.{isHard && keepNow >= 0 ? " Getting one is the hard part." : ""}</p>
+              <p className="why"><b>{keepNow >= 0 ? "Worth more than you pay, the day you leave." : "Worth less than you pay once it is secondhand."}</b> {p.basis === "same-material asks" ? "Sellers ask about" : "Secondhand buyers pay about"} {range(p.band.lo, p.band.hi)}; after a typical resale fee you would keep about {money(Math.abs(keepNow))} {keepNow >= 0 ? "more" : "less"} than {money(p.boutique.price)}.{isHard && keepNow >= 0 ? " Getting one is the hard part." : ""}</p>
             </div>
           ) : (
             <div className={`waypanel ${usedWord === "Likely" ? "buy" : usedWord === "Maybe" ? "wait" : "dont"}`}>
@@ -108,10 +127,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
       ); })()}
 
       <section className="verdict">
-        {photo ? <img src={photo} alt="" className="vphoto" /> : <BagPlate name={bagName} size={132} className="vplate" />}
-        <p className="lab who">{bagName.split(" · ").slice(0, 2).join(" · ").toLowerCase()}</p>
-        {bagName.split(" · ").length > 2 && <p className="spec">{bagName.split(" · ").slice(2).join(" · ")}</p>}
-        <h2>{first} {rest.length > 0 && <i>{rest.join(" ")}</i>}</h2>
+        <h2>{first}{rest.length > 0 ? ` ${rest.join(" ")}` : ""}</h2>
         {result.timing && (() => { const t = plain(result.timing); const [a, ...r] = t.split(/(?<=[.;:])\s+/); return <p className="timing"><b>{a}</b>{r.length ? " " + r.join(" ") : ""}</p>; })()}
         <div className="stamps"><span className="stamp">{result.call}</span><span className="stamp">confidence {result.confidence.toLowerCase()}</span></div>
         <p className="seeit"><span className="lab">go look at it</span>{seeItLinks(bagName.split(" · ")[0] ?? "", bagName.split(" · ")[1] ?? "", n?.links).map((l, i) => <a key={i} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)}</p>
@@ -139,6 +155,14 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         </>
       ); })()}
 
+      {briefId && (
+        <div className="buyit">
+          {saved ? <p>Saved to <a href="/bags">My bags</a>.</p>
+            : !buying ? <button type="button" className="buybtn" onClick={() => { setBuying(true); if (!paid && n?.paths) setPaid(String(way === "new" && n.paths.boutique ? n.paths.boutique.price : n.paths.buy.price)); }}>I&apos;m buying it</button>
+            : <form onSubmit={(e) => { e.preventDefault(); saveBought(); }}><label>What are you paying? <input inputMode="decimal" value={paid} onChange={(e) => setPaid(e.target.value)} placeholder="$" autoFocus /></label><button type="submit" className="buybtn">Add to My bags</button></form>}
+        </div>
+      )}
+
       <button type="button" className="why-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "hide the why" : "show me why"}</button>
       {open && (
         <div className="edit">
@@ -152,10 +176,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             if (t?.sites_asks) items.push(`Asking online ${t.sites_asks.n > 1 ? `${money(t.sites_asks.lo)} to ${money(t.sites_asks.hi)}` : money(t.sites_asks.mean)} (${t.sites_asks.n})`);
             if (t?.private_quotes) items.push(`Your sourcer ${money(t.private_quotes.mean)}`);
             return items.length ? <p className="pricesline"><span className="lab">the prices</span> {items.join(" · ")}.{n.path ? ` The boutique price went from ${money(n.path.from_price)} to ${money(n.path.to_price)} (${fmtDate(n.path.from_date)} to ${fmtDate(n.path.to_date)}).` : ""}</p> : null; })()}
-          <section className="glance">
-            <p className="lab">if you read nothing else</p>
-            <ol>{(result.takeaways && result.takeaways.length ? result.takeaways.filter((t) => !/cohort|generational adjustment|not stated|dossier|tracker/i.test(t)) : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}><Rich text={t} link={askLink} /></li>)}</ol>
-          </section>
+
 
           {(() => {
             const b = n?.buzz;
@@ -220,13 +241,13 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
                   <summary><Glyph kind="proof" />the trend lines</summary>
                   <ul>
                     {f.signals.map((s) => <li key={s.name}><b>{s.name} {s.dir}.</b> {s.evidence}.</li>)}
-                    {tr?.years && tr.years.length > 1 && <li><b>Searches by year.</b> {tr.years.map((y) => `${y.year}: ${y.avg}`).join(" · ")} (US Google, each bag scaled to its own peak of 100).</li>}
+                    
                     {tr?.auction && <li><b>Searches and auction prices.</b> {tr.auction}</li>}
-                    {tr?.resale && <li><b>Searches and resale.</b> {tr.resale}</li>}
+                    
                     {tr?.moments?.map((m) => <li key={m.date + m.type}><b>Moment, {fmtDate(m.date)}.</b> {m.what} {m.changePct == null ? "" : `Searches ${m.changePct >= 0 ? "up" : "down"} ${Math.abs(m.changePct)}% in the eight weeks after.`}</li>)}
                     {f.bands && <li><b>Resale on current trends.</b> {f.bands.map((b) => `${b.y} year${b.y === 1 ? "" : "s"}: ${money(b.lo)} to ${money(b.hi)}`).join(" · ")}{n?.sell?.plain ? ", any leather" : ""}.</li>}
                   </ul>
-                  <p className="bz-read">A forecast from today&apos;s trends, not a promise. Confidence rises when three or more signals agree.</p>
+                  <p className="bz-read">A forecast from today&apos;s trends, not a promise.</p>
                 </details>
               </article>
             ) : null;
@@ -239,7 +260,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
               return (
                 <article key={c.key} className={`ecard ${c.mood}`}>
                   <header><h4>{c.title}</h4><span className="stamp">{c.mood === "strong" ? "good sign" : c.mood === "weak" ? "weak spot" : "mixed"}</span></header>
-                  {c.about && <p className="from"><b>{c.about}</b> From {c.from?.replace(/^./, (x) => x.toLowerCase())}{c.evidence.length ? ` Cited in this answer: ${[...new Set(c.evidence.map((e) => e.source).filter(Boolean))].slice(0, 5).join(", ")}.` : ""}</p>}
+                  {c.about && <p className="from"><b>{c.about}</b> From {c.from?.replace(/^./, (x) => x.toLowerCase())}</p>}
                   <p className="h"><b>{plain(c.soWhat ?? c.headline).replace(/\.$/, "")}.</b></p>
                   {c.soWhat && <p className="so">{plain(c.headline)}</p>}
                   {(proof || more.length > 0 || c.more) && (

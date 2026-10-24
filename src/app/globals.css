@@ -512,3 +512,26 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 .waypanel .why{font-size:18px;line-height:1.5;margin:0}
 .wayask .twonote{font-size:15px;color:var(--ink-3);font-style:italic;margin:8px 0 0}
 .pricesline{max-width:760px;margin:6px auto 22px;text-align:center;font-size:17px;line-height:1.55;color:var(--ink-2)}
+
+/* One reading style for the whole answer (Katie: centered, easy to read, no mix of italic and regular).
+   Italics stay only in the masthead and the "right now?" headline, which are the paper identity. */
+.answer,.answer *{font-style:normal !important}
+.answer{text-align:center}
+.answer .verdict,.answer .verdict .lab.who,.answer .verdict .spec,.answer .verdict h2,.answer .timing{text-align:center;margin-inline:auto}
+.answer .verdict h2 i{color:inherit}
+.answer .ident{padding-bottom:4px;border-bottom:0}
+.answer ul,.answer ol{list-style:none;padding:0;margin-inline:auto;max-width:62ch}
+.answer .ecard,.answer .watch section,.answer .glance{text-align:center}
+.answer .strip .l,.answer .waypanel .why,.answer .tile .why{margin-inline:auto}
+.photonote,.dialnote,.bz-read,.detail .src,.ecard .src,.watch .src{font-style:normal}
+/* I'm buying it: the bag and the price paid go to My bags */
+.buyit{text-align:center;margin:22px 0 4px}
+.buybtn{font:inherit;font-variant:small-caps;letter-spacing:.14em;font-size:16px;background:var(--ink);color:var(--paper);border:0;border-radius:999px;padding:10px 22px;cursor:pointer}
+.buyit form{display:inline-flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.buyit input{font:inherit;font-size:18px;width:9em;padding:6px 10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);margin-left:6px}
+/* the sell sun on My bags */
+.sunrow{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center;margin:10px 0 6px;text-align:left}
+.sellsun{width:120px;height:auto;color:var(--ink)}
+.sunword{font-family:var(--serif);font-size:24px;margin:0;line-height:1.1}
+.sunrow.sunrise .sunword{color:#d9708f}.sunrow.midday .sunword{color:#c9962a}.sunrow.golden .sunword{color:#e0702f}.sunrow.sunset .sunword{color:#9a4a8a}
+.sunline{margin:4px 0 0;font-size:16px;line-height:1.45;color:var(--ink-2)}

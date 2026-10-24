@@ -14,15 +14,6 @@ const EXAMPLES = [
   "Is the Chanel pony hair bag worth buying right now?",
 ];
 
-/** My bags is per device until there is sign-in: the ids of answers asked here live in a cookie the server reads. */
-function rememberBag(id: string) {
-  try {
-    const cur = (document.cookie.match(/(?:^|; )mybags=([^;]*)/)?.[1] ?? "").split(",").filter(Boolean);
-    const next = [id, ...cur.filter((x) => x !== id)].slice(0, 60).join(",");
-    document.cookie = `mybags=${next}; path=/; max-age=31536000; samesite=lax`;
-  } catch { /* cookies blocked: My bags simply stays empty */ }
-}
-
 export type Done = { result: BriefResult; id: string; bagName: string; numbers: QuickNumbers | null; cached?: boolean; answeredAt?: string };
 
 export default function Ask({ initial = null }: { initial?: Done | null }) {
@@ -34,6 +25,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
   const [done, setDone] = useState<Done | null>(initial);
   const [photo, setPhoto] = useState<string | null>(null);
   const started = useRef(false);
+  const retried = useRef(false);
 
   // ?q=… lets another page (or the design preview) hand a question straight to the tool.
   useEffect(() => {
@@ -49,7 +41,6 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
     if (evt.error) { setError(evt.error); return true; }
     if (evt.clarification) { setError(evt.clarification); return true; }
     if (evt.done && evt.result && evt.input && evt.id) {
-      rememberBag(evt.id);
       try { window.history.replaceState(null, "", `/?brief=${evt.id}`); } catch { /* the address is cosmetic */ }
       setDone({ result: evt.result, id: evt.id, bagName: `${evt.input.house} · ${evt.input.bag}${evt.input.spec ? ` · ${evt.input.spec}` : ""}`, numbers: evt.numbers ?? null, cached: !!evt.cached, answeredAt: evt.answered_at });
       return true;
@@ -64,7 +55,12 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
       let res: Response;
       try { res = await fetch(`/api/ask?job=${encodeURIComponent(jobId)}&since=${since}`, { cache: "no-store" }); }
       catch { await new Promise((r) => setTimeout(r, 3000)); continue; }
-      if (res.status === 404) { setError("That question finished while you were away. Look under My bags."); break; }
+      if (res.status === 404) { // the server lost it (restarted): ask it again once, quietly
+        const again = (() => { try { return (JSON.parse(localStorage.getItem("ai-job") || "null") as { q?: string } | null)?.q ?? ""; } catch { return ""; } })();
+        try { localStorage.removeItem("ai-job"); } catch {}
+        if (again && !retried.current) { retried.current = true; setBusy(false); setTimeout(() => { void ask(again, false, true); }, 0); return; }
+        break;
+      }
       const j = (await res.json()) as { done: boolean; events: Parameters<typeof apply>[0][]; total: number };
       let finished = false;
       for (const e of j.events) { if (apply(e)) finished = true; }
@@ -76,8 +72,8 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
     setBusy(false); setStatus(null);
   }
 
-  async function ask(question: string, fresh = false) {
-    if (!question.trim() || busy) return;
+  async function ask(question: string, fresh = false, force = false) {
+    if (!question.trim() || (busy && !force)) return;
     setBusy(true); setError(null); setDone(null); setStatus("Reading your question…");
     try { window.history.replaceState(null, "", "/"); } catch { /* the address is cosmetic */ }
     try {
