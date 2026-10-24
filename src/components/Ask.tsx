@@ -50,6 +50,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
     if (evt.clarification) { setError(evt.clarification); return true; }
     if (evt.done && evt.result && evt.input && evt.id) {
       rememberBag(evt.id);
+      try { window.history.replaceState(null, "", `/?brief=${evt.id}`); } catch { /* the address is cosmetic */ }
       setDone({ result: evt.result, id: evt.id, bagName: `${evt.input.house} · ${evt.input.bag}${evt.input.spec ? ` · ${evt.input.spec}` : ""}`, numbers: evt.numbers ?? null, cached: !!evt.cached, answeredAt: evt.answered_at });
       return true;
     }
@@ -78,6 +79,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
   async function ask(question: string, fresh = false) {
     if (!question.trim() || busy) return;
     setBusy(true); setError(null); setDone(null); setStatus("Reading your question…");
+    try { window.history.replaceState(null, "", "/"); } catch { /* the address is cosmetic */ }
     try {
       const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question, horizon: h, fresh }) });
       const j = (await res.json().catch(() => ({}))) as { job?: string; error?: string };

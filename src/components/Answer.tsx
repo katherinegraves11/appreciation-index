@@ -69,6 +69,7 @@ const fmtDate = (d: string) => { const [y, m] = d.split("-"); const M = ["Jan", 
 
 export default function Answer({ result, bagName, briefId, numbers, photo }: { result: BriefResult; bagName: string; briefId?: string; numbers: QuickNumbers | null; photo?: string | null }) {
   const [open, setOpen] = useState(false);
+  const [way, setWay] = useState<"new" | "used">(numbers?.paths?.buy.isQuote || !numbers?.paths?.boutique ? "used" : "new");
   const signals = toSignals(result);
   const cards = toCards(result);
   const n = numbers;
@@ -77,6 +78,35 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
   const [first, ...rest] = plainAnswer.split(/(?<=\.)\s+/);
   return (
     <div className="answer">
+      {n?.paths && (() => { const p = n.paths; const keepOf = (v: number) => Math.round(v * payoutRate(v));
+        const isHard = /(hermès|hermes|chanel)/i.test(bagName);
+        const keepNow = p.boutique ? keepOf(p.band.mid) - p.boutique.price : 0;
+        const later = p.growthPct != null ? p.horizons[2] : { lo: p.band.lo, mid: p.band.mid, hi: p.band.hi };
+        const net5 = keepOf(later.mid) - p.buy.price;
+        const usedWord = keepOf(later.lo) > p.buy.price ? "Likely" : Math.abs(net5) <= p.buy.price * 0.05 || net5 > 0 ? "Maybe" : "Unlikely";
+        const range = (lo: number, hi: number) => (lo === hi ? money(lo) : `${money(lo)} to ${money(hi)}`);
+        return (
+        <section className="wayask">
+          <p className="lab">how are you buying it?</p>
+          <div className="dial waypick" role="radiogroup" aria-label="How you are buying it">
+            {p.boutique && <button type="button" role="radio" aria-checked={way === "new"} onClick={() => setWay("new")}>new<small>at the boutique, {money(p.boutique.price)}</small></button>}
+            <button type="button" role="radio" aria-checked={way === "used"} onClick={() => setWay("used")}>secondhand<small>at {money(p.buy.price)}{p.buy.isQuote ? ", your quote" : ""}</small></button>
+          </div>
+          {way === "new" && p.boutique ? (
+            <div className={`waypanel ${keepNow >= 0 ? "buy" : "dont"}`}>
+              <p className="word">{keepNow >= 0 ? "Yes" : "No"}</p>
+              <p className="why"><b>{keepNow >= 0 ? "Worth more than you pay, the day you leave." : "Worth less than you pay once it is secondhand."}</b> Secondhand buyers pay about {range(p.band.lo, p.band.hi)}; after a typical resale fee you would keep about {money(Math.abs(keepNow))} {keepNow >= 0 ? "more" : "less"} than {money(p.boutique.price)}.{isHard && keepNow >= 0 ? " Getting one is the hard part." : ""}</p>
+            </div>
+          ) : (
+            <div className={`waypanel ${usedWord === "Likely" ? "buy" : usedWord === "Maybe" ? "wait" : "dont"}`}>
+              <p className="word">{usedWord}</p>
+              <p className="why"><b>{usedWord === "Likely" ? "Likely to keep going up." : usedWord === "Maybe" ? "Roughly holds its value." : "Unlikely to keep going up from here."}</b> {p.growthPct != null ? `In five years, on current trends, about ${range(later.lo, later.hi)}` : `If prices hold, about ${range(later.lo, later.hi)}`}; after fees, about {money(Math.abs(net5))} {net5 >= 0 ? "more" : "less"} than {money(p.buy.price)}.</p>
+            </div>
+          )}
+          <p className="twonote">Based on {p.basisNote}. A read on today&apos;s prices, not a promise.</p>
+        </section>
+      ); })()}
+
       <section className="verdict">
         {photo ? <img src={photo} alt="" className="vphoto" /> : <BagPlate name={bagName} size={132} className="vplate" />}
         <p className="lab who">{bagName.split(" · ").slice(0, 2).join(" · ").toLowerCase()}</p>
@@ -87,30 +117,17 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         <p className="seeit"><span className="lab">go look at it</span>{seeItLinks(bagName.split(" · ")[0] ?? "", bagName.split(" · ")[1] ?? "", n?.links).map((l, i) => <a key={i} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)}</p>
       </section>
 
-      {n?.paths && (() => { const p = n.paths; const keep = (v: number) => Math.round(v * payoutRate(v)); const h5 = p.horizons[2];
-        const times = p.boutique ? p.band.lo / p.boutique.price : null;
-        const later = p.growthPct != null ? h5 : { lo: p.band.lo, mid: p.band.mid, hi: p.band.hi };
-        const ratio = keep(later.mid) / p.buy.price;
-        const word2 = keep(later.lo) > p.buy.price ? "Likely" : ratio >= 0.97 ? "Maybe" : "Unlikely";
-        const line2 = ratio >= 1.15 ? "On current trends it should be worth more in five years, even after selling fees." : ratio >= 0.97 ? "On current trends it would be worth about what you paid in five years, so you would roughly break even." : "On current trends it would be worth less than you paid in five years, once selling fees come off.";
-        const isHard = /(hermès|hermes|chanel)/i.test(bagName);
-        return (
-        <section className="tiles two" aria-label="The two questions">
-          {p.boutique && times != null && <div className={`tile q ${times >= 1.1 ? "buy" : "dont"}`}>
+      <div className="tiles" aria-label="What to do">
+        {signals.map((s) => (
+          <section key={s.intent} className={`tile ${CLS[s.verdict]}`} data-intent={s.intent}>
             <svg className="frame" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" stroke="currentColor"><rect x="1.5" y="1.5" width="97" height="97" rx="3" strokeWidth=".6" /><rect x="4" y="4" width="92" height="92" rx="2" strokeWidth=".3" /></svg>
-            <p className="word">{times >= 1.1 ? "Yes" : "No"}</p>
-            <p className="lab intent">buying it new at the boutique?</p>
-            <p className="why">{times >= 1.1 ? `Secondhand buyers pay about ${times >= 2 ? `${Math.round(times)} times` : `${Math.round((times - 1) * 100)}% more than`} what the boutique charges.${isHard ? " Getting one is the hard part." : ""}` : "Secondhand buyers pay less than the boutique charges, so buy it to wear."}</p>
-          </div>}
-          <div className={`tile q ${word2 === "Likely" ? "buy" : word2 === "Maybe" ? "wait" : "dont"}`}>
-            <svg className="frame" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" stroke="currentColor"><rect x="1.5" y="1.5" width="97" height="97" rx="3" strokeWidth=".6" /><rect x="4" y="4" width="92" height="92" rx="2" strokeWidth=".3" /></svg>
-            <p className="word">{word2}</p>
-            <p className="lab intent">buying it secondhand at {money(p.buy.price)}?</p>
-            <p className="why">{line2}</p>
-          </div>
-          <p className="twonote">Based on {p.basisNote}. A read on today&apos;s prices, not a promise.</p>
-        </section>
-      ); })()}
+            <svg className="glyph" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" aria-hidden="true">{GLYPH[s.intent]}</svg>
+            <p className="word">{WORD[s.verdict]}</p>
+            <p className="lab intent">{(INTENT_LABEL[s.intent]?.title ?? s.intent).toLowerCase()}</p>
+            <p className="why">{plain(s.why)}</p>
+          </section>
+        ))}
+      </div>
 
       {n?.paths && (() => { const p = n.paths; return (
         <>
@@ -125,88 +142,19 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
       <button type="button" className="why-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "hide the why" : "show me why"}</button>
       {open && (
         <div className="edit">
-      {result.options && result.options.length > 0 && (
-        <>
-          <p className="lab stripcap">the timing question</p>
-          <div className="tiles options" aria-label="When to buy">
-            {result.options.slice(0, 3).map((o, i) => (
-              <section key={i} className={`tile on ${CLS[o.verdict]}`}>
-                <svg className="frame" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" stroke="currentColor"><rect x="1.5" y="1.5" width="97" height="97" rx="3" strokeWidth=".6" /><rect x="4" y="4" width="92" height="92" rx="2" strokeWidth=".3" /></svg>
-                <p className="lab intent">{o.label.toLowerCase()}</p>
-                <p className="word">{WORD[o.verdict]}</p>
-                <p className="why">{plain(o.why)}</p>
-              </section>
-            ))}
-          </div>
-        </>
-      )}
 
-      <div className="tiles" aria-label="What to do">
-        {signals.map((s) => (
-          <section key={s.intent} className={`tile ${CLS[s.verdict]}`} data-intent={s.intent}>
-            <svg className="frame" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" stroke="currentColor"><rect x="1.5" y="1.5" width="97" height="97" rx="3" strokeWidth=".6" /><rect x="4" y="4" width="92" height="92" rx="2" strokeWidth=".3" /></svg>
-            <svg className="glyph" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" aria-hidden="true">{GLYPH[s.intent]}</svg>
-            <p className="word">{WORD[s.verdict]}</p>
-            <p className="lab intent">{(INTENT_LABEL[s.intent]?.title ?? s.intent).toLowerCase()}</p>
-            <p className="why">{plain(s.why)}</p>
-          </section>
-        ))}
-      </div>
 
-      {n?.paths && (() => { const p = n.paths; const keep = (v: number) => Math.round(v * payoutRate(v)); const h = p.horizons; const h5 = h[2];
-        const net5 = keep(h5.mid) - p.buy.price;
-        return (
-        <section className="ways" aria-label="Two ways in">
-          <p className="lab stripcap"><Glyph kind="ledger" />two ways in</p>
-          <div className="ways2">
-            {p.boutique && <div className="way"><p className="lab">from the boutique, at {money(p.boutique.price)}</p>
-              <p className="big">{p.band.mid > p.boutique.price ? <>Worth about <b>{money(p.band.lo)} to {money(p.band.hi)}</b> secondhand the day you leave.</> : <>Secondhand pays <b>{money(p.band.lo)} to {money(p.band.hi)}</b>, less than the boutique.</>}</p>
-              <p className="l">Sell at once and keep about {money(keep(p.band.mid) - p.boutique.price >= 0 ? keep(p.band.mid) - p.boutique.price : p.boutique.price - keep(p.band.mid))} {keep(p.band.mid) >= p.boutique.price ? "more" : "less"} than you paid, after a typical resale fee.{p.boutique.label ? ` Boutique price for ${p.boutique.label}${n.tiers?.material && !p.boutique.label.toLowerCase().includes(n.tiers.material) ? `; the house publishes no ${n.tiers.material} price, so this is the closest` : ""}.` : ""}</p></div>}
-            <div className="way"><p className="lab">secondhand, at {money(p.buy.price)}</p>
-              <p className="big">{p.growthPct != null ? <>On current trends, about <b>{money(h5.lo)} to {money(h5.hi)}</b> in five years.</> : <>If prices hold, about <b>{money(p.band.lo)} to {money(p.band.hi)}</b>.</>}</p>
-              <p className="l">{p.growthPct != null ? `6 months ${money(h[0].lo)} to ${money(h[0].hi)} · 1 year ${money(h[1].lo)} to ${money(h[1].hi)}. ` : ""}Sell in five years and you would keep about {money(Math.abs(net5))} {net5 >= 0 ? "more" : "less"} than {p.buy.isQuote ? "your quote" : "you paid"}, after fees, at the middle of that range.</p></div>
-          </div>
-          <p className="waysnote">Based on {p.basisNote}{p.growthPct != null ? `, grown at the boutique's own pace of ${p.growthPct}% a year` : ""}. Arithmetic on today&apos;s prices, not a promise.</p>
-        </section>
-      ); })()}
 
-      {n && (n.retail_now || n.sold_median || n.ask_median || n.sell || n.asks) && (
-        <>
-          <p className="lab stripcap"><Glyph kind="ledger" /><span className="h1txt">the three prices · boutique, websites, sourcers</span><span className="h5h10txt">the long receipts · what has held</span></p>
-          <div className="strip">
-            {n.sell && (() => { const sl = n.sell; const rate = payoutRate(sl.median_sold); const net = Math.round(sl.median_sold * rate - sl.retail); return sl.plain ? null : (
-              <div className={`sell ${net >= 0 ? "up" : "down"}`}><div className="lab">buy at the boutique, resell now</div><div className="v">{net >= 0 ? "+" : "−"}{money(Math.abs(net))}</div><div className="l"><b>Pay {money(sl.retail)}.</b> {sl.plain ? "Plain ones, not this leather," : "Ones in excellent condition or better"} sold for {money(sl.median_sold)} ({sl.n} sold listings seen on The RealReal, {money(sl.lo)} to {money(sl.hi)}). After The RealReal&apos;s {Math.round((1 - rate) * 100)}%, you keep about {money(Math.abs(net))} {net >= 0 ? "more" : "less"} than you paid. {/(hermès|hermes|chanel)/i.test(bagName) ? "Getting one is the hard part." : ""}</div></div>
-            ); })()}
-            {n.sell ? (
-              <div><div className="lab">sold, on average</div><div className="v">{money(n.sell.mean_sold ?? n.sell.median_sold)}</div><div className="l"><b>{n.sell.plain ? "Any leather, not matched to yours. " : ""}{n.sell.n} sold listings, excellent or better.</b> Middle price {money(n.sell.median_sold)}; {money(n.sell.lo)} to {money(n.sell.hi)}. The RealReal shows no sale dates.</div></div>
-            ) : n.sold_n > 0 && n.sold_median ? (
-              <div><div className="lab">sold for</div><div className="v">{money(n.sold_median)}</div><div className="l"><b>{n.sold_n} sales, same size, any condition.</b>{n.retail_now ? ` ${Math.round(n.sold_pct_of_retail ?? 0)}% of the store price.` : ""}</div></div>
-            ) : n.asks && !n.tiers?.sites_asks ? (
-              <div><div className="lab">sellers want</div><div className="v">{money(n.asks.median_ask)}</div><div className="l"><b>{n.asks.n} listing{n.asks.n === 1 ? "" : "s"} on {n.asks.venue}.</b> An ask, not a sale. {n.asks.sold > 0 ? `${n.asks.sold} of this model sold, all colours and sizes.` : "Priced from asking prices."}{n.asks.link ? <> <a className="asklink" href={n.asks.link} target="_blank" rel="noreferrer">{n.asks.link_label}</a></> : null}</div></div>
-            ) : n.trr_sold_90d > 0 ? (
-              <div><div className="lab">sales seen</div><div className="v">{n.trr_sold_90d}</div><div className="l"><b>Sizes and finishes mixed.</b> No same-size sale yet.</div></div>
-            ) : null}
-            {n.tiers?.sites_asks && (() => { const t = n.tiers.sites_asks; return <div><div className="lab">websites ask, on average</div><div className="v">{money(t.mean)}</div><div className="l"><b>{t.n} listing{t.n === 1 ? "" : "s"}, {t.matched}.</b> Asks, not sales, from {t.sources.join(", ")}. {t.n > 1 ? `${money(t.lo)} to ${money(t.hi)}.` : ""}{n.asks?.link && t.sources.includes("The RealReal") ? <> <a className="asklink" href={n.asks.link} target="_blank" rel="noreferrer">{n.asks.link_label}</a></> : null}</div></div>; })()}
-            {n.tiers?.sourcer_sold && (() => { const t = n.tiers.sourcer_sold; return <div><div className="lab">sourcers sold, on average</div><div className="v">{t.n === 1 && t.ranges.length ? t.ranges[0].replace(/\s*[–-]\s*/, " to ") : money(t.mean)}</div><div className="l"><b>{t.n} sold through secondhand sourcers{t.ranges.length ? ", sold as a price range" : ""}.</b> At their listed price, from {t.sources.join(", ")}. {t.n > 1 ? `${money(t.lo)} to ${money(t.hi)}.` : ""}</div></div>; })()}
-            {n.tiers?.private_quotes && (() => { const p = n.tiers.private_quotes; return <div><div className="lab">private sourcers, on average</div><div className="v">{money(p.mean)}</div><div className="l"><b>{p.n} quote{p.n === 1 ? "" : "s"} logged{p.n < 3 ? ", too few to call an average" : ""}.</b> Sourcers set their own price, so buyers pay more here.</div></div>; })()}
-            {n.retail_now && <div><div className="lab">new, from the boutique</div><div className="v">{money(n.retail_now)}</div><div className="l"><b>The one fixed price{n.retail_size ? `, ${n.retail_size}` : ""}.</b>{n.retail_launch && n.retail_launch !== n.retail_now ? ` Was ${money(n.retail_launch)} at launch.` : ""}</div></div>}
-            {!n.tiers?.sites_asks && n.asks?.fwrd_n && n.asks.fwrd_median ? <div><div className="lab">the FWRD Renew shelf</div><div className="v">{money(n.asks.fwrd_median)}</div><div className="l"><b>{n.asks.fwrd_n} vetted pre-owned listing{n.asks.fwrd_n === 1 ? "" : "s"} this week.</b> An asking price, not a sale, from a seller whose pricing we trust.</div></div> : null}
-            {n.ask_median && n.retail_now && !n.sell && !n.tiers?.sites_asks && <div><div className="lab">sellers want</div><div className="v">{Math.round((100 * n.ask_median) / n.retail_now)}%</div><div className="l"><b>of the store price,</b> across {n.ask_n} listings.</div></div>}
-            <span className="longonly">
-              {(() => { const fam = bagName.match(/\b(kelly|birkin)\b(?=.*\b(cut|pochette|danse|elan|moove|depeches|longue|doll|shopper)\b)/i); return fam
-                ? <div><div className="lab">made for decades?</div><div className="v">Partly</div><div className="l"><b>The {fam[1][0].toUpperCase() + fam[1].slice(1).toLowerCase()} is.</b> This version is younger, so we do not count it as one.</div></div>
-                : <div><div className="lab">made for decades?</div><div className="v">{n.icon ? "Yes" : "Not yet"}</div><div className="l"><b>{n.icon ? "A shape the house keeps making." : "A new shape."}</b> {n.icon ? "These hold." : "Novelties fade."}</div></div>; })()}
-            </span>
-          </div>
-          {n.path && (
-            <p className="anchor"><span className="lab"><Glyph kind="anchor" />the price creep</span> <b>{bagName.split(" · ")[0]} raised it from {money(n.path.from_price)} to {money(n.path.to_price)}</b> ({fmtDate(n.path.from_date)} to {fmtDate(n.path.to_date)}), up {Math.round(((n.path.to_price - n.path.from_price) / n.path.from_price) * 100)}% over that time{n.path.steps && n.path.steps > 1 ? `, in ${n.path.steps} rises` : ""}.</p>
-          )}
-        </>
-      )}
-
+          {n && (() => { const t = n.tiers; const items: string[] = [];
+            if (n.retail_now) items.push(`Boutique ${money(n.retail_now)}${n.retail_size ? ` (${n.retail_size})` : ""}`);
+            if (t?.sourcer_sold) items.push(`Sold by secondhand sourcers ${t.sourcer_sold.ranges[0] ? t.sourcer_sold.ranges[0].replace(/\s*[–-]\s*/, " to ") : money(t.sourcer_sold.mean)} (${t.sourcer_sold.n})`);
+            if (n.sell) items.push(`Sold on The RealReal ${money(n.sell.mean_sold ?? n.sell.median_sold)} on average (${n.sell.n}${n.sell.plain ? ", any leather" : ""})`);
+            if (t?.sites_asks) items.push(`Asking online ${t.sites_asks.n > 1 ? `${money(t.sites_asks.lo)} to ${money(t.sites_asks.hi)}` : money(t.sites_asks.mean)} (${t.sites_asks.n})`);
+            if (t?.private_quotes) items.push(`Your sourcer ${money(t.private_quotes.mean)}`);
+            return items.length ? <p className="pricesline"><span className="lab">the prices</span> {items.join(" · ")}.{n.path ? ` The boutique price went from ${money(n.path.from_price)} to ${money(n.path.to_price)} (${fmtDate(n.path.from_date)} to ${fmtDate(n.path.to_date)}).` : ""}</p> : null; })()}
           <section className="glance">
             <p className="lab">if you read nothing else</p>
-            <ol>{(result.takeaways && result.takeaways.length ? result.takeaways : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}><Rich text={t} link={askLink} /></li>)}</ol>
+            <ol>{(result.takeaways && result.takeaways.length ? result.takeaways.filter((t) => !/cohort|generational adjustment|not stated|dossier|tracker/i.test(t)) : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}><Rich text={t} link={askLink} /></li>)}</ol>
           </section>
 
           {(() => {
