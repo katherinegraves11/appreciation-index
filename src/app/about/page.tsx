@@ -1,4 +1,5 @@
 import { SECTION_SOURCES } from "@/lib/cards";
+import { COVERED_HOUSES } from "@/lib/houses";
 
 /** About: every thing a customer sees on an answer, in the order they see it, as "when you see X, it means Y". */
 export default function About() {
@@ -7,6 +8,9 @@ export default function About() {
     <main>
       <section className="bookhead"><p className="lab">about</p><h1 className="vh">How we <i>decide.</i></h1><p className="hint">Everything you see on an answer, in the order you see it, and what it means.</p></section>
       <div className="about">
+        <h3 className="ah">The houses we cover</h3>
+        <p className="asub">For now, 16 houses: {COVERED_HOUSES.join(", ")}. Ask about a bag from one of them. More are coming.</p>
+
         <h3 className="ah">The dial <span className="dim">(1 · 5 · 10 years)</span></h3>
         <p className="asub">The dial picks the question you care about. It changes which question leads the page and the order of the answers. The evidence behind the answer is the same.</p>
         <div className="abox4">

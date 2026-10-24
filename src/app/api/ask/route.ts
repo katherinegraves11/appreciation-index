@@ -1,3 +1,4 @@
+import { coveredHouse, NOT_COVERED } from "@/lib/houses";
 import { checkSpend } from "@/lib/limits";
 import { parseQuestion } from "@/lib/parse";
 import { runResearch } from "@/lib/research";
@@ -42,6 +43,7 @@ export async function POST(req: Request) {
         const parsed = await parseQuestion(question);
         if (!parsed.ok) { send({ clarification: parsed.clarification }); return; }
         const input = parsed.input;
+        if (!coveredHouse(input.house)) { send({ clarification: NOT_COVERED(input.house || "that house") }); return; }
         send({ parsed: { house: input.house, bag: input.bag, spec: input.spec || "" }, interpretation: parsed.interpretation, status: parsed.interpretation ? `${parsed.interpretation} Looking it up…` : `Looking up the ${input.house} ${input.bag}…` });
         if (!fresh) {
           const norm = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
