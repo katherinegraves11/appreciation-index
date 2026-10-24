@@ -7,6 +7,6 @@ RUN npm ci --include=dev --no-audit --no-fund
 COPY . .
 RUN npm run build && npm prune --omit=dev --no-audit --no-fund
 # Where the tracker copy and saved briefs live; mount a persistent volume at /data.
-ENV PORT=3000 TRACKER_DB_PATH=/data/tracker.db TRENDS_DB_PATH=/data/trends.db HIDE_PRIVATE=1 BRIEFS_DIR=/data/briefs
+ENV PORT=3000 TRACKER_DB_PATH=/data/tracker.db TRENDS_DB_PATH=/data/trends.db BRIEFS_DIR=/data/briefs
 EXPOSE 3000
 CMD ["sh", "./scripts/start.sh"]
