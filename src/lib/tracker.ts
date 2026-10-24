@@ -338,9 +338,14 @@ export type QuickNumbers = {
   buzz: BuzzNumbers | null;
   links: { house_url: string | null; runway_url: string | null };
   path: { from_price: number; from_date: string; to_price: number; to_date: string; size: string | null; steps?: number } | null;
-  sell: { retail: number; retail_spec: string; median_sold: number; n: number; window_days: number; matched_on: string; lo: number; hi: number; read_from: string; read_to: string; pristine: number; plain: boolean } | null;
+  sell: { retail: number; retail_spec: string; median_sold: number; mean_sold: number; n: number; window_days: number; matched_on: string; lo: number; hi: number; read_from: string; read_to: string; pristine: number; plain: boolean } | null;
   asks: { median_ask: number; n: number; sold: number; trr_n: number; fwrd_n: number; fwrd_median: number | null; venue: string; link: string | null; link_label: string } | null;
+  tiers: PriceTiers;
 };
+/** Katie's rule: the boutique price is the only absolute price; every secondhand figure is an average.
+ *  Secondhand websites (sold and asked) and the private sourcer market (where the sourcer sets the price) are kept apart. */
+export type Avg = { mean: number; median: number; n: number; lo: number; hi: number };
+export type PriceTiers = { material: string | null; size: string | null; sites_asks: (Avg & { sources: string[]; matched: string }) | null; private_quotes: (Avg & { prices: number[] }) | null } | null;
 /** SQL fragment + params requiring every meaningful word of the bag name to appear in a column (no first-word guessing). */
 /** TRR model column for a bag: model_guess, plus the title when the bag is a Hermès sub-model (TRR tags a Kelly Cut as "Kelly"). */
 function trrModelCol(bag: string): string {
@@ -384,6 +389,7 @@ export function quickNumbers(house: string, bag: string, spec?: string): QuickNu
     links: bagLinks(house, bag),
     path: pricePath(house, bag),
     sell: sellNow(house, bag, spec),
+    tiers: priceTiers(house, bag, spec),
     asks: asksNow(house, bag, spec),
   };
 }
@@ -421,6 +427,58 @@ export function asksNow(house: string, bag: string, spec?: string): QuickNumbers
 }
 
 /** One block of headline numbers the scorer must use, so the words and the tiles never disagree. */
+const TIER_MATERIALS = ["doblis", "suede", "crocodile", "croc", "alligator", "ostrich", "lizard", "shearling", "grizzly", "barenia", "box calf", "chevre", "swift", "epsom", "togo", "clemence", "evercolor", "tadelakt", "caviar", "lambskin", "patent", "tweed", "canvas", "denim", "raffia", "pony hair"];
+function avg(xs: number[]): Avg | null {
+  if (!xs.length) return null; const a = [...xs].sort((x, y) => x - y);
+  return { mean: Math.round(a.reduce((s, x) => s + x, 0) / a.length), median: median(a), n: a.length, lo: a[0], hi: a[a.length - 1] };
+}
+/** The secondhand tiers for one bag: website asks (dealers, platforms, The RealReal, FWRD) and private sourcer quotes, as averages with n.
+ *  Same model; same size when one is given; same material when the question names one. Exotics only when asked for. */
+export function priceTiers(house: string, bag: string, spec?: string): PriceTiers {
+  const db = open(); if (!db) return null;
+  const hTerms = houseTerms(house);
+  const q = <T extends Row>(sql: string, params: (string | number)[] = []): T[] => { try { return db.prepare(sql).all(...params) as T[]; } catch { return []; } };
+  const words = norm(bag).split(" ").filter((w) => w.length > 2 && !/^\d+$/.test(w) && !["bag", "bags", "the", "and", "with", "clutch", "flap"].includes(w)).slice(0, 3);
+  if (!words.length) { db.close(); return null; }
+  const all = norm(`${bag} ${spec ?? ""}`);
+  const material = TIER_MATERIALS.find((m) => all.includes(m)) ?? null;
+  const houseWords = new Set(norm(house).split(" "));
+  const nameIsHousePlusNumber = !norm(bag).split(" ").some((w) => w.length > 1 && !/^\d+$/.test(w) && !houseWords.has(w));
+  const size = nameIsHousePlusNumber ? null : (all.match(/\b(1[5-9]|[2-4]\d)\b/)?.[1] ?? null);
+  const wantsExotic = /(ostrich|croc|alligator|lizard|porosus|niloticus)/.test(all);
+  const sizeOk = (t: string) => !size || new RegExp(`(^|[^0-9])${size}(\\s*cm)?($|[^0-9%,.])`).test(t.replace(/\[.*$/, "").toLowerCase().replace(/\$\s*[0-9][0-9,.]*/g, " ").replace(/[0-9]+(\.[0-9]+)?\s*%/g, " "));
+  const SAME: Record<string, string[]> = { suede: ["suede", "doblis"], doblis: ["doblis", "suede"], croc: ["croc", "crocodile", "porosus", "niloticus"], crocodile: ["croc", "crocodile", "porosus", "niloticus"] };
+  // same material, and not a mixed-leather bag ("Swift/Suede/Togo") when a material is asked for
+  const matOk = (t: string) => {
+    if (!material) return true; const low = t.toLowerCase(); const same = SAME[material] ?? [material];
+    if (!same.some((m) => low.includes(m))) return false;
+    return !TIER_MATERIALS.some((m) => !same.includes(m) && m !== "canvas" && low.includes(m));
+  };
+  const exoticOk = (t: string) => wantsExotic || !/(ostrich|croc|alligator|lizard|porosus|niloticus)/i.test(t);
+  const sub = /\b(kelly|birkin)\b/.test(norm(bag)) ? ["cut", "pochette", "danse", "elan", "moove", "depeches", "longue", "doll", "shoulder", "shopper"].filter((w) => !norm(bag).includes(w)) : [];
+  const subOk = (t: string) => !sub.some((w) => new RegExp(`\\b${w}\\b`, "i").test(t));
+  const like = words.map(() => "and lower(title) like ?").join(" "); const lp = words.map((w) => `%${w}%`);
+  const dealer = q<Row>(`select source, title, price from resale_listings where ${likeAny("brand", hTerms)} ${like} and available=1 and price > 0 and source <> 'private-sourcer-offer' and last_seen >= date('now','-60 days')`, [...likeParams(hTerms), ...lp]);
+  const trr = q<Row>(`select slug, title, price from trr_item_reads where ${likeAny("house", hTerms)} ${like} and sold=0 and price > 0 and read_date >= date('now','-45 days')`, [...likeParams(hTerms), ...lp]);
+  const fwrd = q<Row>(`select title, price from v_fwrd_latest where ${likeAny("house", hTerms)} ${like} and price > 0`, [...likeParams(hTerms), ...lp]);
+  const priv = q<Row>(`select title, price from resale_listings where source='private-sourcer-offer' and ${likeAny("brand", hTerms)} ${like} and price > 0`, [...likeParams(hTerms), ...lp]);
+  db.close();
+  const keep = (t: string) => sizeOk(t) && matOk(t) && exoticOk(t) && subOk(t);
+  const seenSlug = new Set<string>();
+  const asks: { src: string; price: number }[] = [
+    ...dealer.filter((r) => keep(String(r.title))).map((r) => ({ src: String(r.source), price: Number(r.price) })),
+    ...trr.filter((r) => keep(String(r.title)) && !(r.slug && seenSlug.has(String(r.slug))) && (r.slug ? (seenSlug.add(String(r.slug)), true) : true)).map((r) => ({ src: "therealreal", price: Number(r.price) })),
+    ...fwrd.filter((r) => keep(String(r.title))).map((r) => ({ src: "fwrd", price: Number(r.price) })),
+  ];
+  const a = avg(asks.map((x) => x.price)); const pq = avg(priv.filter((r) => keep(String(r.title))).map((r) => Number(r.price)));
+  const NAME: Record<string, string> = { therealreal: "The RealReal", fwrd: "FWRD Renew", fashionphile: "Fashionphile", rebag: "Rebag", madisonavenuecouture: "Madison Avenue Couture", priveporter: "Privé Porter", tabvintage: "Tab Vintage", wararni: "Wararni", janefinds: "Jane Finds" };
+  return {
+    material, size,
+    sites_asks: a ? { ...a, sources: [...new Set(asks.map((x) => NAME[x.src] ?? x.src))], matched: [size ? `size ${size}` : "", material ? material : "any leather"].filter(Boolean).join(", ") } : null,
+    private_quotes: pq ? { ...pq, prices: priv.filter((r) => keep(String(r.title))).map((r) => Number(r.price)) } : null,
+  };
+}
+
 export function headlineNumbers(house: string, bag: string, spec?: string): string {
   const n = quickNumbers(house, bag, spec); if (!n) return "";
   const lines: string[] = [];
@@ -431,6 +489,13 @@ export function headlineNumbers(house: string, bag: string, spec?: string): stri
   if (n.ask_median) lines.push(`Asking median: $${n.ask_median} across ${n.ask_n} listings (asks, not sales).`);
   if (n.asks?.fwrd_n && n.asks.fwrd_median) lines.push(`FWRD Renew (vetted pre-owned, a trusted price reference; asks, not sales): $${n.asks.fwrd_median} median across ${n.asks.fwrd_n} listings this week.`);
   if (n.path) lines.push(`Retail path: $${n.path.from_price} (${n.path.from_date}) → $${n.path.to_price} (${n.path.to_date}).`);
+  {
+    const t = n.tiers; const parts: string[] = [];
+    parts.push(`(1) Boutique price, the only absolute price: ${n.retail_now ? `$${n.retail_now}${n.retail_size ? ` (${n.retail_size})` : ""}` : "not in our records"}.`);
+    parts.push(`(2) Secondhand websites, averages: ${n.sell ? `sold, average $${n.sell.mean_sold} (median $${n.sell.median_sold}) across ${n.sell.n} sold listings${n.sell.plain ? ", plain leather, not the one asked about" : ""}` : "no matching sold listings"}; ${t?.sites_asks ? `asking, average $${t.sites_asks.mean} (median $${t.sites_asks.median}, $${t.sites_asks.lo} to $${t.sites_asks.hi}) across ${t.sites_asks.n} listings matched on ${t.sites_asks.matched}, from ${t.sites_asks.sources.join(", ")}` : "no matching asks"}.`);
+    parts.push(`(3) Private sourcer market (the sourcer sets the price; willingness to pay runs higher): ${t?.private_quotes ? `average $${t.private_quotes.mean} across ${t.private_quotes.n} logged quote${t.private_quotes.n === 1 ? "" : "s"}${t.private_quotes.n < 3 ? ", too few to call an average" : ""}` : "no logged quotes for this bag"}.`);
+    lines.push(`THREE PRICES: ${parts.join(" ")} Say every secondhand figure as an average with its count ("averages $21,300 across 25 sold listings"); never call a secondhand figure "the price".`);
+  }
   return lines.length ? section("HEADLINE NUMBERS (the page shows exactly these; your takeaways, plain_answer and signals must use the same figures)", lines) : "";
 }
 
@@ -478,7 +543,7 @@ export function sellNow(house: string, bag: string, spec?: string): QuickNumbers
     if (sold.length < 3) return null;
     const prices = sold.map((r) => r.price as number).sort((a, b) => a - b);
     const dates = sold.map((r) => String(r.read_date)).sort();
-    return { retail: retailRows[0].price as number, retail_spec: (retailRows[0].size_or_spec as string) ?? "", median_sold: median(prices), n: prices.length, window_days: 45, matched_on: label,
+    return { retail: retailRows[0].price as number, retail_spec: (retailRows[0].size_or_spec as string) ?? "", median_sold: median(prices), mean_sold: Math.round(prices.reduce((a, b) => a + b, 0) / prices.length), n: prices.length, window_days: 45, matched_on: label,
       lo: prices[0], hi: prices[prices.length - 1], read_from: dates[0], read_to: dates[dates.length - 1], pristine: sold.filter((r) => r.condition === "Pristine").length, plain: label.endsWith(", plain") && !!(spec ?? "").trim() };
   };
   const out = (specWords.length ? tryMatch(specWords, `${bag} ${specWords.join(" ")}${sizeWord ? ` ${sizeWord}` : ""}`) : null) ?? tryMatch([], `${bag}${sizeWord ? ` ${sizeWord}` : ""}, plain`);
@@ -693,13 +758,13 @@ export function tickerLines(): string[] {
   const fwrd = g<Row>(`select count(*) n, max(read_date) d from v_fwrd_latest`);
   if (fwrd?.n) out.push(`FWRD Renew shelf: ${fwrd.n} vetted pre-owned listings, read ${fwrd.d}`);
   const lead = g<Row>(`select house, model, sold_pct_of_retail p, n_sold_same_size n from v_sold_vs_retail where n_sold_same_size >= 5 order by sold_pct_of_retail desc limit 1`);
-  if (lead?.p) out.push(`Holding best: ${lead.house} ${lead.model} sold at ${Math.round(lead.p as number)}% of new (${lead.n} sold listings seen)`);
+  if (lead?.p) out.push(`Holding best: ${lead.house} ${lead.model} sold at ${Math.round(lead.p as number)}% of new on average, all leathers (${lead.n} sold listings seen)`);
   const drop = g<Row>(`select a.house, a.model, round(100.0*(b.median_ask-a.median_ask)/a.median_ask) pct from resale_aggregates a join resale_aggregates b on a.source=b.source and a.house=b.house and a.model=b.model and a.snapshot_date<b.snapshot_date where a.median_ask>0 order by b.snapshot_date desc, pct asc limit 1`);
   if (drop?.pct != null && Number(drop.pct) !== 0) out.push(`Sellers ${Number(drop.pct) < 0 ? "dropped" : "raised"} the ${drop.house} ${drop.model} ask ${Math.abs(Number(drop.pct))}% since the last read`);
   const move = g<Row>(`select headline from people_moves order by id desc limit 1`);
   if (move?.headline) out.push(`People moves: ${String(move.headline).slice(0, 90)}`);
   const ev = g<Row>(`select house, family, event_type, event_date from buzz_events order by id desc limit 1`);
-  if (ev?.house) out.push(`Latest buzz${ev.event_date ? ` (${String(ev.event_date).slice(0, 10)})` : ""}: ${ev.house}${ev.family ? ` ${ev.family}` : ""} in the news`);
+  if (ev?.house) out.push(`Latest buzz${ev.event_date ? ` (${String(ev.event_date).slice(0, 10)})` : ""}: ${ev.house}${ev.family ? ` ${ev.family}` : ""}, ${({ press_cycle: "talked up online", viral_video: "a viral video", dupe_wave: "a dupe wave", backlash: "backlash", celebrity: "a celebrity carry" } as Record<string, string>)[String(ev.event_type)] ?? String(ev.event_type).replace(/_/g, " ")}, not a sale`);
   db.close();
   return out;
 }

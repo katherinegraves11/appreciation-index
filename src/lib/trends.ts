@@ -52,7 +52,7 @@ const strength = (rho: number) => { const a = Math.abs(rho); return a < 0.2 ? "n
 const pct = (v: number) => `${v >= 0 ? "+" : ""}${Math.round(v)}%`;
 
 // ---------- data flow ----------
-export type FlowRow = { feed: string; last: string | null; days30: number; rows7: number; status: "daily" | "regular" | "irregular" | "stale" | "empty" };
+export type FlowRow = { feed: string; last: string | null; ageDays: number | null; days30: number; rows7: number; status: "daily" | "regular" | "irregular" | "stale" | "empty" };
 export function dataFlow(today = new Date()): FlowRow[] {
   const db = trackerDb(); const tdb = trendsDb(); const out: FlowRow[] = [];
   const iso = (d: Date) => d.toISOString().slice(0, 10);
@@ -70,13 +70,14 @@ export function dataFlow(today = new Date()): FlowRow[] {
     [tdb, "Google search history (weekly)", "search_interest", "collected_date"],
   ];
   for (const [d, feed, table, col] of feeds) {
-    if (!d) { out.push({ feed, last: null, days30: 0, rows7: 0, status: "empty" }); continue; }
+    if (!d) { out.push({ feed, last: null, ageDays: null, days30: 0, rows7: 0, status: "empty" }); continue; }
     try {
       const r = d.prepare(`select max(${col}) last, count(distinct case when ${col} >= ? then ${col} end) days30, sum(case when ${col} >= ? then 1 else 0 end) rows7 from ${table}`).get(d30, d7) as Row;
       const last = (r.last as string) ?? null; const days30 = Number(r.days30 ?? 0);
       const status = !last ? "empty" : last < d3 ? "stale" : days30 >= 20 ? "daily" : days30 >= 4 ? "regular" : "irregular";
-      out.push({ feed, last, days30, rows7: Number(r.rows7 ?? 0), status });
-    } catch { out.push({ feed, last: null, days30: 0, rows7: 0, status: "empty" }); }
+      const ageDays = last ? Math.max(0, Math.round((new Date(iso(today)).getTime() - new Date(last.slice(0, 10)).getTime()) / 864e5)) : null;
+      out.push({ feed, last, ageDays, days30, rows7: Number(r.rows7 ?? 0), status });
+    } catch { out.push({ feed, last: null, ageDays: null, days30: 0, rows7: 0, status: "empty" }); }
   }
   db?.close(); tdb?.close();
   return out;
@@ -131,7 +132,8 @@ export type Link = {
   culture: string;         // the culture signal
   money: string;           // the WTP or sales signal
   n: number; need: number; // paired readings and the minimum to report
-  rho: number | null; p: number | null; read: string;  // plain-language result
+  rho: number | null; p: number | null; read: string;  // plain-language result (dossier)
+  plain?: string;          // one customer sentence: direction in words, n, chance
   span: string; source: string;
 };
 
@@ -161,7 +163,8 @@ export function auctionLink(house: string, model: string): Link | null {
   const hot = pairs.filter((x) => x.heat > 1).map((x) => x.ratio), cool = pairs.filter((x) => x.heat <= 1).map((x) => x.ratio);
   const split = hot.length >= 3 && cool.length >= 3 ? ` Lots sold after above-normal searching made ${Math.round(median(hot) * 100)}% of mid-estimate (${hot.length} lots); after normal or quiet searching, ${Math.round(median(cool) * 100)}% (${cool.length} lots).` : "";
   const unsoldNote = unsold.length ? ` ${unsold.length} lots went unsold; their median search heat was ${median(unsold).toFixed(2)}× normal.` : "";
-  return { ...base, n: pairs.length, rho, p, read: `${strength(rho)[0].toUpperCase()}${strength(rho).slice(1)} (rank correlation ${rho.toFixed(2)}, ${pairs.length} sold lots; a shuffle test matches it ${Math.round(p * 100)}% of the time, so ${p < 0.05 ? "unlikely to be chance" : "it could be chance"}).${split}${unsoldNote} Correlation, not cause.` };
+  const plainLine = Math.abs(rho) < 0.2 ? `No clear pattern between searches and auction prices (${pairs.length} sales).` : `When searches ran hotter, auction prices came in ${rho > 0 ? "a little higher" : "a little lower"} against estimate (${pairs.length} sales)${p >= 0.05 ? ", but that could be chance" : ""}.`;
+  return { ...base, plain: plainLine, n: pairs.length, rho, p, read: `${strength(rho)[0].toUpperCase()}${strength(rho).slice(1)} (rank correlation ${rho.toFixed(2)}, ${pairs.length} sold lots; a shuffle test matches it ${Math.round(p * 100)}% of the time, so ${p < 0.05 ? "unlikely to be chance" : "it could be chance"}).${split}${unsoldNote} Correlation, not cause.` };
 }
 
 /** The RealReal reads of this bag: as searches move week to week, do saves (intent), sold share and sold price move with them? */
@@ -182,7 +185,8 @@ export function resaleLink(house: string, model: string): Link | null {
   const pts = reads.map((r) => ({ q: at(String(r.read_date)), saves: Number(r.saves) })).filter((x) => x.q != null && Number.isFinite(x.saves)) as { q: number; saves: number }[];
   if (pts.length < MIN_PAIRS) return { ...base, n: pts.length, rho: null, p: null, read: `Collecting: ${pts.length} reads line up with search weeks; ${MIN_PAIRS} needed.` };
   const rho = spearman(pts.map((x) => x.q), pts.map((x) => x.saves)); const p = permutationP(pts.map((x) => x.q), pts.map((x) => x.saves), rho);
-  return { ...base, n: pts.length, rho, p, read: `Searches and saves: ${strength(rho)} (rank correlation ${rho.toFixed(2)}, ${pts.length} reads, ${p < 0.05 ? "unlikely to be chance" : "could be chance"}). Correlation, not cause.` };
+  const plainLine = Math.abs(rho) < 0.2 ? `No clear pattern between searches and saves (${pts.length} reads).` : `When searches rose, saves ${rho > 0 ? "rose" : "fell"} too (${pts.length} reads)${p >= 0.05 ? ", but that could be chance" : ""}.`;
+  return { ...base, plain: plainLine, n: pts.length, rho, p, read: `Searches and saves: ${strength(rho)} (rank correlation ${rho.toFixed(2)}, ${pts.length} reads, ${p < 0.05 ? "unlikely to be chance" : "could be chance"}). Correlation, not cause.` };
 }
 
 /** Boutique price path next to search interest, year by year: shown side by side, never correlated (too few years). */

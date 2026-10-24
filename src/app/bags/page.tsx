@@ -13,7 +13,7 @@ function shortName(bag: string): string {
   return words.length > cut ? words.slice(0, cut).join(" ") : base;
 }
 
-const W: Record<string, string> = { yes: "Buy", no: "Don't", wait: "Wait" };
+const W: Record<string, string> = { yes: "Yes", no: "No", wait: "Not yet" };
 
 /** My bags: every bag the book has answered on, newest first. (A per-user closet with owned / watching comes with sign-in.) */
 export default async function Bags() {

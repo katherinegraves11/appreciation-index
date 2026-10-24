@@ -6,7 +6,7 @@ import type { QuickNumbers } from "@/lib/tracker";
 import { toCards, toSignals, INTENT_LABEL } from "@/lib/cards";
 import BagPlate, { seeItLinks } from "./BagPlate";
 
-const WORD: Record<string, string> = { yes: "Buy", no: "Don't", wait: "Wait" };
+const WORD: Record<string, string> = { yes: "Yes", no: "No", wait: "Not yet" };
 const CLS: Record<string, string> = { yes: "buy", no: "dont", wait: "wait" };
 const DEF: Record<string, string> = {
   flip_1y: "If you sold it within a year.",
@@ -111,32 +111,35 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             <p className="word">{WORD[s.verdict]}</p>
             <p className="lab intent">{(INTENT_LABEL[s.intent]?.title ?? s.intent).toLowerCase()}</p>
             <p className="why">{plain(s.why)}</p>
-            <p className="def">{DEF[s.intent]}</p>
           </section>
         ))}
       </div>
 
       {n && (n.retail_now || n.sold_median || n.ask_median || n.sell || n.asks) && (
         <>
-          <p className="lab stripcap"><Glyph kind="ledger" /><span className="h1txt">the receipts · what actually changed hands</span><span className="h5h10txt">the long receipts · what has held</span></p>
+          <p className="lab stripcap"><Glyph kind="ledger" /><span className="h1txt">the three prices · boutique, websites, sourcers</span><span className="h5h10txt">the long receipts · what has held</span></p>
           <div className="strip">
             {n.sell && (() => { const sl = n.sell; const rate = payoutRate(sl.median_sold); const net = Math.round(sl.median_sold * rate - sl.retail); return sl.plain ? null : (
               <div className={`sell ${net >= 0 ? "up" : "down"}`}><div className="lab">buy at the boutique, resell now</div><div className="v">{net >= 0 ? "+" : "−"}{money(Math.abs(net))}</div><div className="l"><b>Pay {money(sl.retail)}.</b> {sl.plain ? "Plain ones, not this leather," : "Ones in excellent condition or better"} sold for {money(sl.median_sold)} ({sl.n} sold listings seen on The RealReal, {money(sl.lo)} to {money(sl.hi)}). After The RealReal&apos;s {Math.round((1 - rate) * 100)}%, you keep about {money(Math.abs(net))} {net >= 0 ? "more" : "less"} than you paid. {/(hermès|hermes|chanel)/i.test(bagName) ? "Getting one is the hard part." : ""}</div></div>
             ); })()}
             {n.sell ? (
-              <div><div className="lab">sold for</div><div className="v">{money(n.sell.median_sold)}</div><div className="l"><b>{n.sell.plain ? "Plain, not this leather. " : ""}Excellent or better. {n.sell.n} sold listings seen, {money(n.sell.lo)} to {money(n.sell.hi)}.</b> The RealReal shows no sale dates. {n.sold_n > 0 && n.sold_median ? `All conditions and colours: ${money(n.sold_median)} across ${n.sold_n} sold listings seen.` : ""}</div></div>
+              <div><div className="lab">sold, on average</div><div className="v">{money(n.sell.mean_sold ?? n.sell.median_sold)}</div><div className="l"><b>{n.sell.plain ? "Plain leather, not yours. " : ""}{n.sell.n} sold listings, excellent or better.</b> Middle price {money(n.sell.median_sold)}; {money(n.sell.lo)} to {money(n.sell.hi)}. The RealReal shows no sale dates.</div></div>
             ) : n.sold_n > 0 && n.sold_median ? (
               <div><div className="lab">sold for</div><div className="v">{money(n.sold_median)}</div><div className="l"><b>{n.sold_n} sales, same size, any condition.</b>{n.retail_now ? ` ${Math.round(n.sold_pct_of_retail ?? 0)}% of the store price.` : ""}</div></div>
-            ) : n.asks ? (
+            ) : n.asks && !n.tiers?.sites_asks ? (
               <div><div className="lab">sellers want</div><div className="v">{money(n.asks.median_ask)}</div><div className="l"><b>{n.asks.n} listing{n.asks.n === 1 ? "" : "s"} on {n.asks.venue}.</b> An ask, not a sale. {n.asks.sold > 0 ? `${n.asks.sold} of this model sold, all colours and sizes; none we can see in this exact colour and finish.` : "None of this model sold in our recent reads."}{n.asks.link ? <> <a className="asklink" href={n.asks.link} target="_blank" rel="noreferrer">{n.asks.link_label}</a></> : null}</div></div>
             ) : n.trr_sold_90d > 0 ? (
               <div><div className="lab">sales seen</div><div className="v">{n.trr_sold_90d}</div><div className="l"><b>Sizes and finishes mixed.</b> No same-size sale yet.</div></div>
             ) : null}
-            {n.retail_now && <div><div className="lab">new, today</div><div className="v">{money(n.retail_now)}</div><div className="l"><b>Boutique price.</b>{n.retail_launch && n.retail_launch !== n.retail_now ? ` Was ${money(n.retail_launch)} at launch.` : ""}</div></div>}
-            {n.asks?.fwrd_n && n.asks.fwrd_median ? <div><div className="lab">the FWRD Renew shelf</div><div className="v">{money(n.asks.fwrd_median)}</div><div className="l"><b>{n.asks.fwrd_n} vetted pre-owned listing{n.asks.fwrd_n === 1 ? "" : "s"} this week.</b> An asking price, not a sale, from a seller whose pricing we trust.</div></div> : null}
-            {n.ask_median && n.retail_now && !n.sell && <div><div className="lab">sellers want</div><div className="v">{Math.round((100 * n.ask_median) / n.retail_now)}%</div><div className="l"><b>of the store price,</b> across {n.ask_n} listings.</div></div>}
+            {n.tiers?.sites_asks && (() => { const t = n.tiers.sites_asks; return <div><div className="lab">websites ask, on average</div><div className="v">{money(t.mean)}</div><div className="l"><b>{t.n} listing{t.n === 1 ? "" : "s"}, {t.matched}.</b> Asks, not sales, from {t.sources.join(", ")}. {t.n > 1 ? `${money(t.lo)} to ${money(t.hi)}.` : ""}{n.asks?.link && t.sources.includes("The RealReal") ? <> <a className="asklink" href={n.asks.link} target="_blank" rel="noreferrer">{n.asks.link_label}</a></> : null}</div></div>; })()}
+            {n.tiers?.private_quotes && (() => { const p = n.tiers.private_quotes; return <div><div className="lab">private sourcers, on average</div><div className="v">{money(p.mean)}</div><div className="l"><b>{p.n} quote{p.n === 1 ? "" : "s"} logged{p.n < 3 ? ", too few to call an average" : ""}.</b> Sourcers set their own price, so buyers pay more here.</div></div>; })()}
+            {n.retail_now && <div><div className="lab">new, from the boutique</div><div className="v">{money(n.retail_now)}</div><div className="l"><b>The one fixed price{n.retail_size ? `, ${n.retail_size}` : ""}.</b>{n.retail_launch && n.retail_launch !== n.retail_now ? ` Was ${money(n.retail_launch)} at launch.` : ""}</div></div>}
+            {!n.tiers?.sites_asks && n.asks?.fwrd_n && n.asks.fwrd_median ? <div><div className="lab">the FWRD Renew shelf</div><div className="v">{money(n.asks.fwrd_median)}</div><div className="l"><b>{n.asks.fwrd_n} vetted pre-owned listing{n.asks.fwrd_n === 1 ? "" : "s"} this week.</b> An asking price, not a sale, from a seller whose pricing we trust.</div></div> : null}
+            {n.ask_median && n.retail_now && !n.sell && !n.tiers?.sites_asks && <div><div className="lab">sellers want</div><div className="v">{Math.round((100 * n.ask_median) / n.retail_now)}%</div><div className="l"><b>of the store price,</b> across {n.ask_n} listings.</div></div>}
             <span className="longonly">
-              <div><div className="lab">made for decades?</div><div className="v">{n.icon ? "Yes" : "Not yet"}</div><div className="l"><b>{n.icon ? "A shape the house keeps making." : "A new shape."}</b> {n.icon ? "These hold." : "Novelties fade."}</div></div>
+              {(() => { const fam = bagName.match(/\b(kelly|birkin)\b(?=.*\b(cut|pochette|danse|elan|moove|depeches|longue|doll|shopper)\b)/i); return fam
+                ? <div><div className="lab">made for decades?</div><div className="v">Partly</div><div className="l"><b>The {fam[1][0].toUpperCase() + fam[1].slice(1).toLowerCase()} is.</b> This version is younger, so we do not count it as one.</div></div>
+                : <div><div className="lab">made for decades?</div><div className="v">{n.icon ? "Yes" : "Not yet"}</div><div className="l"><b>{n.icon ? "A shape the house keeps making." : "A new shape."}</b> {n.icon ? "These hold." : "Novelties fade."}</div></div>; })()}
             </span>
           </div>
           {n.path && (
@@ -162,7 +165,8 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
             const readFrom = Array.from(new Set(plat));
             const tiktokRead = readFrom.includes("TikTok");
             // a search rise counts only when it is more than a handful of searches (the note carries "last week N")
-            const growth = (b?.movers ?? []).find((m) => m.platform === "google" && m.metric === "growth_pct_7d" && Number((m.note ?? "").match(/last week (\d+)/)?.[1] ?? 0) >= 5);
+            const bagWord = bagShort.toLowerCase().split(/\s+/).find((w) => w.length > 2 && !/^\d+$/.test(w) && !house.toLowerCase().includes(w)) ?? "";
+            const growth = (b?.movers ?? []).find((m) => m.platform === "google" && m.metric === "growth_pct_7d" && !!bagWord && m.term.toLowerCase().includes(bagWord) && Number((m.note ?? "").match(/last week (\d+)/)?.[1] ?? 0) >= 5);
             const trendsForHouse = (b?.trends ?? []).filter((t) => new RegExp(house.split(" ")[0], "i").test(t.note) && !/engagement, \d+ brands|most-viewed/i.test(t.note));
             const over = trendsForHouse.find((t) => /deinfluenc|moved on|had its moment|backlash|over\b/i.test(t.note));
             const carrying = (b?.trends ?? []).find((t) => /whatsinmybag|what's in my bag/i.test(t.note)) ?? (b?.trends ?? []).find((t) => /carr(y|ied)|rotation|most-shown/i.test(t.note));

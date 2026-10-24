@@ -37,12 +37,12 @@ export const CALL_WORDS: Record<string, string> = {
 
 
 export const INTENT_LABEL: Record<string, { title: string; sub: string }> = {
-  flip_1y: { title: "Sell within a year", sub: "Buy now, sell soon" },
-  hold_5y: { title: "Hold five years", sub: "Buy now, sell around 2031" },
-  hold_10y: { title: "Keep ten years", sub: "Buy now, keep" },
-  wear: { title: "Just to wear", sub: "Value is secondary" },
+  flip_1y: { title: "Resell within a year?", sub: "If you sold it within a year" },
+  hold_5y: { title: "Hold five years?", sub: "If you kept it about five years" },
+  hold_10y: { title: "Keep ten years?", sub: "If you kept it ten years or more" },
+  wear: { title: "Just to wear?", sub: "If you bought it to use" },
 };
-export const VERDICT_WORD: Record<string, string> = { yes: "Buy", no: "Don't", wait: "Wait" };
+export const VERDICT_WORD: Record<string, string> = { yes: "Yes", no: "No", wait: "Not yet" };
 
 /** Signals for the four intents. Older briefs have none; derive a cautious set from the call so the page never shows a gap. */
 export function toSignals(r: BriefResult) {

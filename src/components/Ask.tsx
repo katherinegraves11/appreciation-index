@@ -8,10 +8,10 @@ import { Dial, useHorizon } from "./Horizon";
 import PhotoDrop from "./PhotoDrop";
 
 const EXAMPLES = [
-  "Is the pony hair Chanel bag everyone's talking about worth buying right now?",
+  "My sourcer quoted me $48,000 for a Hermès Kelly Cut in suede. Is that worth it?",
   "Will a Birkin 30 be worth more in ten years?",
   "Is the Alaïa Le Teckel still worth it now the designer is leaving?",
-  "Should I buy the new Chanel everyone has, the big soft flap?",
+  "Is the Chanel pony hair bag worth buying right now?",
 ];
 
 export type Done = { result: BriefResult; id: string; bagName: string; numbers: QuickNumbers | null; cached?: boolean; answeredAt?: string };

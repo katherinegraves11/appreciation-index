@@ -65,7 +65,7 @@ form.ask button[disabled]{opacity:.5;cursor:progress}
 .verdict h2 i{font-style:italic;color:var(--indigo)}
 .verdict .timing{margin:12px auto 0;max-width:60ch;font-size:19px;color:var(--ink-2)}
 .verdict .stamps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
-.stamp{font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--line);color:var(--ink-2)}
+.stamp{font-size:14px;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--line);color:var(--ink-2)}
 
 /* engraved tiles */
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:18px;margin-top:26px;counter-reset:tile}
@@ -98,7 +98,7 @@ form.ask button[disabled]{opacity:.5;cursor:progress}
 .detail{margin-top:18px;columns:2;column-gap:40px;font-size:16px;color:var(--ink-2)}
 .detail section{break-inside:avoid;margin-bottom:16px}
 .detail h4{font-family:var(--serif);font-weight:400;font-size:22px;margin:0 0 4px;color:var(--ink)}
-.detail .mood{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:0 0 4px}
+.detail .mood{font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:0 0 4px}
 .detail p{margin:0 0 6px}
 .detail ul{margin:4px 0 0;padding-left:18px}.detail li{margin:4px 0}
 .detail .src{color:var(--ink-3);font-size:14px;font-style:italic}
@@ -123,7 +123,7 @@ form.ask button[disabled]{opacity:.5;cursor:progress}
 .mini{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
 .mini li{border-top:1px solid var(--line);padding-top:6px}
 .mini b{display:block;font-family:var(--serif);font-weight:400;font-size:20px;line-height:1}
-.mini span{display:block;font-size:13px;color:var(--ink-2);font-variant:small-caps;letter-spacing:.06em}
+.mini span{display:block;font-size:14px;color:var(--ink-2);font-variant:small-caps;letter-spacing:.06em}
 .mini .yes b{color:var(--buy)}.mini .no b{color:var(--dont)}.mini .wait b{color:var(--wait)}
 .bag .meta{margin:12px 0 0;font-size:15.5px;color:var(--ink-2)}
 @media (max-width:560px){.mini{grid-template-columns:repeat(2,1fr)}}
@@ -413,7 +413,7 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 @media (max-width:600px){.bz-lines div{grid-template-columns:1fr;gap:2px}}
 
 /* readability pass (Jo): a calm, distinct tint per section so the eye can find its place */
-.strip{background:color-mix(in srgb,#5b6b7a 7%,var(--paper));padding:16px 14px;border-radius:2px}
+.strip{background:color-mix(in srgb,#5b6b7a 13%,var(--paper));padding:16px 14px;border-radius:2px}
 .buzz2{background:color-mix(in srgb,#2f7f7a 7%,var(--paper))}
 .ecard{background:color-mix(in srgb,#b08a3c 5%,var(--paper))}
 .watch{background:color-mix(in srgb,#8a5a3a 6%,var(--paper));padding:16px 18px;border-top:0;border-radius:2px}
