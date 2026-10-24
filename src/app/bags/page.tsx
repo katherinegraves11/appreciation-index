@@ -53,16 +53,12 @@ export default async function Bags() {
             <div key={b.id} className="bag">
               <div className="bag-top">
                 <div><p className="lab">bought {bought.get(b.id)?.date ? new Date(`${bought.get(b.id)!.date}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""} · paid {money(bought.get(b.id)?.price ?? 0)}</p><h3>{b.house} <i>{shortName(b.bag)}</i></h3>{shortName(b.bag) !== b.bag && <p className="spec">{b.bag}</p>}</div>
-                <span className="tag">{b.result.call}</span><BagPlate name={`${b.house} ${b.bag}`} size={72} className="cplate" />
+                <BagPlate name={`${b.house} ${b.bag}`} size={72} className="cplate" />
               </div>
               <BagCondition id={b.id} current={cond} />
               <div className={`sunrow ${phase}`}><SellSun phase={phase} id={b.id.slice(0, 8)} /><div><p className="sunword">{SUN[phase].word}</p><p className="sunline">{SUN[phase].line}{keepNow && nn?.paths && band ? ` Today ${nn.paths.basis === "same-material asks" ? "sellers ask about" : "it would sell for about"} ${band.lo === band.hi ? money(band.mid) : `${money(band.lo)} to ${money(band.hi)}`}${f !== 1 ? ` in this condition (${f > 1 ? `${Math.round((f - 1) * 100)}% more` : `${Math.round((1 - f) * 100)}% less`} than carried with care, from sold listings on The RealReal)` : ""}; in the middle of that, after fees, you would keep ${gainPct! >= 0 ? `${gainPct}% more` : `${Math.abs(gainPct!)}% less`} than the ${money(paid)} you paid.` : ""} A read on today&apos;s numbers, not a promise.</p></div></div>
-              <p className="line">{(b.result.plain_answer || b.result.one_line || "").replace(/\s*\[\[ask-link\]\]/g, "")}</p>
-              <ul className="mini">
-                {sig.map((s) => <li key={s.intent} className={s.verdict}><b>{W[s.verdict]}</b><span>{s.intent === "flip_1y" ? "sell in a year" : s.intent === "hold_5y" ? "hold 5" : s.intent === "hold_10y" ? "keep 10" : "wear"}</span></li>)}
-              </ul>
-              {b.result.timing && <p className="meta">{b.result.timing.replace(/\s*\[\[ask-link\]\]/g, "")}</p>}
-            <p className="openit"><Link href={`/?brief=${b.id}`}>open the answer</Link></p>
+
+            <p className="openit"><Link href={`/?brief=${b.id}`}>the advice before you bought it</Link></p>
             </div>
           );
         })}
