@@ -87,6 +87,44 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         <p className="seeit"><span className="lab">go look at it</span>{seeItLinks(bagName.split(" · ")[0] ?? "", bagName.split(" · ")[1] ?? "", n?.links).map((l, i) => <a key={i} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)}</p>
       </section>
 
+      {n?.paths && (() => { const p = n.paths; const keep = (v: number) => Math.round(v * payoutRate(v)); const h5 = p.horizons[2];
+        const times = p.boutique ? p.band.lo / p.boutique.price : null;
+        const later = p.growthPct != null ? h5 : { lo: p.band.lo, mid: p.band.mid, hi: p.band.hi };
+        const ratio = keep(later.mid) / p.buy.price;
+        const word2 = keep(later.lo) > p.buy.price ? "Likely" : ratio >= 0.97 ? "Maybe" : "Unlikely";
+        const line2 = ratio >= 1.15 ? "On current trends it should be worth more in five years, even after selling fees." : ratio >= 0.97 ? "On current trends it would be worth about what you paid in five years, so you would roughly break even." : "On current trends it would be worth less than you paid in five years, once selling fees come off.";
+        const isHard = /(hermès|hermes|chanel)/i.test(bagName);
+        return (
+        <section className="tiles two" aria-label="The two questions">
+          {p.boutique && times != null && <div className={`tile q ${times >= 1.1 ? "buy" : "dont"}`}>
+            <svg className="frame" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" stroke="currentColor"><rect x="1.5" y="1.5" width="97" height="97" rx="3" strokeWidth=".6" /><rect x="4" y="4" width="92" height="92" rx="2" strokeWidth=".3" /></svg>
+            <p className="word">{times >= 1.1 ? "Yes" : "No"}</p>
+            <p className="lab intent">buying it new at the boutique?</p>
+            <p className="why">{times >= 1.1 ? `Secondhand buyers pay about ${times >= 2 ? `${Math.round(times)} times` : `${Math.round((times - 1) * 100)}% more than`} what the boutique charges.${isHard ? " Getting one is the hard part." : ""}` : "Secondhand buyers pay less than the boutique charges, so buy it to wear."}</p>
+          </div>}
+          <div className={`tile q ${word2 === "Likely" ? "buy" : word2 === "Maybe" ? "wait" : "dont"}`}>
+            <svg className="frame" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" stroke="currentColor"><rect x="1.5" y="1.5" width="97" height="97" rx="3" strokeWidth=".6" /><rect x="4" y="4" width="92" height="92" rx="2" strokeWidth=".3" /></svg>
+            <p className="word">{word2}</p>
+            <p className="lab intent">buying it secondhand at {money(p.buy.price)}?</p>
+            <p className="why">{line2}</p>
+          </div>
+          <p className="twonote">Based on {p.basisNote}. A read on today&apos;s prices, not a promise.</p>
+        </section>
+      ); })()}
+
+      {n?.paths && (() => { const p = n.paths; return (
+        <>
+          <p className="lab stripcap"><Glyph kind="ledger" />the receipts · what it sells for</p>
+          <div className="strip">
+            <div><div className="lab">{p.basis === "same-material asks" ? "sellers ask" : "sells for"}</div><div className="v">{p.band.lo === p.band.hi ? money(p.band.mid) : `${money(p.band.lo)} to ${money(p.band.hi)}`}</div><div className="l"><b>{p.basisNote}.</b>{p.basis === "same-material asks" ? " Asking prices, not sales." : ""}</div></div>
+            {p.boutique && <div><div className="lab">new, from the boutique</div><div className="v">{money(p.boutique.price)}</div><div className="l"><b>The one fixed price{p.boutique.label ? `, ${p.boutique.label}` : ""}.</b></div></div>}
+          </div>
+        </>
+      ); })()}
+
+      <button type="button" className="why-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "hide the why" : "show me why"}</button>
+      {open && (
+        <div className="edit">
       {result.options && result.options.length > 0 && (
         <>
           <p className="lab stripcap">the timing question</p>
@@ -114,10 +152,6 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
           </section>
         ))}
       </div>
-
-      {n?.forward && n.forward.signals.length > 0 && (() => { const f = n.forward; const b5 = f.bands?.find((b) => b.y === 5); const LEAN: Record<string, string> = { rising: "Trends point up", cooling: "Trends point down", mixed: "Trends pull both ways", steady: "Trends are flat" }; return (
-        <p className="anchor ahead"><span className="lab"><Glyph kind="anchor" />looking ahead</span> <b>{LEAN[f.lean]}{f.confidence === "low" ? ", an early read" : ""}.</b> {f.signals.map((s) => `${s.name} ${s.dir}`).join(" · ")}.{f.nextBoutique ? ` On its current pace the boutique price reaches about ${money(f.nextBoutique.price)} by ${f.nextBoutique.date}.` : ""}{b5 ? ` In five years, resale on current trends: ${money(b5.lo)} to ${money(b5.hi)}${n.sell?.plain ? ", any leather" : ""}.` : ""} A forecast, not a promise.</p>
-      ); })()}
 
       {n?.paths && (() => { const p = n.paths; const keep = (v: number) => Math.round(v * payoutRate(v)); const h = p.horizons; const h5 = h[2];
         const net5 = keep(h5.mid) - p.buy.price;
@@ -170,9 +204,6 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         </>
       )}
 
-      <button type="button" className="why-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "hide the why" : "show me why"}</button>
-      {open && (
-        <div className="edit">
           <section className="glance">
             <p className="lab">if you read nothing else</p>
             <ol>{(result.takeaways && result.takeaways.length ? result.takeaways : cards.slice(0, 3).map((c) => c.headline)).slice(0, 3).map((t, i) => <li key={i}><Rich text={t} link={askLink} /></li>)}</ol>

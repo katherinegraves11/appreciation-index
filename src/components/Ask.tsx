@@ -115,7 +115,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
           <input id="q" type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Describe the bag in your own words" autoComplete="off" aria-label="Your question" disabled={busy} />
           <button type="submit" disabled={busy || !q.trim()}>{busy ? "thinking" : "appreciate"}</button>
         </form>
-        {!done && !busy && <PhotoDrop horizon={h} disabled={busy} onAsk={(question, preview) => { setPhoto(preview ?? null); setQ(question); ask(question); }} />}
+        {!busy && <PhotoDrop horizon={h} disabled={busy} onAsk={(question, preview) => { setPhoto(preview ?? null); setQ(question); ask(question); }} />}
         {!done && !busy && (
           <>
             <p className="hint"><span className="h1txt">Ask about any bag. We say whether to buy it now, and why.</span><span className="h5h10txt">Ask about any bag. We say whether it will be worth more, and why.</span> <a href="/about">How we decide</a></p>
