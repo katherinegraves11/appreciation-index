@@ -6,7 +6,6 @@ import type { QuickNumbers } from "@/lib/tracker";
 import Answer from "./Answer";
 import { Dial, useHorizon } from "./Horizon";
 import PhotoDrop from "./PhotoDrop";
-import { COVERED_HOUSES } from "@/lib/houses";
 
 const EXAMPLES = [
   "My sourcer quoted me $48,000 for a Hermès Kelly Cut in suede. Is that worth it?",
@@ -125,7 +124,6 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
         {!done && !busy && (
           <>
             <p className="hint"><span className="h1txt">Ask about any bag. We say whether to buy it now, and why.</span><span className="h5h10txt">Ask about any bag. We say whether it will be worth more, and why.</span> <a href="/about">How we decide</a></p>
-            <p className="houses">We cover 16 houses for now: {COVERED_HOUSES.join(" · ")}.</p>
             <div className="chips">{EXAMPLES.map((ex) => <button key={ex} type="button" className="chip" onClick={() => { setPhoto(null); setQ(ex); ask(ex); }}>{ex}</button>)}</div>
           </>
         )}
