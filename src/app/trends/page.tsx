@@ -1,4 +1,4 @@
-import { dataFlow, bagTrend, TRACKED } from "@/lib/trends";
+import { dataFlow, bagTrend, forwardRead, TRACKED } from "@/lib/trends";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +8,8 @@ const age = (d: number | null) => (d == null ? "not loaded" : d === 0 ? "today" 
 /** Trends: what culture and prices are saying so far, bag by bag, and whether the daily reads are arriving. */
 export default function Trends() {
   const flow = dataFlow();
-  const bags = TRACKED.map(([h, m]) => bagTrend(h, m)).filter((b) => b.term);
+  const bags = TRACKED.map(([h, m]) => ({ ...bagTrend(h, m), fwd: forwardRead(h, m, null) })).filter((b) => b.term);
+  const LEAN: Record<string, string> = { rising: "Up", cooling: "Down", mixed: "Mixed", steady: "Flat" };
   const rising = bags.filter((b) => (b.search?.yoyPct ?? 0) >= 25).sort((a, b) => (b.search!.yoyPct ?? 0) - (a.search!.yoyPct ?? 0));
   const falling = bags.filter((b) => (b.search?.yoyPct ?? 0) <= -15).sort((a, b) => (a.search!.yoyPct ?? 0) - (b.search!.yoyPct ?? 0));
   const linked = bags.filter((b) => b.auction?.plain);
@@ -31,10 +32,11 @@ export default function Trends() {
 
         <h3 className="ah">Bag by bag</h3>
         <div className="tablewrap"><table>
-          <thead><tr><th>Bag</th><th>Searches vs a year ago</th><th>Searches and auction prices</th></tr></thead>
+          <thead><tr><th>Bag</th><th>Looking ahead</th><th>Searches vs a year ago</th><th>Searches and auction prices</th></tr></thead>
           <tbody>{bags.map((b) => (
             <tr key={`${b.house} ${b.model}`}>
               <td><b>{b.house} {b.model}</b></td>
+              <td>{b.fwd ? `${LEAN[b.fwd.lean]}${b.fwd.confidence === "low" ? ", early read" : ""}${b.fwd.nextBoutique ? `; boutique about $${b.fwd.nextBoutique.price.toLocaleString()} by ${b.fwd.nextBoutique.date}` : ""}` : "—"}</td>
               <td>{sign(b.search?.yoyPct)}</td>
               <td>{b.auction?.plain ?? (b.auction ? `Too early: ${b.auction.n} of ${b.auction.need} sales.` : "No auction sales yet.")}</td>
             </tr>

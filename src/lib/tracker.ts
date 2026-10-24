@@ -7,7 +7,7 @@
  * to skip (the analyst then researches from the web only and says so).
  */
 import { DatabaseSync } from "node:sqlite";
-import { connectiveLines } from "./trends";
+import { connectiveLines, forwardRead, forwardLines, type Forward } from "./trends";
 import fs from "fs";
 import path from "path";
 
@@ -338,9 +338,10 @@ export type QuickNumbers = {
   buzz: BuzzNumbers | null;
   links: { house_url: string | null; runway_url: string | null };
   path: { from_price: number; from_date: string; to_price: number; to_date: string; size: string | null; steps?: number } | null;
-  sell: { retail: number; retail_spec: string; median_sold: number; mean_sold: number; n: number; window_days: number; matched_on: string; lo: number; hi: number; read_from: string; read_to: string; pristine: number; plain: boolean } | null;
+  sell: { retail: number; retail_spec: string; median_sold: number; mean_sold: number; prices: number[]; n: number; window_days: number; matched_on: string; lo: number; hi: number; read_from: string; read_to: string; pristine: number; plain: boolean } | null;
   asks: { median_ask: number; n: number; sold: number; trr_n: number; fwrd_n: number; fwrd_median: number | null; venue: string; link: string | null; link_label: string } | null;
   tiers: PriceTiers;
+  forward: Forward;
 };
 /** Katie's rule: the boutique price is the only absolute price; every secondhand figure is an average.
  *  Secondhand websites (sold and asked) and the private sourcer market (where the sourcer sets the price) are kept apart. */
@@ -379,6 +380,7 @@ export function quickNumbers(house: string, bag: string, spec?: string): QuickNu
   const trend = g<Row>(`select a.median_ask a0, b.median_ask a1 from resale_aggregates a join resale_aggregates b on a.source=b.source and a.house=b.house and a.model=b.model where ${likeAny("a.house", hTerms)} and ${modelMatch('a.model', bag, house).sql} and a.snapshot_date < b.snapshot_date order by b.snapshot_date desc, a.snapshot_date desc limit 1`, [...likeParams(hTerms), ...modelMatch('a.model', bag, house).params]);
   const icon = g<Row>(`select launch_year from bags where ${likeAny("house", hTerms)} and ${mm.sql} and launch_year <= 2010 limit 1`, [...likeParams(hTerms), ...mm.params]);
   db.close();
+  const sell = sellNow(house, bag, spec);
   return {
     retail_now: (rc?.retail_now as number) ?? null, retail_launch: (launch?.price as number) ?? null, retail_size: (rc?.size_or_spec as string) ?? null,
     ask_median: (ask?.m as number) ?? null, ask_n: (ask?.n as number) ?? 0,
@@ -388,7 +390,8 @@ export function quickNumbers(house: string, bag: string, spec?: string): QuickNu
     buzz: buzzNumbers(house, bag),
     links: bagLinks(house, bag),
     path: pricePath(house, bag),
-    sell: sellNow(house, bag, spec),
+    sell,
+    forward: (() => { try { return forwardRead(house, bag, sell ? { prices: sell.prices, retailNow: sell.retail, plain: sell.plain } : null); } catch { return null; } })(),
     tiers: priceTiers(house, bag, spec),
     asks: asksNow(house, bag, spec),
   };
@@ -496,6 +499,8 @@ export function headlineNumbers(house: string, bag: string, spec?: string): stri
     parts.push(`(3) Private sourcer market (the sourcer sets the price; willingness to pay runs higher): ${t?.private_quotes ? `average $${t.private_quotes.mean} across ${t.private_quotes.n} logged quote${t.private_quotes.n === 1 ? "" : "s"}${t.private_quotes.n < 3 ? ", too few to call an average" : ""}` : "no logged quotes for this bag"}.`);
     lines.push(`THREE PRICES: ${parts.join(" ")} Say every secondhand figure as an average with its count ("averages $21,300 across 25 sold listings"); never call a secondhand figure "the price".`);
   }
+  const fwd = forwardLines(n.forward);
+  if (fwd.length) lines.push(`FORWARD READ (lead the five- and ten-year signals with this; it is a forecast, say so): ${fwd.join(" ")}`);
   return lines.length ? section("HEADLINE NUMBERS (the page shows exactly these; your takeaways, plain_answer and signals must use the same figures)", lines) : "";
 }
 
@@ -543,7 +548,7 @@ export function sellNow(house: string, bag: string, spec?: string): QuickNumbers
     if (sold.length < 3) return null;
     const prices = sold.map((r) => r.price as number).sort((a, b) => a - b);
     const dates = sold.map((r) => String(r.read_date)).sort();
-    return { retail: retailRows[0].price as number, retail_spec: (retailRows[0].size_or_spec as string) ?? "", median_sold: median(prices), mean_sold: Math.round(prices.reduce((a, b) => a + b, 0) / prices.length), n: prices.length, window_days: 45, matched_on: label,
+    return { retail: retailRows[0].price as number, retail_spec: (retailRows[0].size_or_spec as string) ?? "", median_sold: median(prices), prices, mean_sold: Math.round(prices.reduce((a, b) => a + b, 0) / prices.length), n: prices.length, window_days: 45, matched_on: label,
       lo: prices[0], hi: prices[prices.length - 1], read_from: dates[0], read_to: dates[dates.length - 1], pristine: sold.filter((r) => r.condition === "Pristine").length, plain: label.endsWith(", plain") && !!(spec ?? "").trim() };
   };
   const out = (specWords.length ? tryMatch(specWords, `${bag} ${specWords.join(" ")}${sizeWord ? ` ${sizeWord}` : ""}`) : null) ?? tryMatch([], `${bag}${sizeWord ? ` ${sizeWord}` : ""}, plain`);

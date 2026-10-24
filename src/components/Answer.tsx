@@ -115,6 +115,10 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
         ))}
       </div>
 
+      {n?.forward && n.forward.signals.length > 0 && (() => { const f = n.forward; const b5 = f.bands?.find((b) => b.y === 5); const LEAN: Record<string, string> = { rising: "Trends point up", cooling: "Trends point down", mixed: "Trends pull both ways", steady: "Trends are flat" }; return (
+        <p className="anchor ahead"><span className="lab"><Glyph kind="anchor" />looking ahead</span> <b>{LEAN[f.lean]}{f.confidence === "low" ? ", an early read" : ""}.</b> {f.signals.map((s) => `${s.name} ${s.dir}`).join(" · ")}.{f.nextBoutique ? ` On its current pace the boutique price reaches about ${money(f.nextBoutique.price)} by ${f.nextBoutique.date}.` : ""}{b5 ? ` In five years, resale on current trends: ${money(b5.lo)} to ${money(b5.hi)}${n.sell?.plain ? " for plain leather" : ""}.` : ""} A forecast, not a promise.</p>
+      ); })()}
+
       {n && (n.retail_now || n.sold_median || n.ask_median || n.sell || n.asks) && (
         <>
           <p className="lab stripcap"><Glyph kind="ledger" /><span className="h1txt">the three prices · boutique, websites, sourcers</span><span className="h5h10txt">the long receipts · what has held</span></p>

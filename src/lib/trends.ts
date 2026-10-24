@@ -243,3 +243,66 @@ export const TRACKED: [string, string][] = [
   ["Gucci", "Jackie"], ["Loewe", "Puzzle"], ["Prada", "Galleria"], ["Celine", "Triomphe"], ["Balenciaga", "City"],
   ["Bottega Veneta", "Jodie"], ["Louis Vuitton", "Speedy"], ["Louis Vuitton", "Neverfull"], ["Miu Miu", "Wander"], ["The Row", "Margaux"], ["Goyard", "Saint Louis"],
 ];
+
+// ---------- the forward read (Katie, 2026-10-23: "advice more based off of trend forecasting, not stuck in the past") ----------
+export type ForwardSignal = { name: string; dir: "up" | "down" | "flat"; evidence: string };
+export type Forward = {
+  lean: "rising" | "cooling" | "mixed" | "steady"; confidence: "low" | "medium"; signals: ForwardSignal[];
+  nextBoutique: { price: number; date: string; ratePct: number; years: number } | null;
+  bands: { y: number; lo: number; mid: number; hi: number }[] | null; bandsNote: string | null;
+} | null;
+
+/** Where the forward-looking signals point for one bag. A transparent tally, not a fitted model: each signal shows its evidence,
+ *  confidence is "medium" only when three or more agree and none disagree, never "high" (no backtest yet). */
+export function forwardRead(house: string, model: string, sold?: { prices: number[]; retailNow: number; plain: boolean } | null): Forward {
+  const words = modelWords(model); if (!words.length) return null;
+  const db = trackerDb(); if (!db) return null;
+  const h = `%${norm(house).split(" ")[0].slice(0, 4)}%`; const signals: ForwardSignal[] = [];
+  const q = (sql: string, ...p: (string | number)[]) => { try { return db.prepare(sql).all(...p) as Row[]; } catch { return []; } };
+  // 1. search momentum
+  const term = termFor(house, model); const sr = term ? searchRead(term) : null;
+  if (sr?.yoyPct != null) signals.push({ name: "Searches", dir: sr.yoyPct >= 10 ? "up" : sr.yoyPct <= -10 ? "down" : "flat", evidence: `US Google searches for “${term}” ${sr.yoyPct >= 0 ? "up" : "down"} ${Math.abs(Math.round(sr.yoyPct))}% on a year ago (last 13 weeks); yearly average ${sr.byYear[0]?.avg ?? "?"} in ${sr.byYear[0]?.year ?? "?"} to ${sr.byYear[sr.byYear.length - 1]?.avg ?? "?"} in ${sr.byYear[sr.byYear.length - 1]?.year ?? "?"}` });
+  // 2. boutique price path → next January
+  const rp = q(`select substr(effective_date,1,4) y, max(price) price from retail_reference where lower(house) like ? ${words.map(() => "and lower(model) like ?").join(" ")} and region='US' and is_reference_size=1 group by y order by y`, h, ...words.map((w) => `%${w}%`));
+  let nextBoutique: NonNullable<Forward>["nextBoutique"] = null; let rate = 0;
+  if (rp.length >= 3) {
+    const f = rp[0], l = rp[rp.length - 1]; const yrs = Number(l.y) - Number(f.y);
+    if (yrs >= 2 && Number(f.price) > 0) {
+      rate = Math.pow(Number(l.price) / Number(f.price), 1 / yrs) - 1;
+      nextBoutique = { price: Math.round(Number(l.price) * (1 + rate) / 50) * 50, date: `January ${Number(l.y) + 1}`, ratePct: Math.round(rate * 1000) / 10, years: yrs };
+      signals.push({ name: "Boutique price", dir: rate >= 0.03 ? "up" : rate <= 0 ? "down" : "flat", evidence: `$${Number(f.price).toLocaleString()} in ${f.y} to $${Number(l.price).toLocaleString()} in ${l.y}, about ${nextBoutique.ratePct}% a year; at that pace about $${nextBoutique.price.toLocaleString()} by ${nextBoutique.date} (a projection, not an announced price)` });
+    }
+  }
+  // 3. resale asks between the last two snapshots
+  // same source, at least 20 listings in each snapshot, and sizes within 3x of each other, or the change is noise
+  const ra = q(`select source s, snapshot_date d, median_ask m, n_listings n from resale_aggregates where lower(house) like ? ${words.map(() => "and lower(model) like ?").join(" ")} and median_ask > 0 and n_listings >= 20 order by snapshot_date desc, n_listings desc`, h, ...words.map((w) => `%${w}%`));
+  const bySource = new Map<string, Row[]>(); for (const r of ra) { const k = String(r.s); const list = bySource.get(k) ?? []; if (!list.some((x) => x.d === r.d)) list.push(r); bySource.set(k, list); }
+  const pair = [...bySource.values()].map((l) => l.slice(0, 2)).find((l) => l.length === 2 && Math.max(Number(l[0].n), Number(l[1].n)) <= 3 * Math.min(Number(l[0].n), Number(l[1].n)));
+  const snaps = pair ?? [];
+  if (snaps.length === 2) { const ch = ((Number(snaps[0].m) - Number(snaps[1].m)) / Number(snaps[1].m)) * 100; signals.push({ name: "Resale asks", dir: ch >= 5 ? "up" : ch <= -5 ? "down" : "flat", evidence: `median ask $${Number(snaps[1].m).toLocaleString()} (${snaps[1].d}) to $${Number(snaps[0].m).toLocaleString()} (${snaps[0].d}) on ${snaps[0].s}, ${snaps[1].n} and ${snaps[0].n} listings, ${ch >= 0 ? "+" : ""}${Math.round(ch)}%; two snapshots only` }); }
+  // 4. auctions: price against estimate, last 12 months vs the 12 before
+  const lots = q(`select sale_date d, hammer_price/((estimate_low+estimate_high)/2.0) r from auction_results where lower(house) like ? ${words.map(() => "and lower(coalesce(model_guess,'')) like ?").join(" ")} and sold=1 and hammer_price > 0 and estimate_low > 0 and estimate_high > 0`, h, ...words.map((w) => `%${w}%`));
+  const cut = new Date(Date.now() - 365 * 864e5).toISOString().slice(0, 10), cut2 = new Date(Date.now() - 730 * 864e5).toISOString().slice(0, 10);
+  const recent = lots.filter((l) => String(l.d) >= cut).map((l) => Number(l.r)), prior = lots.filter((l) => String(l.d) < cut && String(l.d) >= cut2).map((l) => Number(l.r));
+  if (recent.length >= 5 && prior.length >= 5) { const a = median(recent), b = median(prior); signals.push({ name: "Auctions", dir: a - b >= 0.05 ? "up" : b - a >= 0.05 ? "down" : "flat", evidence: `sold at ${Math.round(a * 100)}% of mid-estimate in the last 12 months (${recent.length} lots) against ${Math.round(b * 100)}% the year before (${prior.length} lots)` }); }
+  db.close();
+  const ups = signals.filter((s) => s.dir === "up").length, downs = signals.filter((s) => s.dir === "down").length;
+  const lean = ups && !downs ? "rising" : downs && !ups ? "cooling" : ups && downs ? "mixed" : "steady";
+  const agree = Math.max(ups, downs);
+  const confidence = agree >= 3 && !(ups && downs) ? "medium" : "low";
+  // projected resale band: today's sold-to-boutique ratio (middle half) applied to the boutique price grown at its own past rate
+  let bands: NonNullable<Forward>["bands"] = null, bandsNote: string | null = null;
+  if (sold && sold.prices.length >= 8 && sold.retailNow && rp.length >= 3) {
+    const sc = scenario(rp.map((r) => ({ y: String(r.y), price: Number(r.price) })), sold.prices, sold.retailNow);
+    if (sc) { bands = sc.at; bandsNote = `today's sold-to-boutique ratio across ${sc.n} sold listings${sold.plain ? " of plain leather, not the one asked about" : ""} (middle half ${Math.round(sc.ratioLo * 100)}% to ${Math.round(sc.ratioHi * 100)}%), applied to the boutique price growing ${Math.round(sc.cagrPct * 10) / 10}% a year (its ${sc.years}-year pace). A projection, not a forecast of this bag; no backtest yet.`; }
+  }
+  return { lean, confidence, signals, nextBoutique, bands, bandsNote };
+}
+
+export function forwardLines(f: Forward): string[] {
+  if (!f) return [];
+  const out = [`FORWARD LEAN: ${f.lean.toUpperCase()}, confidence ${f.confidence} (${f.signals.length} forward signal${f.signals.length === 1 ? "" : "s"}; medium needs three agreeing, never high without a backtest).`];
+  for (const s of f.signals) out.push(`${s.name}: ${s.dir}. ${s.evidence}.`);
+  if (f.bands) out.push(`Projected resale range (middle half): ${f.bands.map((b) => `${b.y} year${b.y === 1 ? "" : "s"} $${b.lo.toLocaleString()} to $${b.hi.toLocaleString()} (middle $${b.mid.toLocaleString()})`).join("; ")}. Basis: ${f.bandsNote}`);
+  return out;
+}
