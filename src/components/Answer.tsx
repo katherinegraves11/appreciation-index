@@ -116,7 +116,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
       </div>
 
       {n?.forward && n.forward.signals.length > 0 && (() => { const f = n.forward; const b5 = f.bands?.find((b) => b.y === 5); const LEAN: Record<string, string> = { rising: "Trends point up", cooling: "Trends point down", mixed: "Trends pull both ways", steady: "Trends are flat" }; return (
-        <p className="anchor ahead"><span className="lab"><Glyph kind="anchor" />looking ahead</span> <b>{LEAN[f.lean]}{f.confidence === "low" ? ", an early read" : ""}.</b> {f.signals.map((s) => `${s.name} ${s.dir}`).join(" · ")}.{f.nextBoutique ? ` On its current pace the boutique price reaches about ${money(f.nextBoutique.price)} by ${f.nextBoutique.date}.` : ""}{b5 ? ` In five years, resale on current trends: ${money(b5.lo)} to ${money(b5.hi)}${n.sell?.plain ? " for plain leather" : ""}.` : ""} A forecast, not a promise.</p>
+        <p className="anchor ahead"><span className="lab"><Glyph kind="anchor" />looking ahead</span> <b>{LEAN[f.lean]}{f.confidence === "low" ? ", an early read" : ""}.</b> {f.signals.map((s) => `${s.name} ${s.dir}`).join(" · ")}.{f.nextBoutique ? ` On its current pace the boutique price reaches about ${money(f.nextBoutique.price)} by ${f.nextBoutique.date}.` : ""}{b5 ? ` In five years, resale on current trends: ${money(b5.lo)} to ${money(b5.hi)}${n.sell?.plain ? ", any leather" : ""}.` : ""} A forecast, not a promise.</p>
       ); })()}
 
       {n && (n.retail_now || n.sold_median || n.ask_median || n.sell || n.asks) && (
@@ -127,7 +127,7 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
               <div className={`sell ${net >= 0 ? "up" : "down"}`}><div className="lab">buy at the boutique, resell now</div><div className="v">{net >= 0 ? "+" : "−"}{money(Math.abs(net))}</div><div className="l"><b>Pay {money(sl.retail)}.</b> {sl.plain ? "Plain ones, not this leather," : "Ones in excellent condition or better"} sold for {money(sl.median_sold)} ({sl.n} sold listings seen on The RealReal, {money(sl.lo)} to {money(sl.hi)}). After The RealReal&apos;s {Math.round((1 - rate) * 100)}%, you keep about {money(Math.abs(net))} {net >= 0 ? "more" : "less"} than you paid. {/(hermès|hermes|chanel)/i.test(bagName) ? "Getting one is the hard part." : ""}</div></div>
             ); })()}
             {n.sell ? (
-              <div><div className="lab">sold, on average</div><div className="v">{money(n.sell.mean_sold ?? n.sell.median_sold)}</div><div className="l"><b>{n.sell.plain ? "Plain leather, not yours. " : ""}{n.sell.n} sold listings, excellent or better.</b> Middle price {money(n.sell.median_sold)}; {money(n.sell.lo)} to {money(n.sell.hi)}. The RealReal shows no sale dates.</div></div>
+              <div><div className="lab">sold, on average</div><div className="v">{money(n.sell.mean_sold ?? n.sell.median_sold)}</div><div className="l"><b>{n.sell.plain ? "Any leather, not matched to yours. " : ""}{n.sell.n} sold listings, excellent or better.</b> Middle price {money(n.sell.median_sold)}; {money(n.sell.lo)} to {money(n.sell.hi)}. The RealReal shows no sale dates.</div></div>
             ) : n.sold_n > 0 && n.sold_median ? (
               <div><div className="lab">sold for</div><div className="v">{money(n.sold_median)}</div><div className="l"><b>{n.sold_n} sales, same size, any condition.</b>{n.retail_now ? ` ${Math.round(n.sold_pct_of_retail ?? 0)}% of the store price.` : ""}</div></div>
             ) : n.asks && !n.tiers?.sites_asks ? (
