@@ -41,7 +41,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
     if (evt.error) { setError(evt.error); return true; }
     if (evt.clarification) { setError(evt.clarification); return true; }
     if (evt.done && evt.result && evt.input && evt.id) {
-      try { window.history.replaceState(null, "", `/?brief=${evt.id}`); } catch { /* the address is cosmetic */ }
+      try { localStorage.setItem("ai-last", evt.id); window.history.replaceState(null, "", `/?brief=${evt.id}`); } catch { /* the address is cosmetic */ }
       setDone({ result: evt.result, id: evt.id, bagName: `${evt.input.house} · ${evt.input.bag}${evt.input.spec ? ` · ${evt.input.spec}` : ""}`, numbers: evt.numbers ?? null, cached: !!evt.cached, answeredAt: evt.answered_at });
       return true;
     }
@@ -89,9 +89,15 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
 
   // Coming back to Ask while a question is still running: pick it up where it is.
   useEffect(() => {
-    if (initial) return;
+    if (initial) { try { localStorage.setItem("ai-last", initial.id); } catch {} return; }
     try {
-      const raw = localStorage.getItem("ai-job"); if (!raw) return;
+      const raw = localStorage.getItem("ai-job");
+      if (!raw) {
+        const last = localStorage.getItem("ai-last");
+        const params = new URLSearchParams(window.location.search);
+        if (last && !params.get("q") && !params.get("brief")) window.location.replace(`/?brief=${encodeURIComponent(last)}`);
+        return;
+      }
       const saved = JSON.parse(raw) as { id: string; q: string; at: number };
       if (Date.now() - saved.at > 20 * 60 * 1000) { localStorage.removeItem("ai-job"); return; }
       setQ(saved.q); setBusy(true); setStatus("Still working on it…"); void follow(saved.id);
@@ -113,6 +119,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
           <input id="q" type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Describe the bag in your own words" autoComplete="off" aria-label="Your question" disabled={busy} />
           <button type="submit" disabled={busy || !q.trim()}>{busy ? "thinking" : "appreciate"}</button>
         </form>
+        {done && !busy && <p className="clearask"><button type="button" onClick={() => { try { localStorage.removeItem("ai-last"); window.history.replaceState(null, "", "/"); } catch {} setDone(null); setQ(""); setPhoto(null); }}>clear this search</button></p>}
         {!busy && <PhotoDrop horizon={h} disabled={busy} onAsk={(question, preview) => { setPhoto(preview ?? null); setQ(question); ask(question); }} />}
         {!done && !busy && (
           <>

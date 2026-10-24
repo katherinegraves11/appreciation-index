@@ -538,3 +538,7 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 
 /* About: intro lines centered under their headings */
 .about .asub{text-align:center;margin-inline:auto;max-width:72ch}
+
+/* clear this search */
+.clearask{text-align:center;margin:6px 0 0}
+.clearask button{font:inherit;font-size:15px;background:none;border:0;color:var(--ink-3);text-decoration:underline;cursor:pointer}
