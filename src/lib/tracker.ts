@@ -341,6 +341,7 @@ export type QuickNumbers = {
   sell: { retail: number; retail_spec: string; median_sold: number; mean_sold: number; prices: number[]; n: number; window_days: number; matched_on: string; lo: number; hi: number; read_from: string; read_to: string; pristine: number; plain: boolean } | null;
   asks: { median_ask: number; n: number; sold: number; trr_n: number; fwrd_n: number; fwrd_median: number | null; venue: string; link: string | null; link_label: string } | null;
   tiers: PriceTiers;
+  catalog: CatalogHit;
   forward: Forward;
   paths: Paths;
   trend: { term: string | null; years: { year: string; avg: number }[]; auction: string | null; resale: string | null; moments: Moment[] } | null;
@@ -388,6 +389,37 @@ function modelMatch(col: string, bag: string, house?: string): { sql: string; pa
 }
 /** Shapes the houses have made for decades: the fallback when the bags table has no launch year. */
 const ICONS = /\b(birkin|kelly|constance|bolide|picotin|evelyne|lindy|garden party|classic flap|2\.55|reissue|boy|lady dior|saddle|baguette|peekaboo|speedy|neverfull|alma|keepall|capucines|jackie|bamboo|horsebit|dionysus|galleria|cabat|luggage|classic box|triomphe|sac de jour|city|puzzle|margaux)\b/;
+/** Our own catalogue (Katie, 2026-10-24): the house's own US price for this bag, from the product pages we have read.
+ *  Used only when the model matches and, if the question names a material or colour, at least one of them matches too. */
+export type CatalogHit = { price: number; name: string; url: string; date: string; site: string } | null;
+export function catalogMatch(house: string, bag: string, spec?: string): CatalogHit {
+  const db = open(); if (!db) return null;
+  try {
+    const rows = db.prepare(`select c.model, c.material, c.colour, c.price_now, c.last_seen, c.source_url, (select notes from retail_availability_reads r where r.house=c.house and r.reference=c.reference order by read_date desc limit 1) notes
+      from v_house_catalog c where ${likeAny("c.house", houseTerms(house))} and c.price_now is not null`).all(...likeParams(houseTerms(house))) as Row[];
+    const stop = new Set(["bag", "bags", "the", "and", "with", "handbag", "small", "medium", "large", "mini", "maxi"]);
+    const houseWords = new Set(norm(house).split(" "));
+    const toks = norm(bag).split(" ").filter((w) => !stop.has(w) && !houseWords.has(w));
+    const alphaW = toks.filter((w) => w.length > 2 && !/^\d+$/.test(w));
+    const modelWords = alphaW.length ? alphaW : toks.filter((w) => /^\d+$/.test(w));
+    const specWords = norm(spec ?? "").split(" ").filter((w) => w.length > 2 && !stop.has(w));
+    const sizeWord = norm(`${bag} ${spec ?? ""}`).match(/\b(mini|small|medium|large|maxi)\b/)?.[1] ?? null;
+    let best: { r: Row; score: number } | null = null;
+    for (const r of rows) {
+      const model = norm(String(r.model ?? "")); const fin = norm(`${r.material ?? ""} ${r.colour ?? ""} ${r.notes ?? ""}`);
+      if (!modelWords.length || !modelWords.every((w) => model.includes(w))) continue;
+      if (sizeWord && !model.includes(sizeWord)) continue;
+      const score = specWords.filter((w) => fin.includes(w)).length;
+      // most of the described finish must match, or it is a different bag: never borrow a price on one shared word
+      if (specWords.length && score < Math.max(1, Math.ceil(specWords.length * 0.6))) continue;
+      if (!best || score > best.score) best = { r, score };
+    }
+    if (!best) return null;
+    const url = String(best.r.source_url ?? "");
+    return { price: Number(best.r.price_now), name: String(best.r.notes ?? best.r.model).split(";")[0], url, date: String(best.r.last_seen), site: (url.match(/https?:\/\/(?:www\.)?([^/]+)/)?.[1] ?? "the house's site") };
+  } catch { return null; } finally { db.close(); }
+}
+
 export function quickNumbers(house: string, bag: string, spec?: string, notes?: string | null): QuickNumbers | null {
   const db = open(); if (!db) return null;
   const hTerms = houseTerms(house); const mm = modelMatch("model", bag, house); const mg = modelMatch(trrModelCol(bag), bag, house); const bagTerm = norm(bag).split(" ").filter((w) => w.length > 2)[0] ?? norm(bag);
@@ -403,9 +435,10 @@ export function quickNumbers(house: string, bag: string, spec?: string, notes?: 
   const sell = sellNow(house, bag, spec);
   const tiers = priceTiers(house, bag, spec);
   const forward = (() => { try { return forwardRead(house, bag, sell ? { prices: sell.prices, retailNow: sell.retail, plain: sell.plain } : null); } catch { return null; } })();
-  const retailNow = (rc?.retail_now as number) ?? null, retailSize = (rc?.size_or_spec as string) ?? null;
+  const cat = catalogMatch(house, bag, spec);
+  const retailNow = cat?.price ?? (rc?.retail_now as number) ?? null, retailSize = cat ? `${cat.name}, ${cat.site}, read ${cat.date}` : ((rc?.size_or_spec as string) ?? null);
   return {
-    retail_now: (rc?.retail_now as number) ?? null, retail_launch: (launch?.price as number) ?? null, retail_size: (rc?.size_or_spec as string) ?? null,
+    retail_now: retailNow, retail_launch: (launch?.price as number) ?? null, retail_size: retailSize, catalog: cat,
     ask_median: (ask?.m as number) ?? null, ask_n: (ask?.n as number) ?? 0,
     sold_median: (sold?.m as number) ?? null, sold_n: (sold?.n as number) ?? 0, sold_pct_of_retail: (sold?.p as number) ?? null,
     saves_avg: (trr?.saves as number) ?? null, trend_pct: trend?.a0 && trend?.a1 ? Math.round((((trend.a1 as number) - (trend.a0 as number)) / (trend.a0 as number)) * 1000) / 10 : null,
