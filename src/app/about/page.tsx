@@ -11,6 +11,15 @@ export default function About() {
           <div className="abox"><h4>Keep ten years?</h4><p>If you kept it ten years or more.</p><p className="when"><b>Yes when</b> it&apos;s a shape the house has made for decades, with a price history to prove it.</p></div>
           <div className="abox"><h4>Just to wear?</h4><p>If you bought it to use.</p><p className="when"><b>Yes</b> almost always. If a boutique price rise is near, buy before it.</p></div>
         </div>
+        <h3 className="ah">My bags and the sell sun</h3>
+        <p className="asub">Tap <b>I&apos;m buying it</b> on any answer and add what you paid. The bag moves to My bags, kept on this device. Every time you open My bags we compare what the bag sells for today, after a typical resale fee, with what you paid, and check which way its trends point in the daily reads: searches, the boutique&apos;s price rises, secondhand asking prices and auction results. The sun shows where that leaves you.</p>
+        <div className="abox4">
+          <div className="abox"><h4>Sunrise</h4><p>Hold. It is still climbing.</p><p className="when"><b>When</b> its trends point up.</p></div>
+          <div className="abox"><h4>Midday</h4><p>Steady. Keep wearing it.</p><p className="when"><b>When</b> trends are flat or mixed, and you are less than 20% up after fees.</p></div>
+          <div className="abox"><h4>Golden hour</h4><p>Worth watching.</p><p className="when"><b>When</b> you would keep 20% or more than you paid after fees, and trends are no longer rising.</p></div>
+          <div className="abox"><h4>Sunset</h4><p>Time to consider selling.</p><p className="when"><b>When</b> trends point down and you would at least break even, or you would keep 50% or more than you paid and trends are no longer rising.</p></div>
+        </div>
+        <p className="asub">A read on today&apos;s numbers, not a promise. Condition matters most: a bag kept as new, with its box and receipt, sells for more.</p>
         <h3 className="ah">The dial <span className="dim">(1 · 5 · 10 years)</span></h3>
         <p className="asub">One year is the market this month. Ten years is what lasts. The question, the answer and the mood follow the dial.</p>
         <div className="abox4">
