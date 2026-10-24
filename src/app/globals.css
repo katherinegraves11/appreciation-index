@@ -535,3 +535,6 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 .sunword{font-family:var(--serif);font-size:24px;margin:0;line-height:1.1}
 .sunrow.sunrise .sunword{color:#d9708f}.sunrow.midday .sunword{color:#c9962a}.sunrow.golden .sunword{color:#e0702f}.sunrow.sunset .sunword{color:#9a4a8a}
 .sunline{margin:4px 0 0;font-size:16px;line-height:1.45;color:var(--ink-2)}
+
+/* About: intro lines centered under their headings */
+.about .asub{text-align:center;margin-inline:auto;max-width:72ch}
