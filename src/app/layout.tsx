@@ -22,9 +22,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <HorizonProvider>
           <div className="page">
             <header className="mast">
-              <nav><Link href="/">Ask</Link><Link href="/browse">Browse</Link><Link href="/bags">My bags</Link><Link href="/race">The race</Link><Link href="/trends">Trends</Link><Link href="/about">About</Link></nav>
+              <nav><Link href="/">Ask</Link><Link href="/bags">My bags</Link><Link href="/about">About</Link></nav>
               <Link href="/" className="wordmark">Appr<i>e</i>ciation</Link>
-              <div className="right"><Link href="/briefs">Journal</Link><Link href="/classic">Analyst</Link></div>
+              <div className="right"></div>
             </header>
             <div className="rule" />
             <Ticker />

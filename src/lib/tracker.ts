@@ -7,7 +7,7 @@
  * to skip (the analyst then researches from the web only and says so).
  */
 import { DatabaseSync } from "node:sqlite";
-import { connectiveLines, forwardRead, forwardLines, type Forward } from "./trends";
+import { connectiveLines, forwardRead, forwardLines, bagTrend, type Forward } from "./trends";
 import fs from "fs";
 import path from "path";
 
@@ -342,6 +342,7 @@ export type QuickNumbers = {
   asks: { median_ask: number; n: number; sold: number; trr_n: number; fwrd_n: number; fwrd_median: number | null; venue: string; link: string | null; link_label: string } | null;
   tiers: PriceTiers;
   forward: Forward;
+  trend: { term: string | null; years: { year: string; avg: number }[]; auction: string | null; resale: string | null } | null;
 };
 /** Katie's rule: the boutique price is the only absolute price; every secondhand figure is an average.
  *  Secondhand websites (sold and asked) and the private sourcer market (where the sourcer sets the price) are kept apart. */
@@ -391,6 +392,7 @@ export function quickNumbers(house: string, bag: string, spec?: string): QuickNu
     links: bagLinks(house, bag),
     path: pricePath(house, bag),
     sell,
+    trend: (() => { try { const t = bagTrend(house, bag); return { term: t.term, years: t.search?.byYear ?? [], auction: t.auction?.plain ?? (t.auction ? `Too early to say: ${t.auction.n} of ${t.auction.need} auction sales.` : null), resale: t.resale ? (t.resale.plain ?? `Too early to say: ${t.resale.n} of ${t.resale.need} daily reads.`) : null }; } catch { return null; } })(),
     forward: (() => { try { return forwardRead(house, bag, sell ? { prices: sell.prices, retailNow: sell.retail, plain: sell.plain } : null); } catch { return null; } })(),
     tiers: priceTiers(house, bag, spec),
     asks: asksNow(house, bag, spec),

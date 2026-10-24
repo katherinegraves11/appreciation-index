@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies, headers } from "next/headers";
 import { listBriefs } from "@/lib/db";
 import BagPlate from "@/components/BagPlate";
 import { toSignals } from "@/lib/cards";
@@ -17,7 +18,10 @@ const W: Record<string, string> = { yes: "Yes", no: "No", wait: "Not yet" };
 
 /** My bags: every bag the book has answered on, newest first. (A per-user closet with owned / watching comes with sign-in.) */
 export default async function Bags() {
-  const briefs = await listBriefs();
+  // Per device until sign-in: only answers asked from this browser. Katie's own machine (localhost) sees every answer.
+  const mine = new Set(((await cookies()).get("mybags")?.value ?? "").split(",").filter(Boolean));
+  const local = /^(localhost|127\.0\.0\.1)(:|$)/.test((await headers()).get("host") ?? "");
+  const briefs = (await listBriefs(local ? 50 : 300)).filter((b) => local || mine.has(b.id));
   const seen = new Set<string>();
   const rows = briefs.filter((b) => { const k = `${b.house}|${b.bag}`.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
   return (
@@ -25,7 +29,7 @@ export default async function Bags() {
       <section className="bookhead">
         <p className="lab">my bags · {rows.length} answered</p>
         <h1 className="vh"><span className="h1txt">What needs a decision <i>this month.</i></span><span className="h5h10txt">What to <i>simply keep.</i></span></h1>
-        <p className="hint">Every bag you have asked about, with its four signals. Ask about a new one from the home page.</p>
+        <p className="hint">Every bag you have asked about on this device, with its four answers. Ask about a new one from the home page.</p>
       </section>
       <div className="bags">
         {rows.map((b) => {

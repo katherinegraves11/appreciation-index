@@ -210,8 +210,29 @@ export default function Answer({ result, bagName, briefId, numbers, photo }: { r
                 )}
               </article>
             );
+            const f = n?.forward; const tr = n?.trend;
+            const LEANW: Record<string, string> = { rising: "rising", cooling: "cooling", mixed: "mixed", steady: "flat" };
+            const headingCard = f && f.signals.length > 0 ? (
+              <article className={`ecard ${f.lean === "rising" ? "strong" : f.lean === "cooling" ? "weak" : "mixed"}`}>
+                <header><h4><Glyph kind="anchor" />Where it&apos;s heading</h4><span className="stamp">{LEANW[f.lean]}</span></header>
+                <p className="h"><b>{f.lean === "rising" ? "Trends point up" : f.lean === "cooling" ? "Trends point down" : f.lean === "mixed" ? "Trends pull both ways" : "Trends are flat"}{f.confidence === "low" ? ", an early read" : ""}.</b></p>
+                {f.nextBoutique && <p className="so">On its current pace the boutique price reaches about {money(f.nextBoutique.price)} by {f.nextBoutique.date}.</p>}
+                <details>
+                  <summary><Glyph kind="proof" />the trend lines</summary>
+                  <ul>
+                    {f.signals.map((s) => <li key={s.name}><b>{s.name} {s.dir}.</b> {s.evidence}.</li>)}
+                    {tr?.years && tr.years.length > 1 && <li><b>Searches by year.</b> {tr.years.map((y) => `${y.year}: ${y.avg}`).join(" · ")} (US Google, each bag scaled to its own peak of 100).</li>}
+                    {tr?.auction && <li><b>Searches and auction prices.</b> {tr.auction}</li>}
+                    {tr?.resale && <li><b>Searches and resale.</b> {tr.resale}</li>}
+                    {f.bands && <li><b>Resale on current trends.</b> {f.bands.map((b) => `${b.y} year${b.y === 1 ? "" : "s"}: ${money(b.lo)} to ${money(b.hi)}`).join(" · ")}{n?.sell?.plain ? ", any leather" : ""}.</li>}
+                  </ul>
+                  <p className="bz-read">A forecast from today&apos;s trends, not a promise. Confidence rises when three or more signals agree.</p>
+                </details>
+              </article>
+            ) : null;
             return (
               <div className="ecards">
+                {headingCard}
                 {cultureCard}
                 {cards.filter((c) => c.key !== "buy" && c.key !== "culture").map((c) => {
               const [proof, ...more] = c.evidence;

@@ -14,6 +14,15 @@ const EXAMPLES = [
   "Is the Chanel pony hair bag worth buying right now?",
 ];
 
+/** My bags is per device until there is sign-in: the ids of answers asked here live in a cookie the server reads. */
+function rememberBag(id: string) {
+  try {
+    const cur = (document.cookie.match(/(?:^|; )mybags=([^;]*)/)?.[1] ?? "").split(",").filter(Boolean);
+    const next = [id, ...cur.filter((x) => x !== id)].slice(0, 60).join(",");
+    document.cookie = `mybags=${next}; path=/; max-age=31536000; samesite=lax`;
+  } catch { /* cookies blocked: My bags simply stays empty */ }
+}
+
 export type Done = { result: BriefResult; id: string; bagName: string; numbers: QuickNumbers | null; cached?: boolean; answeredAt?: string };
 
 export default function Ask({ initial = null }: { initial?: Done | null }) {
@@ -40,6 +49,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
     if (evt.error) { setError(evt.error); return true; }
     if (evt.clarification) { setError(evt.clarification); return true; }
     if (evt.done && evt.result && evt.input && evt.id) {
+      rememberBag(evt.id);
       setDone({ result: evt.result, id: evt.id, bagName: `${evt.input.house} · ${evt.input.bag}${evt.input.spec ? ` · ${evt.input.spec}` : ""}`, numbers: evt.numbers ?? null, cached: !!evt.cached, answeredAt: evt.answered_at });
       return true;
     }
