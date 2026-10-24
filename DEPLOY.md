@@ -18,6 +18,8 @@ repo, gives a persistent disk for the tracker copy and saved briefs, and costs a
      Trends page and the connective-tissue lines use). Without it those lines say there is no search history.
    - optional spend caps: `ASK_DAILY_PER_VISITOR` (default 12), `ASK_DAILY_TOTAL` (60), `ASK_MAX_RUNNING` (3),
      `IDENTIFY_DAILY_PER_VISITOR` (40). Also set a monthly spend limit in the Anthropic console; that is the hard stop.
+   - `PUBLIC_API_KEY` — a long random string; turns on the partner API at `/api/v1/` (for a Lovable front end). Leave it unset and the API stays off.
+   - `HIDE_PRIVATE` is already set to 1 in the Dockerfile: Katie's own sourcer quotes and private decks never show on the deployed site or through the API.
    - optional `BAGINDEX_MODEL` (defaults to claude-opus-5).
 5. Service → Settings → Networking → Generate domain. The first build takes about ten minutes.
 6. Open the URL, enter the access code, ask one question end to end before sending it to anyone.
@@ -29,3 +31,15 @@ and survive redeploys.
 
 ## What is never deployed
 The private decks, `.data`, `.env*`, and the Desktop database file itself (see `.dockerignore`).
+
+## Connecting a Lovable front end
+The tool stays the brain (tracker, scans, answers); Lovable can be a second face. Lovable calls the partner API from its own server-side functions, with the key stored in Lovable's secrets, never in the browser.
+
+| Call | What it does |
+|---|---|
+| `GET /api/v1/houses` | The houses the tool covers |
+| `POST /api/v1/ask` with `{"question": "...", "horizon": 1}` | Starts an answer; returns `{"job": "<id>"}`. Takes about three minutes |
+| `GET /api/v1/ask?job=<id>&since=<n>` | Progress lines, then a final event with `result`, `input` and `numbers` |
+| `GET /api/v1/answer?id=<answer id>` | A saved answer with today's numbers |
+
+Every call sends `Authorization: Bearer <PUBLIC_API_KEY>`. Answers carry only public, sourced data. The same spend caps apply as on the site.

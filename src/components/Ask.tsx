@@ -75,7 +75,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
   async function ask(question: string, fresh = false, force = false) {
     if (!question.trim() || (busy && !force)) return;
     setBusy(true); setError(null); setDone(null); setStatus("Reading your question…");
-    try { window.history.replaceState(null, "", "/"); } catch { /* the address is cosmetic */ }
+    try { localStorage.removeItem("ai-last"); window.history.replaceState(null, "", "/"); } catch { /* the address is cosmetic */ }
     try {
       const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question, horizon: h, fresh }) });
       const j = (await res.json().catch(() => ({}))) as { job?: string; error?: string };
@@ -120,7 +120,7 @@ export default function Ask({ initial = null }: { initial?: Done | null }) {
           <button type="submit" disabled={busy || !q.trim()}>{busy ? "thinking" : "appreciate"}</button>
         </form>
         {done && !busy && <p className="clearask"><button type="button" onClick={() => { try { localStorage.removeItem("ai-last"); window.history.replaceState(null, "", "/"); } catch {} setDone(null); setQ(""); setPhoto(null); }}>clear this search</button></p>}
-        {!busy && <PhotoDrop horizon={h} disabled={busy} onAsk={(question, preview) => { setPhoto(preview ?? null); setQ(question); ask(question); }} />}
+        {!busy && <PhotoDrop horizon={h} disabled={busy} onNewPhoto={() => { try { localStorage.removeItem("ai-last"); window.history.replaceState(null, "", "/"); } catch {} setDone(null); setError(null); }} onAsk={(question, preview) => { setPhoto(preview ?? null); setQ(question); ask(question); }} />}
         {!done && !busy && (
           <>
             <p className="hint"><span className="h1txt">Ask about any bag. We say whether to buy it now, and why.</span><span className="h5h10txt">Ask about any bag. We say whether it will be worth more, and why.</span> <a href="/about">How we decide</a></p>

@@ -17,7 +17,7 @@ async function shrink(file: File, max = 1024): Promise<string> {
   } finally { URL.revokeObjectURL(url); }
 }
 
-export default function PhotoDrop({ onAsk, disabled, horizon }: { onAsk: (question: string, preview?: string | null) => void; disabled?: boolean; horizon: 1 | 5 | 10 }) {
+export default function PhotoDrop({ onAsk, onNewPhoto, disabled, horizon }: { onAsk: (question: string, preview?: string | null) => void; onNewPhoto?: () => void; disabled?: boolean; horizon: 1 | 5 | 10 }) {
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -32,6 +32,7 @@ export default function PhotoDrop({ onAsk, disabled, horizon }: { onAsk: (questi
     try {
       const image = await shrink(file);
       setPreview(image);
+      onNewPhoto?.();
       const res = await fetch("/api/identify", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ image }) });
       const j = (await res.json()) as Id & { error?: string };
       if (!res.ok || j.error) throw new Error(j.error || "Couldn't read that photo.");

@@ -538,7 +538,8 @@ export function priceTiers(house: string, bag: string, spec?: string): PriceTier
     material, size,
     sites_asks: a ? { ...a, sources: [...new Set(asks.map((x) => NAME[x.src] ?? x.src))], matched: [size ? `size ${size}` : "", material ? material : "any leather"].filter(Boolean).join(", ") } : null,
     sourcer_sold: (() => { const k = placed.filter((r) => keep(String(r.title))); const a2 = avg(k.map((r) => Number(r.price))); return a2 ? { ...a2, sources: [...new Set(k.map((r) => NAME[String(r.source)] ?? String(r.source)))], ranges: k.map((r) => String(r.title).match(/realized (\$[0-9,]+\s*[–-]\s*\$[0-9,]+)/i)?.[1]).filter((x): x is string => !!x) } : null; })(),
-    private_quotes: pq ? { ...pq, prices: priv.filter((r) => keep(String(r.title))).map((r) => Number(r.price)) } : null,
+    // Katie's own sourcer quotes are private: never shown on a deployed site (HIDE_PRIVATE=1) or through the API
+    private_quotes: pq && process.env.HIDE_PRIVATE !== "1" ? { ...pq, prices: priv.filter((r) => keep(String(r.title))).map((r) => Number(r.price)) } : null,
   };
 }
 
