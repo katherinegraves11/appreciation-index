@@ -542,3 +542,8 @@ pre.dossier{white-space:pre-wrap;font-size:13px;line-height:1.5;background:var(-
 /* clear this search */
 .clearask{text-align:center;margin:6px 0 0}
 .clearask button{font:inherit;font-size:15px;background:none;border:0;color:var(--ink-3);text-decoration:underline;cursor:pointer}
+
+/* condition now, on My bags */
+.condnow{display:flex;gap:10px;align-items:center;justify-content:center;font-size:15px;color:var(--ink-2);margin:8px 0 0}
+.condnow select{font:inherit;font-size:15px;padding:4px 8px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.openit{margin:8px 0 0;text-align:center;font-size:15px}

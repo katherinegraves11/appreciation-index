@@ -59,7 +59,7 @@ export default function About() {
           <div className="abox"><h4>Golden hour</h4><p>Worth watching.</p><p className="when"><b>When</b> you would keep 20% or more than you paid after fees, and trends are no longer rising.</p></div>
           <div className="abox"><h4>Sunset</h4><p>Time to consider selling.</p><p className="when"><b>When</b> you would keep double what you paid after fees, whatever the trends; or you would keep 50% more and trends are no longer rising; or trends point down and you would at least break even.</p></div>
         </div>
-        <p className="asub">A read on today&apos;s numbers, not a promise. Condition matters most: a bag kept as new, with its box and receipt, sells for more.</p>
+        <p className="asub">Condition matters most. On My bags you can set each bag&apos;s condition now, and its resale estimate and sun change with it. From sold listings on The RealReal: against a bag carried with care, a never-carried Hermès sells for about 24% more; a scuff or light wear, about 19% less; a stain or visible wear, about 37% less; heavy wear, about half. For other houses the steps are similar. A read on today&apos;s numbers, not a promise.</p>
 
         <div className="abox2">
           <div className="abox"><h4>Ask by photo</h4><p>Drop a photo or a listing screenshot. We name the bag, you confirm, and the answer runs. Photos are read once and not kept.</p></div>

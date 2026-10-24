@@ -108,3 +108,7 @@ export async function listBriefs(limit = 50): Promise<Pick<BriefRecord, "id" | "
     .map((f) => JSON.parse(fs.readFileSync(path.join(DATA_DIR, f), "utf8")) as BriefRecord);
   return records.sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, limit);
 }
+
+/** Answers written before this moment are never reused for a new question (they predate the latest rules and data corrections).
+ *  Move it forward whenever the rules or a tracker correction change what an answer should say. Old answers still open by link. */
+export const CACHE_EPOCH = Date.parse("2026-10-24T03:00:00Z");
