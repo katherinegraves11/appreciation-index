@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { anthropic, RESEARCH_MODEL } from "./anthropic";
+import { anthropic, RESEARCH_MODEL, FAST } from "./anthropic";
 import { ANALYST_SYSTEM, researchPrompt } from "./rubric";
 import { buildTrackerDossier, buzzDossier, collectionDossier, headlineNumbers, ownershipDossier, pestelDossier } from "./tracker";
 import type { BriefInput } from "./schema";
@@ -36,6 +36,15 @@ export async function runResearch(
   });
   const sources = new Map<string, Source>();
   const usage = { input_tokens: 0, output_tokens: 0 };
+  // Fast path: our own scans already hold this bag's prices, sales, trends and house news, so skip the web passes.
+  if (FAST && tracker.available && head && tracker.rowCount >= 20) {
+    onProgress?.("Weighing it up…");
+    return { dossier: `${tracker.text}
+
+## WEB RESEARCH DOSSIER
+
+(Skipped: the tracker covers this bag. Use only the tracker sections above, and cite them as the tracker with their dates.)`, sources: [], usage, trackerRows: tracker.rowCount };
+  }
   let searches = 0;
 
   // Two passes run at the same time: A = the money and the house (headings 1–5), B = the designer, the culture, the world (6–9).

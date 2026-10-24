@@ -1,5 +1,5 @@
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
-import { anthropic, MODEL } from "./anthropic";
+import { anthropic, MODEL, FAST } from "./anthropic";
 import { ANALYST_SYSTEM, COHORT_LABELS, LAYERS, SCORING_INSTRUCTIONS } from "./rubric";
 import { BriefResult } from "./schema";
 import type { BriefInput } from "./schema";
@@ -17,7 +17,7 @@ export async function runScoring(input: BriefInput, dossier: string) {
     max_tokens: 16000,
     system: [{ type: "text" as const, text: ANALYST_SYSTEM, cache_control: { type: "ephemeral" as const } }],
     thinking: { type: "adaptive" as const },
-    output_config: { effort: "medium" as const, format: zodOutputFormat(BriefResult) },
+    output_config: { effort: (FAST ? "low" : "medium") as "low" | "medium", format: zodOutputFormat(BriefResult) },
     messages: [
       {
         role: "user" as const,
