@@ -300,7 +300,7 @@ export function forwardRead(house: string, model: string, sold?: { prices: numbe
 }
 
 export function forwardLines(f: Forward): string[] {
-  if (!f) return [];
+  if (!f || !f.signals.length) return [];
   const out = [`FORWARD LEAN: ${f.lean.toUpperCase()}, confidence ${f.confidence} (${f.signals.length} forward signal${f.signals.length === 1 ? "" : "s"}; medium needs three agreeing, never high without a backtest).`];
   for (const s of f.signals) out.push(`${s.name}: ${s.dir}. ${s.evidence}.`);
   if (f.bands) out.push(`Projected resale range (middle half): ${f.bands.map((b) => `${b.y} year${b.y === 1 ? "" : "s"} $${b.lo.toLocaleString()} to $${b.hi.toLocaleString()} (middle $${b.mid.toLocaleString()})`).join("; ")}. Basis: ${f.bandsNote}`);

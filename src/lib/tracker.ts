@@ -347,7 +347,7 @@ export type QuickNumbers = {
 /** Katie's rule: the boutique price is the only absolute price; every secondhand figure is an average.
  *  Secondhand websites (sold and asked) and the private sourcer market (where the sourcer sets the price) are kept apart. */
 export type Avg = { mean: number; median: number; n: number; lo: number; hi: number };
-export type PriceTiers = { material: string | null; size: string | null; sites_asks: (Avg & { sources: string[]; matched: string }) | null; sourcer_sold: (Avg & { sources: string[] }) | null; private_quotes: (Avg & { prices: number[] }) | null } | null;
+export type PriceTiers = { material: string | null; size: string | null; sites_asks: (Avg & { sources: string[]; matched: string }) | null; sourcer_sold: (Avg & { sources: string[]; ranges: string[] }) | null; private_quotes: (Avg & { prices: number[] }) | null } | null;
 /** SQL fragment + params requiring every meaningful word of the bag name to appear in a column (no first-word guessing). */
 /** TRR model column for a bag: model_guess, plus the title when the bag is a Hermès sub-model (TRR tags a Kelly Cut as "Kelly"). */
 function trrModelCol(bag: string): string {
@@ -481,7 +481,7 @@ export function priceTiers(house: string, bag: string, spec?: string): PriceTier
   return {
     material, size,
     sites_asks: a ? { ...a, sources: [...new Set(asks.map((x) => NAME[x.src] ?? x.src))], matched: [size ? `size ${size}` : "", material ? material : "any leather"].filter(Boolean).join(", ") } : null,
-    sourcer_sold: (() => { const k = placed.filter((r) => keep(String(r.title))); const a2 = avg(k.map((r) => Number(r.price))); return a2 ? { ...a2, sources: [...new Set(k.map((r) => NAME[String(r.source)] ?? String(r.source)))] } : null; })(),
+    sourcer_sold: (() => { const k = placed.filter((r) => keep(String(r.title))); const a2 = avg(k.map((r) => Number(r.price))); return a2 ? { ...a2, sources: [...new Set(k.map((r) => NAME[String(r.source)] ?? String(r.source)))], ranges: k.map((r) => String(r.title).match(/realized (\$[0-9,]+\s*[–-]\s*\$[0-9,]+)/i)?.[1]).filter((x): x is string => !!x) } : null; })(),
     private_quotes: pq ? { ...pq, prices: priv.filter((r) => keep(String(r.title))).map((r) => Number(r.price)) } : null,
   };
 }
@@ -499,7 +499,7 @@ export function headlineNumbers(house: string, bag: string, spec?: string): stri
   {
     const t = n.tiers; const parts: string[] = [];
     parts.push(`(1) Boutique price, the only absolute price: ${n.retail_now ? `$${n.retail_now}${n.retail_size ? ` (${n.retail_size})` : ""}` : "not in our records"}.`);
-    parts.push(`(2) Secondhand websites, averages: ${n.sell ? `sold, average $${n.sell.mean_sold} (median $${n.sell.median_sold}) across ${n.sell.n} sold listings${n.sell.plain ? ", plain leather, not the one asked about" : ""}` : "no matching sold listings"}; ${t?.sites_asks ? `${t?.sourcer_sold ? `sold through secondhand sourcers (marked placed or sold out, at their listed price), average $${t.sourcer_sold.mean} across ${t.sourcer_sold.n}, from ${t.sourcer_sold.sources.join(", ")}; ` : ""}asking, average $${t.sites_asks.mean} (median $${t.sites_asks.median}, $${t.sites_asks.lo} to $${t.sites_asks.hi}) across ${t.sites_asks.n} listings matched on ${t.sites_asks.matched}, from ${t.sites_asks.sources.join(", ")}` : "no matching asks"}.`);
+    parts.push(`(2) Secondhand websites, averages: ${n.sell ? `sold, average $${n.sell.mean_sold} (median $${n.sell.median_sold}) across ${n.sell.n} sold listings${n.sell.plain ? ", plain leather, not the one asked about" : ""}` : "no matching sold listings"}; ${t?.sites_asks ? `${t?.sourcer_sold ? `sold through secondhand sourcers (marked placed or sold out, at their listed price), average $${t.sourcer_sold.mean} across ${t.sourcer_sold.n}, from ${t.sourcer_sold.sources.join(", ")}${t.sourcer_sold.ranges.length ? ` (stated as a range, so quote the range, never the midpoint: ${t.sourcer_sold.ranges.join("; ")})` : ""}; ` : ""}asking, average $${t.sites_asks.mean} (median $${t.sites_asks.median}, $${t.sites_asks.lo} to $${t.sites_asks.hi}) across ${t.sites_asks.n} listings matched on ${t.sites_asks.matched}, from ${t.sites_asks.sources.join(", ")}` : "no matching asks"}.`);
     parts.push(`(3) Private sourcer market (the sourcer sets the price; willingness to pay runs higher): ${t?.private_quotes ? `average $${t.private_quotes.mean} across ${t.private_quotes.n} logged quote${t.private_quotes.n === 1 ? "" : "s"}${t.private_quotes.n < 3 ? ", too few to call an average" : ""}` : "no logged quotes for this bag"}.`);
     lines.push(`THREE PRICES: ${parts.join(" ")} Say every secondhand figure as an average with its count ("averages $21,300 across 25 sold listings"); never call a secondhand figure "the price".`);
   }
